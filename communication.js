@@ -1,4 +1,4 @@
-let socket = new WebSocket("127.0.0.1", 8080);
+let socket = new WebSocket("ws://0.0.0.0:8888/");
 
 connection.onopen = () => {
 	console.log('OPEN')

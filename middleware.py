@@ -22,7 +22,7 @@ async def middleware(websocket, path):
         await websocket.send(result)
         print()
 
-
-asyncio.get_event_loop().run_until_complete(
-    websockets.serve(middleware, 'localhost', 8888))
-asyncio.get_event_loop().run_forever()
+if __name__ == '__main__':
+	loop = asyncio.get_event_loop()
+	loop.run_until_complete(websockets.serve(middleware, 'localhost', 8888))
+	loop.run_forever()

@@ -1,31 +1,22 @@
-import tornado
-import tornado.websocket
-from tornado.options import define, options
+import asyncio
+import websockets
 
-clients = []
+COMMAND = 'python c_program.py'
 
-class Handler(tornado.websocket.WebSocketHandler):
-	def open(self):
-		if self not in clients:
-			clients.append(self)
-		print('New connection.')
+async def generate_simulation(command, data):
+    process = await asyncio.create_subprocess_exec(*command.split(), stdin=asyncio.subprocess.PIPE, stdout=asyncio.subprocess.PIPE)
+    stdout, stderr = await process.communicate(input=bytes(data, encoding='utf-8'))
+    return stdout.decode().split('\n')[0]
 
-	def on_close(self):
-		if self in clients:
-			clients.remove(self)
-		print('Connection closed.')
 
-	def on_message(self, message):
-		print(f'Message: {message}')
+async def middleware(websocket, path):
+	async for message in websocket:
+		print(f'Input: {message}')
+		result = await generate_simulation(COMMAND, message)
+		print(f'Output: {result}')
+		await websocket.send(result)
+		print()
 
-	def check_origin(self, origin):
-		return True
 
-app = tornado.web.Application([
-	(r'/', Handler),
-])
-
-if __name__ == '__main__':
-	http_server = tornado.httpserver.HTTPServer(app)
-	http_server.listen(8888)
-	tornado.ioloop.IOLoop.instance().start()
+asyncio.get_event_loop().run_until_complete(websockets.serve(middleware, 'localhost', 8888))
+asyncio.get_event_loop().run_forever()

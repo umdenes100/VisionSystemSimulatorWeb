@@ -1,16 +1,12 @@
-import asyncio
+import asyncio import create_subprocess_exec, subprocess, get_event_loop
 import websockets
 
 COMMAND = 'python c_program.py'
 
 
 async def generate_simulation(command, data):
-    process = await asyncio.create_subprocess_exec(
-        *command.split(),
-        stdin=asyncio.subprocess.PIPE,
-        stdout=asyncio.subprocess.PIPE)
-    stdout, stderr = await process.communicate(
-        input=bytes(data, encoding='utf-8'))
+    process = await create_subprocess_exec(*command.split(), stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+    stdout, stderr = await process.communicate(input=bytes(data, encoding='utf-8'))
     return stdout.decode().split('\n')[0]
 
 
@@ -23,6 +19,6 @@ async def middleware(websocket, path):
         print()
 
 if __name__ == '__main__':
-	loop = asyncio.get_event_loop()
+	loop = get_event_loop()
 	loop.run_until_complete(websockets.serve(middleware, 'localhost', 8888))
 	loop.run_forever()

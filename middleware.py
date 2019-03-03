@@ -1,4 +1,4 @@
-import asyncio import create_subprocess_exec, subprocess, get_event_loop
+from asyncio import create_subprocess_exec, subprocess, get_event_loop
 import websockets
 
 COMMAND = 'python c_program.py'

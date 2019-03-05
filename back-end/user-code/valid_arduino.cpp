@@ -5,24 +5,34 @@ int wow = 3;
 
 char *string = "wowwowowowo";
 
+Tank tank;
+
 void setup() {
     pinMode(3, OUTPUT);
     digitalWrite(3, LOW);
     pinMode(4, INPUT);
     digitalRead(4);
     Serial.begin(9600);
+    tank.begin();
     delay(20);
 }
 
 void loop() {
     Serial.println("wow");
-    Enes.updateLocation();
-    Tank.setLeftMotorPWM(200);
+    Enes100.updateLocation();
+    tank.setLeftMotorPWM(200);
     for(int i = 0; i < 10; i++) {
-        Serial.println("wowee");
+        Serial.println(string);
     }
 }
 
-void function() {
+void function( int wow, char c) {
     return;
+}
+
+int main() {
+	setup();
+	while(1) {
+		loop();
+	}
 }

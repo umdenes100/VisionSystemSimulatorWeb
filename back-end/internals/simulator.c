@@ -140,6 +140,12 @@ void format(char *file_name) {
     fp = fopen(file_name, "a");
     fputs("\n\nint main() {\n\tsetup();\n\twhile(1) {\n\t\tloop();\n\t}\n}\n", fp);
 
+    for(i = 0; i < matches.n_matches; i++) {
+        free(matches.matches[i]);
+    }
+
+    free(matches.matches);
+
     fclose(fp);
 }
 

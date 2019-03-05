@@ -53,7 +53,7 @@ void format(char *file_name) {
 
     // [0-9A-Za-z_\\[\\]\\*]+[[:space:]]+[0-9A-Za-z_\\[\\]\\*]+[[:space:]]*\\(.*\\)
     // a regex can be used to search for functions.
-    char *function_pattern = "[0-9A-Za-z_\\[\\*]+]?[[:space:]]+[0-9A-Za-z_\\[\\*]+]?[[:space:]]*\\(.*\\)";
+    char *function_pattern = "[0-9A-Za-z_\\[\\*]+]?[[:space:]]+[0-9A-Za-z_]+[[:space:]]*\\(.*\\)";
     int r_return;
 
     regex_t regex;
@@ -61,7 +61,7 @@ void format(char *file_name) {
         error("Could not compile regex.");
     }
 
-    r_return = regexec(&regex, "int[]   \t mainnnnnnn__n(   )", 0, NULL, 0);
+    r_return = regexec(&regex, first_level_code, 0, NULL, 0);
     if(!r_return) {
         printf("Match\n");
     } else if(r_return == REG_NOMATCH) {

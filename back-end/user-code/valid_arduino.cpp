@@ -29,10 +29,3 @@ void loop() {
 void function( int wow, char c) {
     return;
 }
-
-int main() {
-	setup();
-	while(1) {
-		loop();
-	}
-}

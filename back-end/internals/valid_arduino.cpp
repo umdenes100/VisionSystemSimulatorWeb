@@ -1,5 +1,6 @@
 #include "Enes100.h"
 #include "Tank.h"
+#include <iostream>
 
 int wow = 3;
 
@@ -19,6 +20,7 @@ void setup() {
 
 void loop() {
     Serial.println("wow");
+    std::cout << "hello";
     Enes100.updateLocation();
     tank.setLeftMotorPWM(200);
     for(int i = 0; i < 10; i++) {

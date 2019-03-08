@@ -138,22 +138,20 @@ void create_dir(char *name) {
 }
 
 // this function is a debugging function which creates a string of the arduino code
-char* get_code() {
-    FILE *fp = fopen("valid_arduino.cpp", "r");
+char* get_input() {
     char *string = (char*)malloc(1 * sizeof(char));
     int n_characters = 0;
     string[n_characters] = '\0';
 
     char c;
 
-    while((c = fgetc(fp)) != EOF) {
+    while((c = getchar()) != EOF) {
         n_characters++;
         string = (char*)realloc(string, (n_characters + 1) * sizeof(char));
         string[n_characters] = '\0';
         string[n_characters - 1] = c;
     }
 
-    fclose(fp);
     return string;
 }
 
@@ -251,7 +249,7 @@ void free_match_list(struct match_list m) {
 int main(int argc, char* argv[]) {
     // first we need to create the environment
     char *CODE_FILE = "valid_arduino";
-    char *code = get_code();
+    char *input = get_input();
 
     // first we create the folder we will store info in
     create_dir(CODE_FILE);
@@ -260,8 +258,8 @@ int main(int argc, char* argv[]) {
     struct file_names files = get_file_names(CODE_FILE);
     
     // now we want to write the src into persistent memory with a main function
-    create_src_file(code, files.src);
-    free(code);
+    create_src_file(input, files.src);
+    free(input);
 
     // now we need to get the function declarations for the .h file
     struct match_list functions = get_function_declarations(files.src);

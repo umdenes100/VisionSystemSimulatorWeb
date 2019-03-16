@@ -8,7 +8,8 @@ RUN echo "Installing dependencies..." && \
     git \
     python3-pip \
     nano \
-    cmake
+    cmake \
+    lsof
 
 RUN echo "Installing cJSON..." && \
 	git clone https://github.com/DaveGamble/cJSON.git && \

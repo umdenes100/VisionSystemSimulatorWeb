@@ -1,13 +1,14 @@
 from asyncio import create_subprocess_exec, subprocess, get_event_loop
 import websockets
 
-COMMAND = 'python3 c_program.py'
+COMMAND = './randomization/randomize'
 
 
 async def generate_simulation(command, data):
 	process = await create_subprocess_exec(*command.split(), stdin=subprocess.PIPE, stdout=subprocess.PIPE)
-	stdout, stderr = await process.communicate(input=bytes(data, encoding='utf-8'))
-	return stdout.decode().split('\n')[0]
+	# stdout, stderr = await process.communicate(input=bytes(data, encoding='utf-8'))
+	stdout, stderr = await process.communicate()
+	return stdout.decode()
 
 
 async def middleware(websocket, path):

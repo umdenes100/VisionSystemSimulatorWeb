@@ -26,7 +26,7 @@ RUN echo "Installing cJSON..." && \
 COPY ./server /server
 
 RUN echo "Building randomization binary..." && \
-    make -C /server/src/randomization
+    make -C /server/randomization
 
 RUN pip3 install websockets
 

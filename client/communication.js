@@ -36,6 +36,8 @@ void function( int wow, char c) {
 }
 `
 
+console.log(request)
+
 connection.onopen = () => {
 	console.log('OPEN')
 	connection.send(request)

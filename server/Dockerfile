@@ -28,4 +28,4 @@ RUN pip3 install websockets
 
 WORKDIR /server
 
-CMD ["sleep", "infinity"]
+CMD ["python3", "-u", "middleware.py"]

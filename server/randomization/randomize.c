@@ -114,6 +114,11 @@ void randomize(void) {
 }
 
 int main() {
+    struct timeval time_for_seed;
+    gettimeofday(&time_for_seed, NULL);
+    unsigned long seed = time_for_seed.tv_usec * time_for_seed.tv_sec;
+    srand(seed);
+
     randomize();
     return 0;
 }

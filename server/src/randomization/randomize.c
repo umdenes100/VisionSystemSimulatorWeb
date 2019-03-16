@@ -112,3 +112,7 @@ void randomize(void) {
     }
     cJSON_Delete(root);
 }
+
+int main() {
+    return 0;
+}

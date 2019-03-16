@@ -3,8 +3,6 @@ services:
   client:
     container_name: nginx
     restart: always
-    volumes:
-      - "./client:/client"
     build:
       context: .
       dockerfile: ./client/Dockerfile
@@ -13,8 +11,6 @@ services:
   server:
     container_name: server
     restart: always
-    volumes:
-      - "./server:/server"
     build:
       context: .
       dockerfile: ./server/Dockerfile

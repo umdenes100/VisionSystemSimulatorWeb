@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include "../libraries/cJSON.h"
+#include <cjson/cJSON.h>
 
 #define PI 3.14159f
 #define OBSTACLE_WIDTH 0.2f

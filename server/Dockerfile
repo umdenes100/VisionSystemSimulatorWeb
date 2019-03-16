@@ -1,6 +1,10 @@
 FROM ubuntu:latest
 
-RUN echo "Installing dependencies." && \
+ENV CPATH /usr/include/
+ENV C_INCLUDE PATH /usr/include/
+ENV CPLUS_INCLUDE_PATH /usr/include/
+
+RUN echo "Installing dependencies..." && \
     apt -y --no-install-recommends update && \ 
     # apt -y --no-install-recommends upgrade && \
     apt install -y --no-install-recommends \
@@ -9,6 +13,20 @@ RUN echo "Installing dependencies." && \
     python3-pip \
     nano \
     cmake
+
+RUN echo "Installing cJSON..." && \
+	git clone https://github.com/DaveGamble/cJSON.git && \
+	cd cJSON && \
+	mkdir build && \
+	cd build && \
+	cmake .. -DENABLE_CJSON_UTILS=On -DENABLE_CJSON_TEST=Off -DCMAKE_INSTALL_PREFIX=/usr && \
+	make && \
+	make install
+
+COPY ./server /server
+
+RUN echo "Building randomization binary..." && \
+    make -C /server/src/randomization
 
 RUN pip3 install websockets
 

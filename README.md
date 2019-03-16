@@ -35,3 +35,22 @@ python -m http.server
 ```
 
 In order to see what the client is receiving, go to `localhost:8000`, right-click, click `Inspect Element` and then `Console`.
+
+
+## Docker
+
+To use, install Docker and open up a command prompt.
+
+Pop into the project working directory and run - 
+
+```bash
+docker-compose up -d
+```
+
+The image will build once and then run. It takes a while the first time but should be prompt for subsequent changes.
+
+In order to poke your head into the container and peer around, type in - 
+
+```bash
+docker-compose exec server bash
+```

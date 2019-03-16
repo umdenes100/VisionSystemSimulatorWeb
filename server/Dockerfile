@@ -1,9 +1,5 @@
 FROM ubuntu:latest
 
-ENV CPATH /usr/include/
-ENV C_INCLUDE PATH /usr/include/
-ENV CPLUS_INCLUDE_PATH /usr/include/
-
 RUN echo "Installing dependencies..." && \
     apt -y --no-install-recommends update && \ 
     # apt -y --no-install-recommends upgrade && \

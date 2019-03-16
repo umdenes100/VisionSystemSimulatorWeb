@@ -2,6 +2,9 @@ from asyncio import create_subprocess_exec, subprocess, get_event_loop
 import websockets
 import json
 
+HOST = '0.0.0.0'
+PORT = 8888
+
 RANDOMIZE = './randomization/randomize'
 SIMULATE = './simulator/simulate'
 
@@ -26,7 +29,7 @@ async def middleware(websocket, path):
 			result = await process_command(RANDOMIZE)
 		elif message['type'] == 'simulation':
 			print(f"Input: {message['content']}")
-			
+
 			result = await generate_simulation(SIMULATE, message['content'])
 		else:
 			raise ValueError('Unexpected JSON type.')
@@ -36,7 +39,7 @@ async def middleware(websocket, path):
 		print()
 
 if __name__ == '__main__':
-	print("Starting websocket server...")
+	print(f"Starting websocket server at {HOST}:{PORT}...")
 	loop = get_event_loop()
-	loop.run_until_complete(websockets.serve(middleware, '0.0.0.0', 8888))
+	loop.run_until_complete(websockets.serve(middleware, HOST, PORT))
 	loop.run_forever()

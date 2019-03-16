@@ -1,4 +1,4 @@
-let connection = new WebSocket("ws://0.0.0.0:8888/")
+let connection = new WebSocket("ws://127.0.0.1:8888/")
 
 let request = {
     type: 'randomization'

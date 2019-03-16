@@ -1,6 +1,6 @@
+#include <iostream>
 #include "Enes100.h"
 #include "Tank.h"
-#include <iostream>
 
 int wow = 3;
 

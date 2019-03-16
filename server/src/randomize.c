@@ -1,4 +1,4 @@
-#include "./randomize.h"
+#include "randomize.h"
 
 static int print_preallocated(cJSON *root) {
     char *out = NULL;
@@ -111,6 +111,4 @@ void randomize(void) {
         exit(EXIT_FAILURE);
     }
     cJSON_Delete(root);
-
-
 }

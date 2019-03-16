@@ -114,5 +114,6 @@ void randomize(void) {
 }
 
 int main() {
+    randomize();
     return 0;
 }

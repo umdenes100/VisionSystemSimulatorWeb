@@ -26,6 +26,7 @@ async def middleware(websocket, path):
 			result = await process_command(RANDOMIZE)
 		elif message['type'] == 'simulation':
 			print(f"Input: {message['content']}")
+			
 			result = await generate_simulation(SIMULATE, message['content'])
 		else:
 			raise ValueError('Unexpected JSON type.')

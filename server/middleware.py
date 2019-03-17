@@ -30,7 +30,7 @@ async def middleware(websocket, path):
 		elif message['type'] == 'simulation':
 			print(f"Input: {message['content']}")
 
-			result = await generate_simulation(SIMULATE, message['content'])
+			result = await process_command(SIMULATE, message['content'])
 		else:
 			raise ValueError('Unexpected JSON type.')
 

@@ -1,5 +1,6 @@
 from asyncio import create_subprocess_exec, subprocess, get_event_loop
 import websockets
+import uuid
 import json
 
 HOST = '0.0.0.0'
@@ -28,9 +29,12 @@ async def middleware(websocket, path):
 		if message['type'] == 'randomization':
 			result = await process_command(RANDOMIZE)
 		elif message['type'] == 'simulation':
-			print(f"Input: {message['content']}")
+			content = message['content']
+			content['id'] = uuid.uuid4().hex
 
-			result = await process_command(SIMULATE, message['content'])
+			print(f"Input: {content}")
+
+			result = await process_command(SIMULATE, content)
 		else:
 			raise ValueError('Unexpected JSON type.')
 

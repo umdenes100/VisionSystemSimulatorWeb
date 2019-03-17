@@ -21,20 +21,18 @@ async def process_command(command, data=None):
 	return stdout.decode()
 
 async def middleware(websocket, path):
-	async for message in websocket:
+	async for request in websocket:
 
-		print(f'Message: {message}')
+		print(f'Request: {request}')
 
-		message = json.loads(message)
-		if message['type'] == 'randomization':
+		request = json.loads(request)
+		if request['type'] == 'randomization':
 			result = await process_command(RANDOMIZE)
-		elif message['type'] == 'simulation':
-			content = message['content']
-			content['id'] = uuid.uuid4().hex
+		elif request['type'] == 'simulation':
+			request['id'] = uuid.uuid4().hex
+			print(f"Input: {request}")
 
-			print(f"Input: {content}")
-
-			result = await process_command(SIMULATE, content)
+			result = await process_command(SIMULATE, request)
 		else:
 			raise ValueError('Unexpected JSON type.')
 

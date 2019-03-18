@@ -44,13 +44,18 @@ async def middleware(websocket, path):
 		else:
 			raise ValueError('Unexpected JSON type.')
 
-		print(f'Output: {json.dumps(result, indent=2)}')
+		try:
+			result_json = json.loads(result)
+		except json.decoder.JSONDecodeError:
+			result_json = result
+
+		print(f'Output: {json.dumps(result_json, indent=2)}')
 		print()
 
 		await websocket.send(result)
 
 if __name__ == '__main__':
-	print(f"Starting websocket server at {HOST}:{PORT}...")
+	print(f"Starting websocket server at http://{HOST}:{PORT}...")
 	loop = get_event_loop()
 	loop.run_until_complete(websockets.serve(middleware, HOST, PORT))
 	loop.run_forever()

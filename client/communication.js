@@ -133,5 +133,16 @@ $(document).ready(() => {
 	})
 
 	$canvas.drawLayers()
+
+	let editor = CodeMirror(document.getElementById('code-editor'), {
+		value: 'void setup() {\n\n}\n\nvoid loop() {\n\n}',
+		theme: 'midnight',
+		indentUnit: 4,
+		firstLineNumber: 0,
+		lineNumbers: true,
+		lineWrapping: true,
+		indentWithTabs: true,
+	})
+
 })
 

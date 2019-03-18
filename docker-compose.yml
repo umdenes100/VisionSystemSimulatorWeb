@@ -7,7 +7,7 @@ services:
       context: .
       dockerfile: ./client/Dockerfile
     volumes:
-      - ./client:/sandbox
+      - ./client:/usr/share/nginx/html
     ports:
       - "8080:80"
   server:

@@ -1,5 +1,10 @@
-const ARENA_SCALE = 300
+let ARENA_WIDTH_SCALE
+let ARENA_HEIGHT_SCALE
+
 const DESTINATION_RADIUS = 0.09
+
+const ARENA_WIDTH = 4
+const ARENA_HEIGHT = 2
 
 const OBSTACLE_WIDTH = 0.25
 const OBSTACLE_HEIGHT = 0.50
@@ -7,12 +12,18 @@ const OBSTACLE_HEIGHT = 0.50
 const DEFAULT_OSV_WIDTH = 0.20
 const DEFAULT_OSV_HEIGHT = 0.20
 
-const ROCKY_TERRAIN_OFFSET = 0.67
-const ROCKY_TERRAIN_WIDTH = 0.67
+const ROCKY_TERRAIN_OFFSET = 0.50
+const ROCKY_TERRAIN_WIDTH = 0.50
 
 let osv_height = DEFAULT_OSV_HEIGHT
 let osv_width = DEFAULT_OSV_WIDTH
 
+$(window).resize(() => {
+	let $canvas = $('canvas')
+	$canvas.height($canvas.width() / 2)
+	ARENA_WIDTH_SCALE = $canvas.width() / ARENA_WIDTH
+	ARENA_HEIGHT_SCALE = $canvas.height() / ARENA_HEIGHT
+});
 
 let request = {
     type: 'randomization'
@@ -54,6 +65,14 @@ void loop() {
 	}
 }
 
+$(document).ready(() => {
+	let $canvas = $('canvas')
+	$canvas.height($canvas.width() / 2)
+	ARENA_WIDTH_SCALE = $canvas.width() / 4
+	ARENA_HEIGHT_SCALE = $canvas.height() / 2
+})
+
+
 
 $(document).ready(() => {
 	let connection = new WebSocket("ws://127.0.0.1:8888/")
@@ -71,37 +90,43 @@ $(document).ready(() => {
 	connection.onmessage = message => {
 
 		message = JSON.parse(message.data)
+		console.log(message)
 		if (message.type == 'randomization') {
 
-			$('canvas').drawArc({
-			  layer: true,
-			  strokeStyle: 'blue',
-			  strokeWidth: 2,
-			  x: message.destination.x * ARENA_SCALE, y: message.destination.y * ARENA_SCALE,
-			  radius: DESTINATION_RADIUS * ARENA_SCALE
-			})
+			console.log(message.destination.x * ARENA_WIDTH_SCALE)
+			console.log(message.destination.y * ARENA_HEIGHT_SCALE)
+			console.log(DESTINATION_RADIUS * ARENA_WIDTH_SCALE)
 
-			$canvas.drawRect({
-			  layer: true,
-			  fillStyle: '#957e5a',
-			  x: message.osv.x * ARENA_SCALE, y: (message.osv.y - osv_height) * ARENA_SCALE,
-			  fromCenter: false,
-			  width: osv_width * ARENA_SCALE,
-			  height: osv_height * ARENA_SCALE
-			})
+			// $('canvas').drawArc({
+			//   layer: true,
+			//   strokeStyle: 'blue',
+			//   strokeWidth: 2,
+			//   x: message.destination.x * ARENA_WIDTH_SCALE, 
+			//   y: message.destination.y * ARENA_HEIGHT_SCALE,
+			//   radius: DESTINATION_RADIUS
+			// })
 
-			message.obstacles.forEach(obstacle => {
-				$canvas.drawRect({
-				  layer: true,
-				  fillStyle: '#957e5a',
-				  x: obstacle.x * ARENA_SCALE, y: (obstacle.y - OBSTACLE_HEIGHT) * ARENA_SCALE,
-				  fromCenter: false,
-				  width: OBSTACLE_WIDTH * ARENA_SCALE,
-				  height: OBSTACLE_HEIGHT * ARENA_SCALE
-				})
-			})
+		// 	$canvas.drawRect({
+		// 	  layer: true,
+		// 	  fillStyle: '#957e5a',
+		// 	  x: message.osv.x * ARENA_SCALE, y: (message.osv.y - osv_height) * ARENA_SCALE,
+		// 	  fromCenter: false,
+		// 	  width: osv_width * ARENA_SCALE,
+		// 	  height: osv_height * ARENA_SCALE
+		// 	})
 
-			$canvas.drawLayers()
+		// 	message.obstacles.forEach(obstacle => {
+		// 		$canvas.drawRect({
+		// 		  layer: true,
+		// 		  fillStyle: '#957e5a',
+		// 		  x: obstacle.x * ARENA_SCALE, y: (obstacle.y - OBSTACLE_HEIGHT) * ARENA_SCALE,
+		// 		  fromCenter: false,
+		// 		  width: OBSTACLE_WIDTH * ARENA_SCALE,
+		// 		  height: OBSTACLE_HEIGHT * ARENA_SCALE
+		// 		})
+		// 	})
+
+		// 	$canvas.drawLayers()
 
 		} else {
 			console.log('Unimplemented')
@@ -114,25 +139,22 @@ $(document).ready(() => {
 
 	const $canvas = $('#canvas')
 
-	$canvas.drawImage({
-	  source: './background.png',
-	  layer: true,
+	$canvas.drawRect({
+	  fillStyle: '#FAE3BF',
 	  x: 0, y: 0,
-	  width: 4 * ARENA_SCALE,
-	  height: 2 * ARENA_SCALE,
+	  fromCenter: false,
+	  width: ARENA_WIDTH * ARENA_WIDTH_SCALE,
+	  height: ARENA_HEIGHT * ARENA_HEIGHT_SCALE,
 	  fromCenter: false
 	})
 
 	$canvas.drawRect({
-	  layer: true,
 	  fillStyle: '#d2bb9b',
-	  x: ROCKY_TERRAIN_OFFSET * ARENA_SCALE, y: 0,
+	  x: ROCKY_TERRAIN_OFFSET * ARENA_WIDTH_SCALE, y: 0,
 	  fromCenter: false,
-	  width: ROCKY_TERRAIN_WIDTH * ARENA_SCALE,
-	  height: 2 * ARENA_SCALE,
+	  width: ROCKY_TERRAIN_WIDTH * ARENA_WIDTH_SCALE,
+	  height: ARENA_HEIGHT * ARENA_HEIGHT_SCALE,
 	})
-
-	$canvas.drawLayers()
 
 	let editor = CodeMirror(document.getElementById('code-editor'), {
 		value: 'void setup() {\n\n}\n\nvoid loop() {\n\n}',

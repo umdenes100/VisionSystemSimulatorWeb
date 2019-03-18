@@ -19,11 +19,10 @@ async def process_command(command, data=None):
 	else:
 		stdout, stderr = await process.communicate(input=bytes(str(data), encoding='utf-8'))
 
+	print(f'Return Code: {process.returncode}')
 	if stderr:
 		print(f'Error: {stderr}')
 		print(f'General Process Info: {vars(process)}')
-
-	print(f'Return Code: {process.returncode}')
 
 	return stdout.decode()
 

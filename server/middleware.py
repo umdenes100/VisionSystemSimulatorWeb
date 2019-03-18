@@ -30,22 +30,25 @@ async def process_command(command, data=None):
 async def middleware(websocket, path):
 	async for request in websocket:
 
-		print(f'Request: {request}')
-
 		request = json.loads(request)
+		print(f'Request: {json.dumps(request, indent=2)}')
+		print()
+
 		if request['type'] == 'randomization':
 			result = await process_command(RANDOMIZE)
+
 		elif request['type'] == 'simulation':
 			request['id'] = uuid.uuid4().hex
-			print(f"Input: {request}")
-
+			print(f"Input: {json.dumps(request, indent=2, sort_keys=True)}")
+			print()
 			result = await process_command(SIMULATE, request)
 		else:
 			raise ValueError('Unexpected JSON type.')
 
-		print(f'Output:\n {result}')
-		await websocket.send(result)
+		print(f'Output: {json.dumps(result, indent=2, sort_keys=True)}')
 		print()
+
+		await websocket.send(result)
 
 if __name__ == '__main__':
 	print(f"Starting websocket server at {HOST}:{PORT}...")

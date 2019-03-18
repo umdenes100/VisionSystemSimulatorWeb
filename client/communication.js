@@ -1,3 +1,16 @@
+const ARENA_SCALE = 300
+const DESTINATION_RADIUS = 0.18
+
+const OBSTACLE_WIDTH = 0.25
+const OBSTACLE_HEIGHT = 0.50
+
+const DEFAULT_OSV_WIDTH = 0.20
+const DEFAULT_OSV_HEIGHT = 0.20
+
+let osv_height = DEFAULT_OSV_HEIGHT
+let osv_width = DEFAULT_OSV_WIDTH
+
+
 let request = {
     type: 'randomization'
 }
@@ -83,26 +96,26 @@ $(document).ready(() => {
 
 			$('canvas').drawArc({
 			  strokeStyle: 'blue',
-			  strokeWidth: 5,
-			  x: message.destination.x * 300, y: message.destination.y * 300,
-			  radius: 54
+			  strokeWidth: 2,
+			  x: message.destination.x * ARENA_SCALE, y: message.destination.y * ARENA_SCALE,
+			  radius: DESTINATION_RADIUS * ARENA_SCALE
 			})
 
 			$canvas.drawRect({
 			  fillStyle: '#957e5a',
-			  x: message.osv.x * 300, y: message.osv.y * 300 - 75,
+			  x: message.osv.x * ARENA_SCALE, y: (message.osv.y - osv_height) * ARENA_SCALE,
 			  fromCenter: false,
-			  width: 75,
-			  height: 75
+			  width: osv_width * ARENA_SCALE,
+			  height: osv_height * ARENA_SCALE
 			})
 
 			message.obstacles.forEach(obstacle => {
 				$canvas.drawRect({
 				  fillStyle: '#957e5a',
-				  x: obstacle.x * 300, y: obstacle.y * 300 - 150,
+				  x: obstacle.x * ARENA_SCALE, y: (obstacle.y - OBSTACLE_HEIGHT) * ARENA_SCALE,
 				  fromCenter: false,
-				  width: 75,
-				  height: 150
+				  width: OBSTACLE_WIDTH * ARENA_SCALE,
+				  height: OBSTACLE_HEIGHT * ARENA_SCALE
 				})
 			})
 

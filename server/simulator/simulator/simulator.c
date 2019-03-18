@@ -60,6 +60,7 @@ cJSON* get_randomization(cJSON *json) {
 }
 
 int main(int argc, char *argv[]) {
+    setvbuf(stdout, _IONBF, 0, 0);
     printf("{\"status\":\"starting\"}\n");
     char *input = get_input();
     printf("{\"status\":\"got input\"}\n");

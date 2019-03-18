@@ -12,15 +12,18 @@ SIMULATE = './simulator/simulator/simulate'
 async def process_command(command, data=None):
 	process = await create_subprocess_exec(*command.split(), 
 										   stdin=subprocess.PIPE, 
-										   stdout=subprocess.PIPE)
+										   stdout=subprocess.PIPE,
+										   stderr=subprocess.PIPE)
 	if data is None:
 		stdout, stderr = await process.communicate()
 	else:
 		stdout, stderr = await process.communicate(input=bytes(str(data), encoding='utf-8'))
 
-	print(f'Error: {stderr}')
+	if stderr:
+		print(f'Error: {stderr}')
+		print(f'General Process Info: {vars(process)}')
+
 	print(f'Return Code: {process.returncode}')
-	print(f'General Process Info: {vars(process)}')
 
 	return stdout.decode()
 

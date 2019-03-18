@@ -18,6 +18,10 @@ async def process_command(command, data=None):
 	else:
 		stdout, stderr = await process.communicate(input=bytes(str(data), encoding='utf-8'))
 
+	print(f'Error: {stderr}')
+	print(f'Return Code: {process.returncode}')
+	print(f'General Process Info: {vars(process)}')
+
 	return stdout.decode()
 
 async def middleware(websocket, path):

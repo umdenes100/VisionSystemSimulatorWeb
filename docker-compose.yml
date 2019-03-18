@@ -6,6 +6,8 @@ services:
     build:
       context: .
       dockerfile: ./client/Dockerfile
+    volumes:
+      - ./client:/sandbox
     ports:
       - "8080:80"
   server:
@@ -16,3 +18,5 @@ services:
       dockerfile: ./server/Dockerfile
     ports:
       - "8888:8888"
+    volumes:
+      - ./server:/sandbox

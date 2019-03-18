@@ -39,13 +39,13 @@ async def middleware(websocket, path):
 
 		elif request['type'] == 'simulation':
 			request['id'] = uuid.uuid4().hex
-			print(f"Input: {json.dumps(request, indent=2, sort_keys=True)}")
+			print(f"Input: {json.dumps(request, indent=2)}")
 			print()
 			result = await process_command(SIMULATE, request)
 		else:
 			raise ValueError('Unexpected JSON type.')
 
-		print(f'Output: {json.dumps(result, indent=2, sort_keys=True)}')
+		print(f'Output: {json.dumps(result, indent=2)}')
 		print()
 
 		await websocket.send(result)

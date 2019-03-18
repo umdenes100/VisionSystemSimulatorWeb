@@ -75,6 +75,7 @@ void randomize(void) {
 
     //generate starting location
     root = cJSON_CreateObject();
+    cJSON_AddItemToObject(root, "type", cJSON_CreateString("randomization"));
     cJSON_AddItemToObject(root, "osv", osv = cJSON_CreateObject());
     cJSON_AddNumberToObject(osv, "x", 0.35);
     cJSON_AddNumberToObject(osv, "y", 0.4 + (rand() % 5)*0.3);

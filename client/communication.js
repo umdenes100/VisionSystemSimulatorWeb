@@ -1,5 +1,3 @@
-let connection = new WebSocket("ws://127.0.0.1:8888/")
-
 let request = {
     type: 'randomization'
 }
@@ -65,21 +63,38 @@ void function( int wow, char c) {
 	}
 }
 
-console.log(request)
 
-connection.onopen = () => {
-	console.log('OPEN')
-	connection.send(JSON.stringify(request))
-}
+$(document).ready(() => {
+	let connection = new WebSocket("ws://127.0.0.1:8888/")
 
-connection.onerror = error => {
-    console.log('WebSocket Error.')
-}
+	console.log(request)
 
-connection.onmessage = message => {
-	console.log(JSON.parse(message.data))
-}
+	connection.onopen = () => {
+		console.log('OPEN')
+		connection.send(JSON.stringify(request))
+	}
 
-connection.onclose = () => {
-	console.log('Failed')
-}
+	connection.onerror = error => {
+	    console.log('WebSocket Error.')
+	}
+
+	connection.onmessage = message => {
+		
+		console.log(JSON.parse(message.data))
+	}
+
+	connection.onclose = () => {
+		console.log('Failed')
+	}
+
+	const $canvas = $('#canvas')
+
+	$canvas.drawRect({
+	  fillStyle: '#d2bb9b',
+	  x: 200, y: 0,
+	  fromCenter: false,
+	  width: 200,
+	  height: 600
+	})
+})
+

@@ -43,7 +43,7 @@ async def middleware(websocket, path):
 		else:
 			raise ValueError('Unexpected JSON type.')
 
-		print(f'Output: {result}')
+		print(f'Output:\n {result}')
 		await websocket.send(result)
 		print()
 

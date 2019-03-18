@@ -67,8 +67,6 @@ void function( int wow, char c) {
 $(document).ready(() => {
 	let connection = new WebSocket("ws://127.0.0.1:8888/")
 
-	console.log(request)
-
 	connection.onopen = () => {
 		console.log('OPEN')
 		connection.send(JSON.stringify(request))
@@ -79,8 +77,38 @@ $(document).ready(() => {
 	}
 
 	connection.onmessage = message => {
-		
-		console.log(JSON.parse(message.data))
+
+		message = JSON.parse(message.data)
+		if (message.type == 'randomization') {
+
+			$('canvas').drawArc({
+			  strokeStyle: 'blue',
+			  strokeWidth: 5,
+			  x: message.destination.x * 300, y: message.destination.y * 300,
+			  radius: 54
+			})
+
+			$canvas.drawRect({
+			  fillStyle: '#957e5a',
+			  x: message.osv.x * 300, y: message.osv.y * 300 - 75,
+			  fromCenter: false,
+			  width: 75,
+			  height: 75
+			})
+
+			message.obstacles.forEach(obstacle => {
+				$canvas.drawRect({
+				  fillStyle: '#957e5a',
+				  x: obstacle.x * 300, y: obstacle.y * 300 - 150,
+				  fromCenter: false,
+				  width: 75,
+				  height: 150
+				})
+			})
+
+		} else {
+			console.log('Unimplemented')
+		}
 	}
 
 	connection.onclose = () => {

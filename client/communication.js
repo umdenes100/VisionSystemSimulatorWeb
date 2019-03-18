@@ -7,6 +7,9 @@ const OBSTACLE_HEIGHT = 0.50
 const DEFAULT_OSV_WIDTH = 0.20
 const DEFAULT_OSV_HEIGHT = 0.20
 
+const ROCKY_TERRAIN_OFFSET = 0.67
+const ROCKY_TERRAIN_WIDTH = 0.67
+
 let osv_height = DEFAULT_OSV_HEIGHT
 let osv_width = DEFAULT_OSV_WIDTH
 
@@ -115,18 +118,18 @@ $(document).ready(() => {
 	  source: './background.png',
 	  layer: true,
 	  x: 0, y: 0,
-	  width: 1200,
-	  height: 600,
+	  width: 4 * ARENA_SCALE,
+	  height: 2 * ARENA_SCALE,
 	  fromCenter: false
 	})
 
 	$canvas.drawRect({
 	  layer: true,
 	  fillStyle: '#d2bb9b',
-	  x: 200, y: 0,
+	  x: ROCKY_TERRAIN_OFFSET * ARENA_SCALE, y: 0,
 	  fromCenter: false,
-	  width: 200,
-	  height: 600
+	  width: ROCKY_TERRAIN_WIDTH * ARENA_SCALE,
+	  height: 2 * ARENA_SCALE,
 	})
 
 	$canvas.drawLayers()

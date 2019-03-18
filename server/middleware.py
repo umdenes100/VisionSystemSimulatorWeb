@@ -7,7 +7,7 @@ HOST = '0.0.0.0'
 PORT = 8888
 
 RANDOMIZE = './randomization/randomize'
-SIMULATE = './simulator/simulate'
+SIMULATE = './simulator/simulator/simulate'
 
 async def process_command(command, data=None):
 	process = await create_subprocess_exec(*command.split(), 
@@ -16,7 +16,7 @@ async def process_command(command, data=None):
 	if data is None:
 		stdout, stderr = await process.communicate()
 	else:
-		stdout, stderr = await process.communicate(input=bytes(data, encoding='utf-8'))
+		stdout, stderr = await process.communicate(input=bytes(str(data), encoding='utf-8'))
 
 	return stdout.decode()
 

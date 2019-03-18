@@ -16,6 +16,7 @@ let request = {
 }
 
 let simulation_request = {
+	type: 'simulation',
 	code: `
 #include <iostream>
 #include "Enes100.h"
@@ -83,6 +84,7 @@ $(document).ready(() => {
 	connection.onopen = () => {
 		console.log('OPEN')
 		connection.send(JSON.stringify(request))
+		connection.send(JSON.stringify(simulation_request))
 	}
 
 	connection.onerror = error => {

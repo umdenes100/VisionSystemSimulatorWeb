@@ -4,20 +4,11 @@
 #include <regex.h>
 #include <sys/stat.h>
 
-// struct to return char[][] of matches
-struct match_list {
-    char **matches;
-    int n_matches;
-};
+#include "compile.h"
 
-struct file_names {
-    char *hdr;
-    char *src;
-};
-
-// this is the standard error function.
+// this is the standard error function. exits with code 1.
 void error(char *error_msg) {
-    printf("Error: %s\n", error_msg);
+    fprintf(stderr, "Error: %s\n", error_msg);
     exit(1);
 }
 
@@ -123,11 +114,11 @@ struct match_list get_function_declarations(char *file_name) {
 
 // this function creates a directory for the program using the program name
 void create_dir(char *name) {
-    char dest[14 + strlen(name) + 1];
+    char dest[17 + strlen(name) + 1];
 
     int i;
-    for(i = 0; i < 14; i++) {
-        dest[i] = "../user-code/"[i];
+    for(i = 0; i < 17; i++) {
+        dest[i] = "../environments/"[i];
     }
 
     strcat(dest, name);
@@ -137,27 +128,9 @@ void create_dir(char *name) {
     }
 }
 
-// this function is a debugging function which creates a string of the arduino code
-char* get_input() {
-    char *string = (char*)malloc(1 * sizeof(char));
-    int n_characters = 0;
-    string[n_characters] = '\0';
-
-    char c;
-
-    while((c = getchar()) != EOF) {
-        n_characters++;
-        string = (char*)realloc(string, (n_characters + 1) * sizeof(char));
-        string[n_characters] = '\0';
-        string[n_characters - 1] = c;
-    }
-
-    return string;
-}
-
 // this function returns the .cpp and .h file paths for the program
 struct file_names get_file_names(char *file_name) {
-    int s_len = strlen("../user-code/");
+    int s_len = strlen("../environments/");
     int f_len = strlen(file_name);
     int src_len = s_len + 2 * f_len + 1 + strlen(".cpp");
     int hdr_len = s_len + 2 * f_len + 1 + strlen(".h");
@@ -167,8 +140,8 @@ struct file_names get_file_names(char *file_name) {
 
     int i;
     for(i = 0; i < s_len; i++) {
-        src[i] = "../user-code/"[i];
-        hdr[i] = "../user-code/"[i];
+        src[i] = "../environments/"[i];
+        hdr[i] = "../environments/"[i];
     }
 
     for(i = 0; i < f_len; i++) {
@@ -246,30 +219,65 @@ void free_match_list(struct match_list m) {
     free(m.matches);
 }
 
-int main(int argc, char* argv[]) {
+// this is the final function to compile the executable
+void compile(char *file) {
+    int len_base = strlen("cd ../dependencies & make name=");
+    int len_f = strlen(file);
+    int len = len_f + len_base + strlen(" 2>&1");
+    char command[len + 1];
+
+
+    int i;
+    for(i = 0; i < len_base; i++) {
+        command[i] = "cd ../dependencies ; make name="[i];
+        command[i + 1] = '\0';
+    }
+
+    strcat(command, file);
+    strcat(command, " 2>&1");
+
+    FILE* p = popen(command, "r");
+    if(!p) {
+        error("Could not read file.");
+    }
+
+    char *buff = (char*)malloc(1 * sizeof(char));
+    i = 0;
+    while((buff[i] = fgetc(p)) != EOF) {
+        i++;
+        buff = realloc(buff, (i + 1) * sizeof(char));
+    }
+
+    buff[i] = '\0';
+    int code = pclose(p);
+
+    if(code != 0) {
+        error(buff);
+    }
+
+    return;
+}
+
+void initialize(char *program_name, char *code) {
     // first we need to create the environment
-    char *CODE_FILE = "valid_arduino";
-    char *input = get_input();
 
     // first we create the folder we will store info in
-    create_dir(CODE_FILE);
+    create_dir(program_name);
 
     // its convinient not to get all of the names of the files we're using
-    struct file_names files = get_file_names(CODE_FILE);
+    struct file_names files = get_file_names(program_name);
     
     // now we want to write the src into persistent memory with a main function
-    create_src_file(input, files.src);
-    free(input);
+    create_src_file(code, files.src);
 
     // now we need to get the function declarations for the .h file
     struct match_list functions = get_function_declarations(files.src);
-
     // now we want to write the .h file
     create_hdr_file(functions, files.hdr);
 
     free_match_list(functions);
+    
+    compile(program_name);
     free(files.src);
     free(files.hdr);
-
-    // now we have a .cpp, .h, and other libraries. we just need to compile the program.
 }

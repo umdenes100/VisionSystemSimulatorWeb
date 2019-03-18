@@ -26,6 +26,9 @@ COPY ./server /server
 RUN echo "Building randomization binary..." && \
     make -C /server/randomization
 
+RUN echo "Building simulator binary" && \
+    make -C /server/simulator/simulator
+
 RUN pip3 install websockets
 
 WORKDIR /server

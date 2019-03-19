@@ -60,21 +60,27 @@ cJSON* get_randomization(cJSON *json) {
 }
 
 int main(int argc, char *argv[]) {
-    setvbuf(stdout, _IONBF, 0, 0);
-    printf("{\"status\":\"starting\"}\n");
     char *input = get_input();
-    printf("{\"status\":\"got input\"}\n");
-    cJSON *json = cJSON_Parse(input)->child;    
+    cJSON *json = cJSON_Parse(input);
+
+    if(json == NULL) {
+        fprintf(stderr, "Unable to parse JSON.\n");
+        fflush(stderr);
+        return -1;
+    }
+
+    json = json->child;
 
     // now that we have the JSON we need to perform initialization
-    initialize(get_id(json), get_code(json));
+    if(initialize(get_id(json), get_code(json)) != 0) {
+        // initialize error:
+        return -1;
+    }
 
     // now we need to simulate
-
     cJSON_Delete(json);
     free(input);
 
-    printf("{\"status\":\"done\"}\n");
-
+    fflush(stdout);
     return 0;
 }

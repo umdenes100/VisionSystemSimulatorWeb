@@ -81,6 +81,7 @@ $(document).ready(() => {
 		if (message.type == 'randomization') {
 
 			$('canvas').drawArc({
+			  layer: true,
 			  strokeStyle: 'blue',
 			  strokeWidth: 2,
 			  x: message.destination.x * ARENA_SCALE, y: message.destination.y * ARENA_SCALE,
@@ -88,6 +89,7 @@ $(document).ready(() => {
 			})
 
 			$canvas.drawRect({
+			  layer: true,
 			  fillStyle: '#957e5a',
 			  x: message.osv.x * ARENA_SCALE, y: (message.osv.y - osv_height) * ARENA_SCALE,
 			  fromCenter: false,
@@ -97,6 +99,7 @@ $(document).ready(() => {
 
 			message.obstacles.forEach(obstacle => {
 				$canvas.drawRect({
+				  layer: true,
 				  fillStyle: '#957e5a',
 				  x: obstacle.x * ARENA_SCALE, y: (obstacle.y - OBSTACLE_HEIGHT) * ARENA_SCALE,
 				  fromCenter: false,
@@ -104,6 +107,8 @@ $(document).ready(() => {
 				  height: OBSTACLE_HEIGHT * ARENA_SCALE
 				})
 			})
+
+			$canvas.drawLayers()
 
 		} else {
 			console.log('Unimplemented')
@@ -116,12 +121,24 @@ $(document).ready(() => {
 
 	const $canvas = $('#canvas')
 
+	$canvas.drawImage({
+	  source: './background.png',
+	  layer: true,
+	  x: 0, y: 0,
+	  width: 1200,
+	  height: 600,
+	  fromCenter: false
+	})
+
 	$canvas.drawRect({
+	  layer: true,
 	  fillStyle: '#d2bb9b',
 	  x: 200, y: 0,
 	  fromCenter: false,
 	  width: 200,
 	  height: 600
 	})
+
+	$canvas.drawLayers()
 })
 

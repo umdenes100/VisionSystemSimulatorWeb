@@ -32,12 +32,22 @@ let request = {
 let simulation_request = {
 	type: 'simulation',
 	code: `
-void setup() {
+#include "Enes100.h"
+#include "Tank.h"
 
+int wow = 6;
+
+void setup() {
+	pinMode(16, OUTPUT);
 }
 
 void loop() {
-	
+	digitalWrite(3, HIGH);
+	function("yes");
+}
+
+int function  (char *    a) {
+	Serial.println(a);
 }
 	`,
 	randomization: {

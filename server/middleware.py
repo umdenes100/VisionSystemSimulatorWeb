@@ -21,7 +21,8 @@ async def process_command(command, data=None):
 	if data is None:
 		stdout, stderr = await process.communicate()
 	else:
-		stdout, stderr = await process.communicate(input=bytes(str(data).replace('"', '\\"').replace("'", '"'), encoding='utf-8'))
+		stdout, stderr = await process.communicate(input=bytes(json.dumps(data), 
+															   encoding='utf-8'))
 
 	print(f'Return Code: {process.returncode}')
 	if stderr:

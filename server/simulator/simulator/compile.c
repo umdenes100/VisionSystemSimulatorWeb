@@ -9,6 +9,8 @@
 // this is the standard error function. exits with code 1.
 void error(char *error_msg) {
     fprintf(stderr, "Error: %s\n", error_msg);
+    fflush(stderr);
+    fflush(stdout);
     exit(1);
 }
 
@@ -48,11 +50,16 @@ struct match_list get_all_matches(regex_t r, char *to_match) {
 }
 
 // this function will get all of the function names
-struct match_list get_function_declarations(char *file_name) {
+struct match_list get_function_declarations(char *file_name, int *status_code) {
     FILE *fp = fopen(file_name, "r");
 
+    struct match_list dummy;
+
     if(fp == NULL) {
-        error("Unable to open the file.");
+        fprintf(stderr, "Unable to open the file\n");
+        fflush(stderr);
+        *status_code = -1;
+        return dummy;
     }
 
     int n_characters = 0;
@@ -100,7 +107,10 @@ struct match_list get_function_declarations(char *file_name) {
 
     regex_t regex;
     if(regcomp(&regex, function_pattern, REG_EXTENDED)) {
-        error("Could not compile regex.");
+        fprintf(stderr, "Could not compile regex.\n");
+        fflush(stderr);
+        *status_code = -1;
+        return dummy;
     }
 
     struct match_list matches = get_all_matches(regex, first_level_code);
@@ -113,7 +123,7 @@ struct match_list get_function_declarations(char *file_name) {
 }
 
 // this function creates a directory for the program using the program name
-void create_dir(char *name) {
+int create_dir(char *name) {
     char dest[17 + strlen(name) + 1];
 
     int i;
@@ -124,8 +134,12 @@ void create_dir(char *name) {
     strcat(dest, name);
 
     if(mkdir(dest, 0777) != 0) {
-        error("Unable to create directory.");
+        fprintf(stderr, "Unable to create directory\n");
+        fflush(stderr);
+        return -1;
     }
+
+    return 0;
 }
 
 // this function returns the .cpp and .h file paths for the program
@@ -175,24 +189,37 @@ struct file_names get_file_names(char *file_name) {
 }
 
 // this function will create a temp src file
-void create_src_file(char *code, char *file) {
-    FILE *fp = fopen(file, "w");
+int create_src_file(char *code, struct file_names files) {
+    FILE *fp = fopen(files.src, "w");
 
     if(fp == NULL) {
-        error("Unable to create src file.");
+        fprintf(stderr, "Unable to create src file\n");
+        fflush(stderr);
+        return -1;
     }
 
+    char n_line[strlen("#include ''") + strlen(files.hdr) + 2];
+    n_line[0] = '\0';
+    strcat(n_line, "#include \"");
+    strcat(n_line, files.hdr);
+    strcat(n_line, "\"\n");
+
+    fputs(n_line, fp);
     fputs(code, fp);
     fputs("\n\nint main() {\n\tsetup();\n\twhile(1) {\n\t\tloop();\n\t}\n}\n", fp);
     fclose(fp);
+
+    return 0;
 }
 
 // this function will create the header file
-void create_hdr_file(struct match_list functions, char *file) {
+int create_hdr_file(struct match_list functions, char *file) {
     FILE *fp = fopen(file, "w");
 
     if(fp == NULL) {
-        error("Unable to create header file.");
+        fprintf(stderr, "Unable to create header file.\n");
+        fflush(stderr);
+        return -1;
     }
 
     fputs("#ifndef PROTOTYPES_H\n#define PROTOTYPES_H\n\n", fp);
@@ -206,6 +233,8 @@ void create_hdr_file(struct match_list functions, char *file) {
     fputs("\n#endif", fp);
 
     fclose(fp);
+
+    return 0;
 }
 
 // this function frees a match_set
@@ -220,7 +249,7 @@ void free_match_list(struct match_list m) {
 }
 
 // this is the final function to compile the executable
-void compile(char *file) {
+int compile(char *file) {
     int len_base = strlen("cd ../dependencies & make name=");
     int len_f = strlen(file);
     int len = len_f + len_base + strlen(" 2>&1");
@@ -252,32 +281,51 @@ void compile(char *file) {
     int code = pclose(p);
 
     if(code != 0) {
-        error(buff);
+        fprintf(stderr, "%s\n", buff);
+        fflush(stderr);
+        return -1;
     }
 
-    return;
+    return 0;
 }
 
-void initialize(char *program_name, char *code) {
+int initialize(char *program_name, char *code) {
     // first we need to create the environment
 
     // first we create the folder we will store info in
-    create_dir(program_name);
+    if(create_dir(program_name) != 0) {
+        return -1;
+    }
 
     // its convinient not to get all of the names of the files we're using
     struct file_names files = get_file_names(program_name);
     
     // now we want to write the src into persistent memory with a main function
-    create_src_file(code, files.src);
+    if(create_src_file(code, files) != 0) {
+        return -1;
+    }
 
     // now we need to get the function declarations for the .h file
-    struct match_list functions = get_function_declarations(files.src);
+    int status_code = 0;
+    struct match_list functions = get_function_declarations(files.src, &status_code);
+
+    if(status_code != 0) {
+        return -1;
+    }
+
     // now we want to write the .h file
-    create_hdr_file(functions, files.hdr);
+    if(create_hdr_file(functions, files.hdr) != 0) {
+        return -1;
+    }
 
     free_match_list(functions);
     
-    compile(program_name);
+    if(compile(program_name) != 0) {
+        return -1;
+    }
+
     free(files.src);
     free(files.hdr);
+
+    return 0;
 }

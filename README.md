@@ -1,56 +1,50 @@
 # VisionSystemSimulatorWeb
 
-* This guide assumes that you have the command `pip` aliased to `pip3`.
-* This guide assumes that you have the command `python` aliased to `python3`.
-
-## Middleware
-
-To use middleware, you must first install the websockets library.
-
-```bash
-pip install websockets
-```
-
-To run the server, simply run -
-
-```bash
-python middleware.py
-```
-
-This will create a simple server that passes messages between the website and the "C program".
-
-The "C program" sleeps for a random amount of time between 0 and 2 seconds, and then returns the same input that was passed into it but with the associated delay tagged onto the beginning.
-
-It's just meant to simulate what working with the actual C program will be. The middleware will also print out the message it plans to send back to the client.
-
-At the start of `middleware.py`, there's a variable called `COMMAND`. Once you have a C program set up, simply change `COMMAND` to however you call it. The program passes input in through `stdin` and expects a response through `stdout`.
-
-## Client
-
-To run the client, simply run the command - 
-
-```bash
-cd VisionSystemSimulatorWeb
-python -m http.server
-```
-
-In order to see what the client is receiving, go to `localhost:8000`, right-click, click `Inspect Element` and then `Console`.
-
-
 ## Docker
 
-To use, install Docker and open up a command prompt.
+Given that we have developers using every operating system under the sun, we have to have some way of standardizing things without making life hell for everybody. Enter Docker.
 
-Pop into the project working directory and run - 
+### Setup
 
-```bash
-docker-compose up -d
-```
+The first thing we're going to do is make life hell for Windows users. There are multiple Docker solutions on Windows (Docker Toolbox for Windows, Docker for Windows) but only one that will not make you want to burn your computer and become a hermit.
 
-The image will build once and then run. It takes a while the first time but should be prompt for subsequent changes.
+You'll want Docker for Windows. Unfortunately, this uses a hypervisor known as HyperV. It isn't compatible with Windows 10 Home. Fortunately, the university gives away 
+Windows 10 Education, which will do just fine. (This will break VirtualBox. Talk to Karam about how to fix it.)
 
-In order to poke your head into the container and peer around, type in - 
+Once that's installed, install Docker for Windows. Macintosh users, install Docker for Mac.
 
-```bash
-docker-compose exec server bash
-```
+### Background
+
+Docker utilizes a technology known as containerization. Little isolated environments that share a kernel but nothing else. We have two containers in this application - client and server. Each container is set up using a Dockerfile, which is a glorified bash script.
+
+You can build these containers into static images for convenience, and even extend other people's static containers for your own use. For example, the client container extends an NGINX image and the server container extends an Ubuntu image.
+
+These containers are orchestrated using docker-compose. In our configuration file (docker-compose.yml), you can see a few features of the orchestration, notably the names of the containers, the ports within the containers that are mapped to ports on your machine, and the directories that have been mounted. Mounting directories sets up your container so that certain directories on the container are tied to local directories on your machine and will reflect changes. For example, the client directory is mounted to NGINX's serving directory, which means that if you change a client file, a browser refresh will show you the changes you made.
+
+### Use
+
+Docker and docker-compose are well documented and so I won't talk about too many commands, but here are some key useful ones to know.
+
+`docker-compose up`
+
+Creates all your containers.
+
+`docker-compose up -d`
+
+Creates all your containers and then detaches so that you can continue to use your terminal.
+
+`docker-compose up --force-recreate --build`
+
+Recreates the container and rebuilds with any changes you might have made. Useful for when you modify the server. Docker caches steps so although it takes a while the first time you run it, subsequent runs will be quicker.
+
+`docker-compose exec <container-name> bash`
+
+Opens up the container and allows you to explore it in its current state. Useful for trying stuff out and debugging. e.g. `docker-compose exec server bash`
+
+`docker-compose stop`
+
+Stops all containers.
+
+`docker-compose kill`
+
+Stops all containers, violently.

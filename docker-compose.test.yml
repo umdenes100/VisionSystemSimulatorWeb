@@ -1,7 +1,7 @@
 version: '3.6'
 services:
   client:
-    container_name: client
+    container_name: nginx
     restart: always
     build:
       context: .

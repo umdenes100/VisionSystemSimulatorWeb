@@ -25,6 +25,8 @@ $(window).resize(() => {
 	ARENA_HEIGHT_SCALE = $canvas.height() / ARENA_HEIGHT
 });
 
+let bad_request = 'This is a terribly formatted request.'
+
 let request = {
     type: 'randomization'
 }
@@ -90,8 +92,10 @@ $(document).ready(() => {
 	connection.onopen = () => {
 		console.log('OPEN')
 		connection.send(JSON.stringify(request))
-		connection.send(JSON.stringify(simulation_request))
-		console.log(JSON.stringify(simulation_request))
+		connection.send(JSON.stringify(request))
+		connection.send(JSON.stringify(bad_request))
+		// connection.send(JSON.stringify(simulation_request))
+		// console.log(JSON.stringify(simulation_request))
 	}
 
 	connection.onerror = error => {

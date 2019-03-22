@@ -1,22 +1,13 @@
 version: '3.6'
 services:
-  client:
-    container_name: nginx
+  tester:
+    container_name: tester
     restart: always
     build:
       context: .
-      dockerfile: ./client/Dockerfile
-    volumes:
-      - ./client:/usr/share/nginx/html
-    ports:
-      - "8080:80"
-  server:
-    container_name: server
-    restart: always
-    build:
-      context: .
-      dockerfile: ./server/Dockerfile
+      dockerfile: ./tests/Dockerfile
     ports:
       - "8888:8888"
     volumes:
       - ./server:/sandbox
+      - ./tests:/tests

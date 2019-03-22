@@ -48,3 +48,14 @@ Stops all containers.
 `docker-compose kill`
 
 Stops all containers, violently.
+
+## Testing
+
+We've got support for extensive and flexible testing. To create and modify tests - simply fill out and add to the tests in the tests directory. To create a new tests file, just prepend the name with `test_` to ensure that it will run.
+
+To run all the tests - 
+
+```bash
+chmod +rwx run_tests.sh
+./run_tests
+```

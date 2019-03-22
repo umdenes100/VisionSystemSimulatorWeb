@@ -1,20 +1,27 @@
 from asyncio import create_subprocess_exec, subprocess, get_event_loop
+from collections import namedtuple
 import websockets
+import argparse
 import uuid
 import json
+import os
 
-HOST = '0.0.0.0'
-PORT = 8888
+Executable = namedtuple('Executable', ['command', 'working_directory'])
 
-RANDOMIZE = './randomization/randomize'
-SIMULATE = './simulate'
+BASE_DIR = os.path.dirname(os.path.realpath(__file__))
 
-async def process_command(command, data=None):
-	cwd = "."
-	if not (data is None):
-		cwd = "simulator/simulator/"
+REQUEST_TYPES = {
+	'randomization': Executable(command='./randomize', 
+								working_directory=os.path.join(BASE_DIR, 'randomization')),
+	'simulation': Executable(command='./simulate', 
+							 working_directory=os.path.join(BASE_DIR, 'simulator', 'simulator')),
+	'test': Executable(command='python3 c_program.py',
+					   working_directory=os.path.join(os.path.dirname(BASE_DIR), 'tests')),
+}
 
-	process = await create_subprocess_exec(*command.split(), cwd=cwd,
+async def process_command(command, working_directory, data=None):
+	process = await create_subprocess_exec(*command.split(),
+										   cwd=working_directory,
 										   stdin=subprocess.PIPE, 
 										   stdout=subprocess.PIPE,
 										   stderr=subprocess.PIPE)
@@ -34,33 +41,52 @@ async def process_command(command, data=None):
 async def middleware(websocket, path):
 	async for request in websocket:
 
-		request = json.loads(request)
+		try:
+			request = json.loads(request)
+			if not isinstance(request, dict):
+				raise
+		except:
+			error = f'Invalid JSON: Received request - {json.dumps(request, indent=2)}'
+			print(error)
+			print()
+
+			await websocket.send(json.dumps({
+				'type': 'error',
+				'error_type': 'InvalidJSON',
+				'request': request,
+			}))
+			continue
+
 		print(f'Request: {json.dumps(request, indent=2)}')
 		print()
 
-		if request['type'] == 'randomization':
-			result = await process_command(RANDOMIZE)
+		request['id'] = uuid.uuid4().hex
+		print(f"Program Input: {json.dumps(request, indent=2)}")
+		print()
 
-		elif request['type'] == 'simulation':
-			request['id'] = uuid.uuid4().hex
-			print(f"Input: {json.dumps(request, indent=2)}")
-			print()
-			result = await process_command(SIMULATE, request)
-		else:
-			raise ValueError('Unexpected JSON type.')
+		command, working_directory = REQUEST_TYPES[request['type']]
+		result = await process_command(command, working_directory, request)
 
 		try:
 			result_json = json.loads(result)
 		except json.decoder.JSONDecodeError:
-			result_json = result
+			print(f'Invalid JSON: Received result {result}')
+			continue
 
 		print(f'Output: {json.dumps(result_json, indent=2)}')
 		print()
-
 		await websocket.send(result)
 
+
+
 if __name__ == '__main__':
-	print(f"Starting websocket server at http://{HOST}:{PORT}...")
+
+	parser = argparse.ArgumentParser()
+	parser.add_argument('--host', type=str, default='0.0.0.0', help="e.g. 0.0.0.0")
+	parser.add_argument('--port', type=int, default=8888, help="e.g. 8888")
+	args = parser.parse_args()
+
+	print(f"Starting websocket server at http://{args.host}:{args.port}...")
 	loop = get_event_loop()
-	loop.run_until_complete(websockets.serve(middleware, HOST, PORT))
+	loop.run_until_complete(websockets.serve(middleware, args.host, args.port))
 	loop.run_forever()

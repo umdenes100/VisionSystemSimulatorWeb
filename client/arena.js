@@ -48,7 +48,7 @@ class RockyTerrain {
 		this.width = innerWidth * (0.65 / 4)
 		this.height = innerWidth /  2
 
-		this.color = '#d2bb9a'
+		this.color = '#d0a9ae'
 	}
 
 	draw() {
@@ -64,9 +64,9 @@ class Obstacle {
 	constructor(x, y) {
 		this.x = canvas.width * (x / 4)
 		this.y = canvas.height * ((2 - y) / 2)
-		this.width = canvas.width * (0.3 / 4)
+		this.width = canvas.width * (0.25 / 4)
 		this.height = canvas.height * (0.5 / 2)
-		this.color = '#967f5b'
+		this.color = '#556B2F'
 	}
 
 	draw() {

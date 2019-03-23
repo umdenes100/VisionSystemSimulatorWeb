@@ -2,13 +2,8 @@
 	border: 1px black solid;
 }
 
-canvas {
-	background-color: #fae3bf;
-}
-
-html, body {
-  height: 100%;
-  min-height: 100%;
+body {
+	margin: 0px;
 }
 
 #code-editor {
@@ -23,6 +18,21 @@ html, body {
 	height: 100%;
 }
 
-canvas {
+.wrapper {
+	position: relative;
 	width: 100%;
+}
+
+canvas {
+	position: absolute;
+	top: 0;
+	left: 0;
+}
+
+#background {
+	z-index: 1;
+}
+
+#foreground {
+	z-index: 2;
 }

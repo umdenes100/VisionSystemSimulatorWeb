@@ -3,10 +3,10 @@ import asyncio
 import pytest
 
 
-def connect(f):
-	async def wrapper(*args, **kwargs):
+def connect(func):
+	async def wrapper():
 		async with websockets.connect('ws://0.0.0.0:8888') as websocket:
-			await f(websocket)
+			await func(websocket)
 	return wrapper
 
 
@@ -19,3 +19,4 @@ async def test_bad_request(websocket):
 	await websocket.send('banana')
 	result = await websocket.recv()
 	assert 'InvalidJSON' in result
+

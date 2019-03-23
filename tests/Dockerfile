@@ -29,7 +29,7 @@ RUN echo "Building randomization binary..." && \
 RUN echo "Building simulator binary..." && \
     make -C /server/simulator/simulator
 
-RUN pip3 install websockets pytest pytest-asyncio
+RUN pip3 install decorator websockets pytest pytest-asyncio
 
 WORKDIR /tests
 

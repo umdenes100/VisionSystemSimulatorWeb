@@ -1,4 +1,5 @@
 import subprocess
+import decorator
 import json
 import os
 
@@ -6,22 +7,23 @@ import os
 COMMAND = './randomize'
 WORKING_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'server', 'randomization')
 
-def get_randomization():
-	process = subprocess.Popen(COMMAND, 
-							   cwd=WORKING_DIR,
-							   stdin=subprocess.PIPE,
-                               stdout=subprocess.PIPE,
-                               stderr=subprocess.PIPE)
-	stdout, stderr = process.communicate()
+def randomize(func):
+	def wrapper():
 
-	randomization = json.loads(stdout.decode())
+		process = subprocess.Popen(COMMAND, 
+								   cwd=WORKING_DIR,
+								   stdin=subprocess.PIPE,
+	                               stdout=subprocess.PIPE,
+	                               stderr=subprocess.PIPE)
+		stdout, stderr = process.communicate()
 
-	return randomization
+		randomization = json.loads(stdout.decode())
+		func(randomization)
 
-def test_randomization_format():
+	return wrapper
 
-	randomization = get_randomization()
-
+@randomize
+def test_format(randomization):
 	assert isinstance(randomization, dict)
 	assert 'type' in randomization
 	assert 'osv' in randomization

@@ -1,93 +1,8 @@
-let ARENA_WIDTH_SCALE
-let ARENA_HEIGHT_SCALE
-
-const DESTINATION_RADIUS = 0.09
-
-const ARENA_WIDTH = 4
-const ARENA_HEIGHT = 2
-
-const OBSTACLE_WIDTH = 0.25
-const OBSTACLE_HEIGHT = 0.50
-
-const DEFAULT_OSV_WIDTH = 0.20
-const DEFAULT_OSV_HEIGHT = 0.20
-
-const ROCKY_TERRAIN_OFFSET = 0.50
-const ROCKY_TERRAIN_WIDTH = 0.50
-
-let osv_height = DEFAULT_OSV_HEIGHT
-let osv_width = DEFAULT_OSV_WIDTH
-
-$(window).resize(() => {
-	let $canvas = $('canvas')
-	$canvas.height($canvas.width() / 2)
-	ARENA_WIDTH_SCALE = $canvas.width() / ARENA_WIDTH
-	ARENA_HEIGHT_SCALE = $canvas.height() / ARENA_HEIGHT
-});
-
-let bad_request = 'This is a terribly formatted request.'
-
-let request = {
-    type: 'randomization'
-}
-
-let simulation_request = {
-	type: 'simulation',
-	code: `
-#include "Enes100.h"
-#include "Tank.h"
-
-int wow = 6
-
-void setup() {
-	pinMode(16, OUTPUT);
-}
-
-void loop() {
-	digitalWrite(3, HIGH);
-	function("yes");
-}
-
-int function  (char *    a) {
-	Serial.println(a);
-}
-	`,
-	randomization: {
-		osv: {
-				x: 0.35,
-				y: 0.7,
-				theta: -3.1415901184082031
-		},
-		obstacles: [
-			{
-				x: 1.5,
-				y: 1.25
-			}, {
-				x: 2.05,
-				y: 1.8999999761581421
-			}, {
-				x: 2.6,
-				y: 0.60000002384185791
-			}
-		],
-		destination:  {
-			x: 3.4056000709533691,
-			y: 0.49000000953674316
-		}
-	}
-}
-
 $(document).ready(() => {
-	let $canvas = $('canvas')
-	$canvas.height($canvas.width() / 2)
-	ARENA_WIDTH_SCALE = $canvas.width() / 4
-	ARENA_HEIGHT_SCALE = $canvas.height() / 2
-})
 
+	resizeArena()
 
-
-$(document).ready(() => {
-	let connection = new WebSocket("ws://127.0.0.1:8888/")
+	const connection = new WebSocket("ws://127.0.0.1:8888/")
 
 	connection.onopen = () => {
 		console.log('OPEN')
@@ -106,9 +21,9 @@ $(document).ready(() => {
 		console.log(message)
 		if (message.type == 'randomization') {
 
-			console.log(message.destination.x * ARENA_WIDTH_SCALE)
-			console.log(message.destination.y * ARENA_HEIGHT_SCALE)
-			console.log(DESTINATION_RADIUS * ARENA_WIDTH_SCALE)
+			// console.log(message.destination.x * ARENA_WIDTH_SCALE)
+			// console.log(message.destination.y * ARENA_HEIGHT_SCALE)
+			// console.log(DESTINATION_RADIUS * ARENA_WIDTH_SCALE)
 
 			// $('canvas').drawArc({
 			//   layer: true,
@@ -150,24 +65,8 @@ $(document).ready(() => {
 		console.log('Failed')
 	}
 
-	const $canvas = $('#canvas')
 
-	$canvas.drawRect({
-	  fillStyle: '#FAE3BF',
-	  x: 0, y: 0,
-	  fromCenter: false,
-	  width: ARENA_WIDTH * ARENA_WIDTH_SCALE,
-	  height: ARENA_HEIGHT * ARENA_HEIGHT_SCALE,
-	  fromCenter: false
-	})
 
-	$canvas.drawRect({
-	  fillStyle: '#d2bb9b',
-	  x: ROCKY_TERRAIN_OFFSET * ARENA_WIDTH_SCALE, y: 0,
-	  fromCenter: false,
-	  width: ROCKY_TERRAIN_WIDTH * ARENA_WIDTH_SCALE,
-	  height: ARENA_HEIGHT * ARENA_HEIGHT_SCALE,
-	})
 
 	let editor = CodeMirror(document.getElementById('code-editor'), {
 		value: 'void setup() {\n\n}\n\nvoid loop() {\n\n}',
@@ -180,4 +79,5 @@ $(document).ready(() => {
 	})
 
 })
+
 

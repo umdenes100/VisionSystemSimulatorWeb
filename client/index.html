@@ -24,21 +24,23 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/1.8.6/showdown.js"></script>
         <script src="lib/codemirror/lib/codemirror.js"></script>
         <script src="lib/codemirror/mode/clike/clike.js"></script>
+        <script src="arena.js"></script>
+        <script src="requests.js"></script>
         <script src="communication.js"></script>
 
     </head>
 
     <body>
-        <div class="container-fluid test h-100">
+        <div class="container-fluid h-100">
             <div class="row h-100">
-                <div class="col-md-5 h-100 pl-0 pr-0 test">
+                <div class="col-md-5 h-100 pl-0 pr-0">
                     <div id="code-editor"></div>
                 </div>
-                <div class="col-md-7 test">
-                    <div class="row test" width="100%">
-                        <canvas id="canvas" class="test"></canvas>
+
+                <div class="col-md-7">
+                    <div class="row" width="100%">
+                        <canvas class="test"></canvas>
                     </div>
-                    
                 </div>
             </div>
         </div>

@@ -72,6 +72,24 @@ class Obstacle {
 	draw() {
 		context.fillStyle = this.color
 		context.fillRect(this.x, this.y, this.width, this.height)
+	}
+}
+
+class Destination {
+	constructor(x, y) {
+		this.x = canvas.width * (x / 4)
+		this.y = canvas.height * ((2 - y) / 2)
+		this.radius = canvas.width * (0.09 / 4)
+		this.color = 'blue'
+	}
+
+	draw() {
+		context.beginPath()
+		context.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false)
+		context.strokeStyle = this.color
+		context.stroke()
+		context.closePath()
 		console.log(this)
 	}
 }
+

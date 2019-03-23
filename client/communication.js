@@ -20,6 +20,9 @@ $(document).ready(() => {
 				let obs = new Obstacle(obstacle.x, obstacle.y)
 				obs.draw()
 			})
+
+			let destination = new Destination(message.destination.x, message.destination.y)
+			destination.draw()
 		} else {
 			console.log('Unimplemented')
 		}

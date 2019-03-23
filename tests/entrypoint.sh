@@ -4,4 +4,7 @@ cd /server
 python3 middleware.py &
 
 cd /tests
-python3 -u test_middleware.py
+pytest
+
+rm -rf .pytest_cache
+rm -rf __pycache__

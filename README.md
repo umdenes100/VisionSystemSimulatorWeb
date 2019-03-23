@@ -59,3 +59,4 @@ To run all the tests -
 chmod +rwx run_tests.sh
 ./run_tests
 ```
+

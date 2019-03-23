@@ -37,7 +37,7 @@ let simulation_request = {
 #include "Enes100.h"
 #include "Tank.h"
 
-int wow = 6;
+int wow = 6
 
 void setup() {
 	pinMode(16, OUTPUT);
@@ -94,8 +94,6 @@ $(document).ready(() => {
 		connection.send(JSON.stringify(request))
 		connection.send(JSON.stringify(request))
 		connection.send(JSON.stringify(bad_request))
-		// connection.send(JSON.stringify(simulation_request))
-		// console.log(JSON.stringify(simulation_request))
 	}
 
 	connection.onerror = error => {

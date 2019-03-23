@@ -16,7 +16,10 @@ $(document).ready(() => {
 		message = JSON.parse(message.data)
 		console.log(message)
 		if (message.type == 'randomization') {
-
+			message.obstacles.map(obstacle => {
+				let obs = new Obstacle(obstacle.x, obstacle.y)
+				obs.draw()
+			})
 		} else {
 			console.log('Unimplemented')
 		}

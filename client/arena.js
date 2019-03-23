@@ -27,15 +27,14 @@ resize()
 
 class Arena {
 	constructor() {
-		this.x = window.innerWidth
-		this.y = window.innerHeight
+		this.x = innerWidth
+		this.y = innerHeight
 		this.color = '#fae3bf'
 	}
 
 	draw() {
-		background_context.rect(0, 0, this.x, this.y)
 		background_context.fillStyle = this.color
-		background_context.fill()
+		background_context.fillRect(0, 0, this.x, this.y)
 	}
 }
 
@@ -44,19 +43,35 @@ arena.draw()
 
 class RockyTerrain {
 	constructor() {
-		this.x = window.innerWidth * (0.65 / 4)
-		this.x_offset = window.innerWidth * (0.6 / 4)
-		this.y = window.innerWidth /  2
+		this.x = innerWidth * (0.6 / 4)
+		this.y = 0
+		this.width = innerWidth * (0.65 / 4)
+		this.height = innerWidth /  2
 
 		this.color = '#d2bb9a'
 	}
 
 	draw() {
-		context.rect(this.x_offset, 0, this.x, this.y)
 		context.fillStyle = this.color
-		context.fill()
+		context.fillRect(this.x, this.y, this.width, this.height)
 	}
 }
 
 let rockyTerrain = new RockyTerrain()
 rockyTerrain.draw()
+
+class Obstacle {
+	constructor(x, y) {
+		this.x = canvas.width * (x / 4)
+		this.y = canvas.height * ((2 - y) / 2)
+		this.width = canvas.width * (0.3 / 4)
+		this.height = canvas.height * (0.5 / 2)
+		this.color = '#967f5b'
+	}
+
+	draw() {
+		context.fillStyle = this.color
+		context.fillRect(this.x, this.y, this.width, this.height)
+		console.log(this)
+	}
+}

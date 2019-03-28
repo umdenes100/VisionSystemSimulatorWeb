@@ -1,0 +1,7 @@
+rule infer
+  command = pytype-single --imports_info $imports --module-name $module -V 3.7 -o $out --no-report-errors --nofail --quick $in
+rule check
+  command = pytype-single --imports_info $imports --module-name $module -V 3.7 -o $out --analyze-annotated --nofail --quick $in
+build /Users/ExSidius/Desktop/VisionSystemSimulatorWeb/server/pytype_output/pyi/middleware.pyi: check /Users/ExSidius/Desktop/VisionSystemSimulatorWeb/server/middleware.py
+  imports = /Users/ExSidius/Desktop/VisionSystemSimulatorWeb/server/pytype_output/imports/middleware.imports
+  module = middleware

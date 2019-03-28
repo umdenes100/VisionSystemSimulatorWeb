@@ -1,18 +1,5 @@
-const DESTINATION_RADIUS = 0.09
-
-const ARENA_X = 4
-const ARENA_Y = 2
-
-const OBSTACLE_X = 0.2
-const OBSTACLE_Y = 0.5
-
-const DEFAULT_OSV_BREADTH = 0.20
-const DEFAULT_OSV_LENGTH = 0.30
-const DEFAULT_OSV_ORIENTATION = 0
-
 let background = document.getElementById('background')
 let background_context = background.getContext('2d')
-
 let canvas = document.getElementById('foreground')
 let context = canvas.getContext('2d')
 
@@ -24,6 +11,9 @@ function resize() {
 }
 
 resize()
+
+const ARENA_X = 4
+const ARENA_Y = 2
 
 class Arena {
 	constructor() {
@@ -43,10 +33,10 @@ arena.draw()
 
 class RockyTerrain {
 	constructor() {
-		this.x = innerWidth * (0.6 / 4)
+		this.x = innerWidth * (0.6 / ARENA_X)
 		this.y = 0
-		this.width = innerWidth * (0.65 / 4)
-		this.height = innerWidth /  2
+		this.width = innerWidth * (0.65 / ARENA_X)
+		this.height = innerWidth /  ARENA_Y
 
 		this.color = '#d0a9ae'
 	}
@@ -60,12 +50,15 @@ class RockyTerrain {
 let rockyTerrain = new RockyTerrain()
 rockyTerrain.draw()
 
+const OBSTACLE_X = 0.2
+const OBSTACLE_Y = 0.5
+
 class Obstacle {
 	constructor(x, y) {
-		this.x = canvas.width * (x / 4)
-		this.y = canvas.height * ((2 - y) / 2)
-		this.width = canvas.width * (0.25 / 4)
-		this.height = canvas.height * (0.5 / 2)
+		this.x = canvas.width * (x / ARENA_X)
+		this.y = canvas.height * ((2 - y) / ARENA_Y)
+		this.width = canvas.width * (OBSTACLE_X / ARENA_X)
+		this.height = canvas.height * (OBSTACLE_Y / ARENA_Y)
 		this.color = '#556B2F'
 	}
 
@@ -75,11 +68,14 @@ class Obstacle {
 	}
 }
 
+
+const DESTINATION_RADIUS = 0.09
+
 class Destination {
 	constructor(x, y) {
-		this.x = canvas.width * (x / 4)
-		this.y = canvas.height * ((2 - y) / 2)
-		this.radius = canvas.width * (0.09 / 4)
+		this.x = canvas.width * (x / ARENA_X)
+		this.y = canvas.height * ((2 - y) / ARENA_Y)
+		this.radius = canvas.width * (DESTINATION_RADIUS / ARENA_X)
 		this.color = 'blue'
 	}
 

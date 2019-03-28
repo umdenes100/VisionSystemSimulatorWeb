@@ -1,6 +1,6 @@
 $(document).ready(() => {
 
-	const connection = new WebSocket("ws://127.0.0.1:8888/")
+	const connection = new WebSocket("ws://18.191.246.34:8888/")
 
 	connection.onopen = () => {
 		console.log('OPEN')

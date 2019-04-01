@@ -1,6 +1,7 @@
 $(document).ready(() => {
 
-	const connection = new WebSocket("ws://18.191.246.34:8888/")
+	// const connection = new WebSocket("ws://18.191.246.34:8888/")
+	const connection = new WebSocket("ws://127.0.0.1:8888/")
 
 	connection.onopen = () => {
 		console.log('OPEN')
@@ -16,6 +17,7 @@ $(document).ready(() => {
 		message = JSON.parse(message.data)
 		console.log(message)
 		if (message.type == 'randomization') {
+
 			message.obstacles.map(obstacle => {
 				let obs = new Obstacle(obstacle.x, obstacle.y)
 				obs.draw()

@@ -4,6 +4,7 @@ import websockets
 import argparse
 import uuid
 import json
+import time
 import os
 
 Executable = namedtuple('Executable', ['command', 'working_directory'])
@@ -20,13 +21,14 @@ REQUEST_TYPES = {
 	        working_directory=os.path.join(BASE_DIR, 'simulator', 'simulator')
         ),
     'test': Executable(
-	        command='python3 c_program.py',
+	        command='python3.7 c_program.py',
 	        working_directory=os.path.join(os.path.dirname(BASE_DIR), 'tests')
         ),
 }
 
 
 async def process_command(command, working_directory, data=None):
+    start_time = time.time_ns()
     process = await create_subprocess_exec(*command.split(),
                                            cwd=working_directory,
                                            stdin=subprocess.PIPE,
@@ -37,7 +39,7 @@ async def process_command(command, working_directory, data=None):
     else:
         stdout, stderr = await process.communicate(input=bytes(json.dumps(data),
                                                                encoding='utf-8'))
-
+    print(f'Total Time (ns): {time.time_ns() - start_time}')
     print(f'Return Code: {process.returncode}')
     if stderr:
         print(f'Error: {stderr}')

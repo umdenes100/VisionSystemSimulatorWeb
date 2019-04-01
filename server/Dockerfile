@@ -3,12 +3,18 @@ FROM ubuntu:latest
 RUN echo "Installing dependencies..." && \
     apt -y --no-install-recommends update && \ 
     # apt -y --no-install-recommends upgrade && \
+    apt remove --purge python && apt autoremove && \
     apt install -y --no-install-recommends \
-    build-essential \
-    git \
+    python3.7 \
     python3-pip \
-    nano \
+    g++ \
+    gcc \
+    libc6-dev \
+    make \
+    wget\
     cmake \
+    git \
+    nano \
     lsof \
     sudo
 
@@ -21,6 +27,8 @@ RUN echo "Installing cJSON..." && \
 	make && \
 	make install
 
+RUN python3.7 -m pip install websockets
+
 COPY ./server /server
 
 RUN echo "Building randomization binary..." && \
@@ -29,8 +37,6 @@ RUN echo "Building randomization binary..." && \
 RUN echo "Building simulator binary..." && \
     make -C /server/simulator/simulator
 
-RUN pip3 install websockets
-
 WORKDIR /server
 
-CMD ["python3", "-u", "middleware.py"]
+CMD ["python3.7", "-u", "middleware.py"]

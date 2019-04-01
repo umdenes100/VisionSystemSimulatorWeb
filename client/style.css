@@ -2,9 +2,22 @@
 	border: 1px black solid;
 }
 
-body {
+html, body, .container-fluid {
+	padding: 0px;
 	margin: 0px;
+	height:100%;
 }
+
+canvas {
+	position: absolute;
+/*	top: 0;
+	left: 0;*/
+}
+
+#wrapper {
+	padding: 0;
+}
+
 
 #code-editor {
 	padding: 0px;
@@ -18,11 +31,7 @@ body {
 	height: 100%;
 }
 
-canvas {
-	position: absolute;
-	top: 0;
-	left: 0;
-}
+
 
 #background {
 	z-index: 1;

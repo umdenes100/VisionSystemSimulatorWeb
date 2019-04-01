@@ -11,13 +11,13 @@
 
         <title>Simulator</title>
 
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
         <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
         <link rel="stylesheet" href="style.css">
         <link rel="stylesheet" href="lib/codemirror/lib/codemirror.css">
         <link rel="stylesheet" href="lib/codemirror/theme/midnight.css">
 
         <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/jcanvas/21.0.1/min/jcanvas.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.4/js/tether.min.js"></script>
 
         <script src="lib/codemirror/lib/codemirror.js"></script>
@@ -28,10 +28,19 @@
     </head>
 
     <body>
-        <div id="wrapper">
-            <canvas id="background" class="test"></canvas>
-            <canvas id="foreground" class="test"></canvas>
+        <div class="container-fluid h-100">
+            <div class="row h-100">
+                <div class="col-md-6"></div>
+                <div class="col-md-6">
+                    <button id="randomize" class="ml-2">Randomize</button>
+                    <div id="wrapper" class="ml-2 mr-2">
+                        <canvas id="background" class="test"></canvas>
+                        <canvas id="foreground" class="test"></canvas>
+                    </div>
+                </div>
+            </div>
         </div>
+
     </body>
 
     <script src="arena.js"></script>

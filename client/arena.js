@@ -1,91 +1,143 @@
-let background = document.getElementById('background')
-let background_context = background.getContext('2d')
-let canvas = document.getElementById('foreground')
-let context = canvas.getContext('2d')
-
-function resize() {
-	background.width = window.innerWidth
-	background.height = window.innerWidth / 2
-	canvas.width = window.innerWidth
-	canvas.height = window.innerWidth / 2
-}
-
-resize()
-
 const ARENA_X = 4
 const ARENA_Y = 2
 
-class Arena {
-	constructor() {
-		this.x = innerWidth
-		this.y = innerHeight
-		this.color = '#fae3bf'
-	}
-
-	draw() {
-		background_context.fillStyle = this.color
-		background_context.fillRect(0, 0, this.x, this.y)
-	}
-}
-
-let arena = new Arena()
-arena.draw()
-
-class RockyTerrain {
-	constructor() {
-		this.x = innerWidth * (0.6 / ARENA_X)
-		this.y = 0
-		this.width = innerWidth * (0.65 / ARENA_X)
-		this.height = innerWidth /  ARENA_Y
-
-		this.color = '#d0a9ae'
-	}
-
-	draw() {
-		context.fillStyle = this.color
-		context.fillRect(this.x, this.y, this.width, this.height)
-	}
-}
-
-let rockyTerrain = new RockyTerrain()
-rockyTerrain.draw()
+const ROCKY_TERRAIN_OFFSET = 0.6
+const ROCKY_TERRAIN_X = 0.65
 
 const OBSTACLE_X = 0.2
 const OBSTACLE_Y = 0.5
 
+const DESTINATION_RADIUS = 0.09
+
+let background = document.getElementById('background')
+let background_context = background.getContext('2d')
+let foreground = document.getElementById('foreground')
+let foreground_context = foreground.getContext('2d')
+
+
+class Arena {
+	constructor() {
+		this.color = '#fae3bf'
+	}
+
+	resize(width, height) {
+		this.width = width
+		this.height = height
+	}
+
+	draw() {
+		background_context.fillStyle = this.color
+		background_context.fillRect(0, 0, this.width, this.height)
+	}
+}
+
+class RockyTerrain {
+	constructor(canvas_width, canvas_height) {
+		this.color = '#d0a9ae'
+	}
+
+	resize(width, height) {
+		this.x = width * (ROCKY_TERRAIN_OFFSET / ARENA_X)
+		this.y = 0
+		this.width = width * (ROCKY_TERRAIN_X / ARENA_X)
+		this.height = height
+	}
+
+	draw() {
+		foreground_context.fillStyle = this.color
+		foreground_context.fillRect(this.x, this.y, this.width, this.height)
+	}
+}
+
+
 class Obstacle {
 	constructor(x, y) {
-		this.x = canvas.width * (x / ARENA_X)
-		this.y = canvas.height * ((2 - y) / ARENA_Y)
-		this.width = canvas.width * (OBSTACLE_X / ARENA_X)
-		this.height = canvas.height * (OBSTACLE_Y / ARENA_Y)
+		this.actual_x = x
+		this.actual_y = y
+
 		this.color = '#556B2F'
 	}
 
+	resize(width, height) {
+		this.x = width * (this.actual_x / ARENA_X)
+		this.y = height * ((2 - this.actual_y) / ARENA_Y)
+		this.width = width * (OBSTACLE_X / ARENA_X)
+		this.height = height * (OBSTACLE_Y / ARENA_Y)
+	}
+
 	draw() {
-		context.fillStyle = this.color
-		context.fillRect(this.x, this.y, this.width, this.height)
+		foreground_context.fillStyle = this.color
+		foreground_context.fillRect(this.x, this.y, this.width, this.height)
 	}
 }
 
-
-const DESTINATION_RADIUS = 0.09
 
 class Destination {
 	constructor(x, y) {
-		this.x = canvas.width * (x / ARENA_X)
-		this.y = canvas.height * ((2 - y) / ARENA_Y)
-		this.radius = canvas.width * (DESTINATION_RADIUS / ARENA_X)
+		this.actual_x = x
+		this.actual_y = y
+
 		this.color = 'blue'
 	}
 
+	resize(width, height) {
+		this.x = width * (this.actual_x / ARENA_X)
+		this.y = height * ((2 - this.actual_y) / ARENA_Y)
+		this.radius = width * (DESTINATION_RADIUS / ARENA_X)
+	}
+
 	draw() {
-		context.beginPath()
-		context.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false)
-		context.strokeStyle = this.color
-		context.stroke()
-		context.closePath()
-		console.log(this)
+		foreground_context.beginPath()
+		foreground_context.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false)
+		foreground_context.strokeStyle = this.color
+		foreground_context.stroke()
+		foreground_context.closePath()
 	}
 }
+
+class Canvas {
+	constructor() {
+		this.arena = new Arena()
+		this.rockyTerrain = new RockyTerrain()
+		this.obstacles = undefined
+		this.destination = undefined
+		this.osv = undefined
+	}
+
+	width() {
+		return $('canvas').first().parent().width()
+	}
+
+	height() {
+		return this.width() / 2
+	}
+
+	draw() {
+
+		background.width = this.width()
+		background.height = this.height()
+		foreground.width = this.width()
+		foreground.height = this.height()
+
+		this.elements().map(element => {
+			if (element !== undefined) {
+				element.resize(this.width(), this.height())
+				element.draw()
+			}
+		})
+	}
+
+	elements() {
+		return [this.arena, this.rockyTerrain, this.obstacles, this.destination, this.osv].flat()
+	}
+
+}
+
+
+let canvas = new Canvas()
+canvas.draw()
+
+$(window).resize(() => {
+	canvas.draw()
+})
 

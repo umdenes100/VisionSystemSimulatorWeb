@@ -1,8 +1,8 @@
 let bad_request = 'This is a terribly formatted request.'
 
-let request = {
+let randomization_request = JSON.stringify({
     type: 'randomization'
-}
+})
 
 let simulation_request = {
 	type: 'simulation',

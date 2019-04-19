@@ -69,16 +69,21 @@ int main(int argc, char *argv[]) {
         return -1;
     }
 
-    json = json->child;
+    cJSON *parent_json = json;
+    cJSON *child_json = json->child;
 
     // now that we have the JSON we need to perform initialization
-    if(initialize(get_id(json), get_code(json)) != 0) {
+    if(initialize(get_id(child_json), get_code(child_json)) != 0) {
         // initialize error:
         return -1;
     }
 
+    // printf("Hello world!\n");
+    char *out = cJSON_Print(parent_json);
+    printf("%s\n", out);
+
     // now we need to simulate
-    cJSON_Delete(json);
+    cJSON_Delete(parent_json);
     free(input);
 
     fflush(stdout);

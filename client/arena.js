@@ -15,9 +15,26 @@ let foreground = document.getElementById('foreground')
 let foreground_context = foreground.getContext('2d')
 
 
+const SAND_COLORS = [
+	'#F9E3C1',
+	'#CFBCAD',
+	'#CFC8BF',
+	'#DFC5AD',
+	'#BFA783',
+]
+
+function hexToRgb(hex) {
+    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result ? {
+        r: parseInt(result[1], 16),
+        g: parseInt(result[2], 16),
+        b: parseInt(result[3], 16)
+    } : null;
+}
+
 class Arena {
 	constructor() {
-		this.color = '#fae3bf'
+		this.colors = SAND_COLORS
 	}
 
 	resize(width, height) {
@@ -26,8 +43,22 @@ class Arena {
 	}
 
 	draw() {
-		background_context.fillStyle = this.color
-		background_context.fillRect(0, 0, this.width, this.height)
+
+		let imageData = background_context.getImageData(0, 0, this.width, this.height)
+
+		for (let i = 0; i < imageData.data.length / 4; i++) {
+
+			let hex = this.colors[Math.floor(Math.random() * this.colors.length)]
+			let rgb = hexToRgb(hex)
+
+			imageData.data[4*i] = rgb.r;    // RED (0-255)
+			imageData.data[4*i+1] = rgb.g;    // GREEN (0-255)
+			imageData.data[4*i+2] = rgb.b;    // BLUE (0-255)
+			imageData.data[4*i+3] = 255;  // APLHA (0-255)
+		}
+
+		background_context.putImageData(imageData,0,0);
+		// background_context.fillRect(0, 0, this.width, this.height)
 	}
 }
 
@@ -101,7 +132,7 @@ class Canvas {
 		this.rockyTerrain = new RockyTerrain()
 		this.obstacles = undefined
 		this.destination = undefined
-		this.osv = undefined
+		this.osv_frames = undefined
 	}
 
 	width() {

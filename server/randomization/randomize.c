@@ -88,6 +88,8 @@ void randomize(void) {
         point = cJSON_CreateObject();
         cJSON_AddNumberToObject(point, "x", i * 0.55 + 1.5);
         cJSON_AddNumberToObject(point, "y", baseY);
+        cJSON_AddNumberToObject(point, "width", 0.2);
+        cJSON_AddNumberToObject(point, "height", 0.5);
         cJSON_AddItemToArray(obstacles, point);
     }
     cJSON_AddItemToObject(root, "obstacles", obstacles);

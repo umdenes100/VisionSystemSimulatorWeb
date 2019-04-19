@@ -11,7 +11,7 @@ RUN echo "Installing dependencies..." && \
     gcc \
     libc6-dev \
     make \
-    wget\
+    wget \
     cmake \
     git \
     nano \
@@ -27,7 +27,8 @@ RUN echo "Installing cJSON..." && \
 	make && \
 	make install
 
-RUN python3.7 -m pip install websockets
+RUN python3.7 -m pip install setuptools
+RUN python3.7 -m pip install websockets pycparser
 
 COPY ./server /server
 

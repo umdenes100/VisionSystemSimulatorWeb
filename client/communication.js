@@ -1,3 +1,6 @@
+let randomization = undefined
+let simulation = undefined
+
 $(document).ready(() => {
 
 	const connection = new WebSocket("ws://18.191.246.34:8888/")
@@ -17,6 +20,8 @@ $(document).ready(() => {
 		message = JSON.parse(message.data)
 		console.log(message)
 		if (message.type == 'randomization') {
+			randomization = message
+
 			canvas.obstacles = message.obstacles.map(obstacle => new Obstacle(obstacle.x, obstacle.y))
 			canvas.destination = new Destination(message.destination.x, message.destination.y)
 			canvas.draw()

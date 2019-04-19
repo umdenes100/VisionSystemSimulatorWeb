@@ -60,6 +60,8 @@ cJSON* get_randomization(cJSON *json) {
 }
 
 int main(int argc, char *argv[]) {
+
+    printf("Hello world\n");
     char *input = get_input();
     cJSON *json = cJSON_Parse(input);
 

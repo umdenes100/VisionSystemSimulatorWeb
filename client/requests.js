@@ -83,5 +83,6 @@ int function  (char *    a) {
 			x: 3.4056000709533691,
 			y: 0.49000000953674316
 		}
-	}
+	},
+	distance_sensors: [0, 2],
 }

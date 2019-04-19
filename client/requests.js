@@ -46,7 +46,7 @@ let simulation_request = {
 #include "Enes100.h"
 #include "Tank.h"
 
-int wow = 6
+int wow = 6;
 
 void setup() {
 	pinMode(16, OUTPUT);
@@ -54,7 +54,7 @@ void setup() {
 
 void loop() {
 	digitalWrite(3, HIGH);
-	function("yes");
+	// function("yes");
 }
 
 int function  (char *    a) {

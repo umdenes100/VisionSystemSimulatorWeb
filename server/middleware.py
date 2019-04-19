@@ -50,11 +50,9 @@ async def process_command(command, working_directory, data=None):
 
 async def middleware(websocket, path):
     async for request in websocket:
-
         try:
             request = json.loads(request)
-            if not isinstance(request, dict):
-                raise
+            assert isinstance(request, dict)
         except BaseException:
             error = f'Invalid JSON: Received request - {json.dumps(request, indent=2)}'
             print(error)

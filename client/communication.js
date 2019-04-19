@@ -3,12 +3,12 @@ let simulation = undefined
 
 $(document).ready(() => {
 
-	const connection = new WebSocket("ws://18.191.246.34:8888/")
-	// const connection = new WebSocket("ws://127.0.0.1:8888/")
+	// const connection = new WebSocket("ws://18.191.246.34:8888/")
+	const connection = new WebSocket("ws://127.0.0.1:8888/")
 
 	connection.onopen = () => {
 		console.log('OPEN')
-		connection.send(randomization_request)
+		connection.send(JSON.stringify(simulation_request))
 	}
 
 	connection.onerror = error => {

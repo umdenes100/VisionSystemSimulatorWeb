@@ -32,8 +32,6 @@ RUN python3.7 -m pip install websockets pycparser
 
 COPY ./server /server
 
-RUN ls
-
 RUN echo "Building randomization binary..." && \
     make -C /server/randomization clean && \
     make -C /server/randomization

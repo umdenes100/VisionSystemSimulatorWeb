@@ -65,7 +65,9 @@ int function  (char *    a) {
 		osv: {
 				x: 0.35,
 				y: 0.7,
-				theta: -3.1415901184082031
+				theta: -3.1415901184082031,
+				height: 0.3,
+				width: 0.3,
 		},
 		obstacles: [
 			{

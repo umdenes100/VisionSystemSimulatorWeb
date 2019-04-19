@@ -19,4 +19,4 @@ services:
     ports:
       - "8888:8888"
     volumes:
-      - ./server:/sandbox
+      - ./server:/server

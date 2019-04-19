@@ -19,3 +19,7 @@ void Tank::setRightMotorPWM(int pwm) {
 void Tank::turnOffMotors(){
     // do what we want
 };
+
+float Tank::readDistanceSensor(int id) {
+    // do what we want
+}

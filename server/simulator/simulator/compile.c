@@ -205,8 +205,9 @@ int create_src_file(char *code, struct file_names files) {
     strcat(n_line, "\"\n");
 
     fputs(n_line, fp);
+    fputs("#include \"State.h\"\nState lib_state;\n", fp);
     fputs(code, fp);
-    fputs("\n\nint main() {\n\tsetup();\n\twhile(1) {\n\t\tloop();\n\t}\n}\n", fp);
+    fputs("\n\nint main(int argc, char *argv[]) {\n\tlib_state.init(argv[1]);\n\tsetup();\n\twhile(1) {\n\t\tloop();\n\t}\n}\n", fp);
     fclose(fp);
 
     return 0;

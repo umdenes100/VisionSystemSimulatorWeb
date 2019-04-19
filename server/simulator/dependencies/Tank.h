@@ -11,7 +11,7 @@ class Tank
 public:
   Tank();
   void begin();
-
+  float readDistanceSensor(int id);
   void turnOffMotors();
   void setRightMotorPWM(int pwm);
   void setLeftMotorPWM(int pwm);

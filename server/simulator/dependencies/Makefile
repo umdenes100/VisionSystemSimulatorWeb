@@ -1,8 +1,8 @@
 CC = g++
 CFLAGS = -I ./
 
-all: ArduinoHelpers.o Tank.o VisionSystemClient.o Enes100.h
-	$(CC) $(CFLAGS) -o ../environments/$(name)/$(name) ../environments/$(name)/$(name).cpp ArduinoHelpers.o Tank.o VisionSystemClient.o
+all: ArduinoHelpers.o Tank.o VisionSystemClient.o State.o Enes100.h
+	$(CC) $(CFLAGS) -o ../environments/$(name)/$(name) ../environments/$(name)/$(name).cpp ArduinoHelpers.o State.o Tank.o VisionSystemClient.o
 
 ArduinoHelpers.o: ArduinoHelpers.hpp ArduinoHelpers.cpp
 	$(CC) -c ArduinoHelpers.cpp
@@ -12,6 +12,9 @@ Tank.o: Tank.h Tank.cpp
 
 VisionSystemClient.o: VisionSystemClient.cpp VisionSystemClient.hpp
 	$(CC) -c VisionSystemClient.cpp
+
+State.o: State.cpp State.h
+	$(CC) -c State.cpp
 
 clean:
 	rm -rf *~ *.o

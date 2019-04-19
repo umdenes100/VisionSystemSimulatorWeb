@@ -59,9 +59,14 @@ cJSON* get_randomization(cJSON *json) {
     error("Unable to get randomization.");
 }
 
-int main(int argc, char *argv[]) {
+cJSON* clean_for_simulate(cJSON *json) {
+    // get rid of type and code
+    json = json->next->next;
+    // keep randomization, distance sensors, id
+    return json;
+}
 
-    printf("Hello world\n");
+int main(int argc, char *argv[]) {
     char *input = get_input();
     cJSON *json = cJSON_Parse(input);
 
@@ -80,12 +85,34 @@ int main(int argc, char *argv[]) {
         return -1;
     }
 
-    // printf("Hello world!\n");
-    char *out = cJSON_Print(parent_json);
-    printf("%s\n", out);
+    child_json = clean_for_simulate(child_json);
+    parent_json->child = child_json;
+
+    char *json_output = cJSON_Print(parent_json);
+    char *program_input = (char*)malloc((strlen(json_output) + 2) * sizeof(char));
+    sprintf(program_input, "'%s'", json_output);
+    char *command = (char*)malloc((strlen(program_input) + strlen("./../environments//") + 2 * strlen(get_id(child_json)) + strlen(" ")));
+    sprintf(command, "./../environments/%s/%s %s", get_id(child_json), get_id(child_json), program_input);
+    
+    FILE* p = popen(command, "r");
+    if(!p) {
+        error("Could not read file.");
+    }
+
+    char *buff = (char*)malloc(1 * sizeof(char));
+    int i = 0;
+    while((buff[i] = fgetc(p)) != EOF) {
+        i++;
+        buff = realloc(buff, (i + 1) * sizeof(char));
+    }
+
+    buff[i] = '\0';
+    pclose(p);
+    printf("%s\n", buff);
 
     // now we need to simulate
     cJSON_Delete(parent_json);
+    free(buff);
     free(input);
 
     fflush(stdout);

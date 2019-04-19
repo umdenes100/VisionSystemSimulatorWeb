@@ -1,4 +1,9 @@
 **/a.out
 **/*.o
 
-server/simulator/environments/
+server/simulator/environments/*
+!server/simulator/environments/.gitkeep 
+
+server/simulator/simulator/simulate
+
+server/randomization/randomize

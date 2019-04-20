@@ -1,6 +1,8 @@
 **/a.out
 **/*.o
 
+.vscode
+
 server/simulator/environments/*
 !server/simulator/environments/.gitkeep 
 

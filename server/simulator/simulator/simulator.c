@@ -1,9 +1,16 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
+#include <fcntl.h>
+#include <unistd.h>
 #include <cjson/cJSON.h>
 
 #include "compile.h"
+
+#define TIMEOUT 10000
+#define BUFFER_SIZE 100
+#define FRAME_RATE 10
 
 // this function is a debugging function which creates a string of the arduino code
 char* get_input() {
@@ -66,6 +73,27 @@ cJSON* clean_for_simulate(cJSON *json) {
     return json;
 }
 
+char ngetc(int fd) {
+    char c;
+    int size = read(fd, &c, 1);
+    if(size == 0) {
+        return (char)(-1);
+    } else {
+        return c;
+    }
+}
+
+int ngets(char *new_buffer, int fd) {
+    return read(fd, new_buffer, BUFFER_SIZE);
+}
+
+void frame(char **buff, int fd) {
+    // buff is current command (not nessesarily a full command)
+    // can also be multiple commands and command fragments
+    // write to fd on command.
+    // should handle one command and adjust buff apropriately
+}
+
 int main(int argc, char *argv[]) {
     char *input = get_input();
     cJSON *json = cJSON_Parse(input);
@@ -88,6 +116,7 @@ int main(int argc, char *argv[]) {
     child_json = clean_for_simulate(child_json);
     parent_json->child = child_json;
 
+    // we have to run the processs
     char *json_output = cJSON_Print(parent_json);
     char *program_input = (char*)malloc((strlen(json_output) + 2) * sizeof(char));
     sprintf(program_input, "'%s'", json_output);
@@ -96,19 +125,33 @@ int main(int argc, char *argv[]) {
     
     FILE* p = popen(command, "r");
     if(!p) {
-        error("Could not read file.");
+        return -1;
     }
+    
+    int fd = fileno(p);
+    // we need a non-blocking read this is called ngetc
+    fcntl(fd, F_SETFL, O_NONBLOCK);
 
     char *buff = (char*)malloc(1 * sizeof(char));
-    int i = 0;
-    while((buff[i] = fgetc(p)) != EOF) {
-        i++;
-        buff = realloc(buff, (i + 1) * sizeof(char));
+    int size = 0;
+    buff[size] = '\0';
+    char *curr_buff = (char*)malloc(BUFFER_SIZE * sizeof(char));
+    time_t start = time(NULL);
+    time_t last = time(NULL);
+
+    while(last - start > TIMEOUT) {
+        while(time(NULL) - last < FRAME_RATE);
+        // This itteration happens each frame
+        int curr_size = ngets(curr_buff, fd);
+        buff = (char*)realloc(buff, (curr_size + size + 1) * (sizeof(char)));
+        strcat(buff, curr_buff);
+        frame(&buff, fd);
+        last = time(NULL);
     }
 
-    buff[i] = '\0';
     pclose(p);
-    printf("%s\n", buff);
+    free(buff);
+    free(curr_buff);
 
     // now we need to simulate
     cJSON_Delete(parent_json);

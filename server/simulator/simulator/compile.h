@@ -7,7 +7,6 @@
 #include <regex.h>
 #include <sys/stat.h>
 
-// struct to return char[][] of matches
 struct match_list {
     char **matches;
     int n_matches;

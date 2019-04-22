@@ -86,3 +86,8 @@ bool VisionSystemClient::receive(Coordinate *coordinate)
 {
     // do what we want
 }
+
+void delay(int msec) 
+{
+    // do what we want
+}

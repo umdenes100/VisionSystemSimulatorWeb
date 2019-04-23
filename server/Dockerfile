@@ -1,5 +1,7 @@
 FROM ubuntu:latest
 
+ENV PYTHONUNBUFFERED 1
+
 RUN echo "Installing dependencies..." && \
     apt -y --no-install-recommends update && \ 
     # apt -y --no-install-recommends upgrade && \
@@ -34,3 +36,5 @@ RUN python3.7 -m pip install websockets
 COPY ./server /server
 
 WORKDIR /server
+
+ENTRYPOINT ["/server/entrypoint.sh"]

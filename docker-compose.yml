@@ -20,4 +20,3 @@ services:
       - "8888:8888"
     volumes:
       - ./server:/server
-    command: /server/entrypoint.sh

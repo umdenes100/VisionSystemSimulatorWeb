@@ -8,4 +8,4 @@ echo "Building simulator binary..." && \
 make -C /server/simulator/simulator clean && \
 make -C /server/simulator/simulator
 
-python3.7 -u middleware.py
+./middleware

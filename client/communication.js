@@ -1,5 +1,6 @@
 let randomization = undefined
 let simulation = undefined
+let editor = undefined
 
 $(document).ready(() => {
 
@@ -8,7 +9,7 @@ $(document).ready(() => {
 
 	connection.onopen = () => {
 		console.log('OPEN')
-		connection.send(JSON.stringify(simulation_request))
+		connection.send(JSON.stringify(randomization_request))
 	}
 
 	connection.onerror = error => {
@@ -25,6 +26,7 @@ $(document).ready(() => {
 			canvas.obstacles = message.obstacles.map(obstacle => new Obstacle(obstacle.x, obstacle.y))
 			canvas.destination = new Destination(message.destination.x, message.destination.y)
 			canvas.draw()
+
 		} else {
 			console.log('Unimplemented')
 		}
@@ -34,16 +36,18 @@ $(document).ready(() => {
 		console.log('Failed')
 	}
 
-	let editor = CodeMirror(document.getElementById('code-editor'), {
+	editor = CodeMirror(document.getElementById('code-editor'), {
 		value: 'void setup() {\n\n}\n\nvoid loop() {\n\n}',
-		theme: 'midnight',
+		// theme: 'night',
+		mode: "text/x-c++src",
 		indentUnit: 4,
+		indentWithTabs: true,
 		firstLineNumber: 0,
+		extraKeys: {"Ctrl-Space": "autocomplete"},
+		matchBrackets: true,
 		lineNumbers: true,
 		lineWrapping: true,
-		indentWithTabs: true,
 	})
-
 
 	$('#randomize').on('click', () => {
 		connection.send(randomization_request)

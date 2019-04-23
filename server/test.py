@@ -1,18 +1,25 @@
-from pycparser import parse_file, c_parser, c_generator
-from pycparser.c_ast import FuncDef, FuncCall, ID, Compound, EmptyStatement
+from pygccxml import utils
+from pygccxml import declarations
+from pygccxml import parser
 
-ast = parse_file('simple_program.c', use_cpp=True)
+# Find the location of the xml generator (castxml or gccxml)
+generator_path, generator_name = utils.find_xml_generator()
 
-for i, item in enumerate(ast.ext):
-	if isinstance(item, FuncDef) and item.body.block_items is not None:
-		block_items = []
-		for bi in item.body.block_items:
-			block_items.append(bi)
-			block_items.append(FuncCall(name=ID(name='test'), args=None))
-		item.body.block_items = block_items
+# Configure the xml generator
+xml_generator_config = parser.xml_generator_configuration_t(
+    xml_generator_path=generator_path,
+    xml_generator=generator_name)
 
-print(ast)
-print()
+# Write a string containing some c++ code
+code = """
+    class MyClass {
+        int a;
+    };
+"""
 
-generator = c_generator.CGenerator()
-print(generator.visit(ast))
+# Parse the code
+decls = parser.parse_string(code, xml_generator_config)
+
+# Get access to the global namespace
+global_ns = declarations.get_global_namespace(decls)
+breakpoint()

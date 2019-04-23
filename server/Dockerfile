@@ -16,6 +16,7 @@ RUN echo "Installing dependencies..." && \
     git \
     nano \
     lsof \
+    castxml \
     sudo
 
 RUN echo "Installing cJSON..." && \
@@ -28,7 +29,7 @@ RUN echo "Installing cJSON..." && \
 	make install
 
 RUN python3.7 -m pip install setuptools
-RUN python3.7 -m pip install websockets pycparser
+RUN python3.7 -m pip install websockets pygccxml
 
 COPY ./server /server
 

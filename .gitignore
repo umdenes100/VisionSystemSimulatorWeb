@@ -1,6 +1,7 @@
 **/a.out
 **/*.o
 
+.idea
 .vscode
 
 server/simulator/environments/*

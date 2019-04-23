@@ -29,18 +29,8 @@ RUN echo "Installing cJSON..." && \
 	make install
 
 RUN python3.7 -m pip install setuptools
-RUN python3.7 -m pip install websockets pygccxml
+RUN python3.7 -m pip install websockets
 
 COPY ./server /server
 
-RUN echo "Building randomization binary..." && \
-    make -C /server/randomization clean && \
-    make -C /server/randomization
-
-RUN echo "Building simulator binary..." && \
-    make -C /server/simulator/simulator clean && \
-    make -C /server/simulator/simulator
-
 WORKDIR /server
-
-CMD ["python3.7", "-u", "middleware.py"]

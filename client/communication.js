@@ -14,14 +14,22 @@ $(document).ready(() => {
 	}
 
 	connection.onerror = error => {
-	    console.log('WebSocket Error.')
+	    console.log(`WebSocket Error.: ${error}`)
 	}
 
 	connection.onmessage = message => {
 
 		message = JSON.parse(message.data)
 		console.log(message)
-		if (message.type == 'randomization') {
+		if (message.type === 'randomization') {
+
+			let $textarea = $('#terminal');
+			$textarea.append('Updated randomization.\n')
+			let last_thousand_messages = $textarea.val().split('\n').slice(-1000).join('\n')
+			$textarea.empty()
+			$textarea.append(last_thousand_messages)
+			$textarea.scrollTop($textarea[0].scrollHeight);
+
 			randomization = message
 
 			canvas.obstacles = message.obstacles.map(obstacle => new Obstacle(obstacle.x, obstacle.y))
@@ -51,7 +59,23 @@ $(document).ready(() => {
 	})
 
 	$('#randomize').on('click', () => {
-		connection.send(randomization_request)
+		connection.send(JSON.stringify(randomization_request))
+	})
+
+	$('#simulate').on('click', () => {
+
+		let r = randomization
+		r.osv.height = 0.3
+		r.osv.width = 0.3
+
+		let simulation_request = JSON.stringify({
+			type: 'simulation',
+			code: editor.getDoc().getValue(),
+			randomization: r,
+			distance_sensors: [0, 2],
+		})
+
+		connection.send(simulation_request)
 	})
 
 })

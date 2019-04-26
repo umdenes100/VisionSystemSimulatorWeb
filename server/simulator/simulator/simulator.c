@@ -10,9 +10,9 @@
 
 #include "compile.h"
 
-#define TIMEOUT 10
+#define TIMEOUT_SEC 1
 #define BUFFER_SIZE 100
-#define FRAME_RATE 1
+#define FRAME_RATE_NSEC 20000
 
 // this function is a debugging function which creates a string of the arduino code
 char* get_input() {
@@ -154,10 +154,16 @@ void cclose(struct process p) {
     kill(p.pid, SIGKILL);
 }
 
-unsigned long time() {
+unsigned long time_sec() {
     struct timeval t;
     gettimeofday(&t, NULL);
     return t.tv_sec;
+}
+
+unsigned long time_nsec() {
+    struct timeval t;
+    gettimeofday(&t, NULL);
+    return t.tv_nsec;
 }
 
 int main(int argc, char *argv[]) {
@@ -198,18 +204,21 @@ int main(int argc, char *argv[]) {
     buff[size] = '\0';
     char *curr_buff = (char*)malloc(BUFFER_SIZE * sizeof(char));
 
-    unsigned long start = time();
-    unsigned long last = time();
+    unsigned long start = time_sec();
+    unsigned long curr_sec = time_sec();
+    unsigned long curr_nsec = time_nsec();
 
-    while(last - start < TIMEOUT) {
+    while(curr_sec - start < TIMEOUT_SEC) {
         printf("Hello\n");
-        while(time() - last < FRAME_RATE);
+        while(time_nsec() - curr_nsec < FRAME_RATE_NSEC);
         // This itteration happens each frame
         int curr_size = ngets(curr_buff, p.input_fd);
         // buff = (char*)realloc(buff, (curr_size + size + 1) * (sizeof(char)));
         strcat(buff, curr_buff);
         frame(&buff, p);
-        last = time();
+
+        curr_sec = time_sec();
+        curr_nsec = time_nsec();
     }
 
     cclose(p);

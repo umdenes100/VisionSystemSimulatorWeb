@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/time.h>
+#include <time.h>
 #include <fcntl.h>
 #include <sys/prctl.h>
 #include <signal.h>
@@ -9,10 +9,8 @@
 #include <cjson/cJSON.h>
 
 #include "compile.h"
-
-#define TIMEOUT_SEC 1
-#define BUFFER_SIZE 100
-#define FRAME_RATE_NSEC 20000
+#include "vs.h"
+#include "simulator.h"
 
 // this function is a debugging function which creates a string of the arduino code
 char* get_input() {
@@ -89,19 +87,6 @@ int ngets(char *new_buffer, int fd) {
     return read(fd, new_buffer, BUFFER_SIZE);
 }
 
-struct process {
-    int pid;
-    int input_fd;
-    int output_fd;
-};
-
-void frame(char **buff, struct process p) {
-    // buff is current command (not nessesarily a full command)
-    // can also be multiple commands and command fragments
-    // write to fd on command.
-    // should handle one command and adjust buff apropriately
-}
-
 struct process copen(char *command) {
     char *argv[] = { command, NULL };
     int in_pipe[2];
@@ -155,14 +140,14 @@ void cclose(struct process p) {
 }
 
 unsigned long time_sec() {
-    struct timeval t;
-    gettimeofday(&t, NULL);
+    struct timespec t;
+    clock_gettime(CLOCK_REALTIME, &t);
     return t.tv_sec;
 }
 
 unsigned long time_nsec() {
-    struct timeval t;
-    gettimeofday(&t, NULL);
+    struct timespec t;
+    clock_gettime(CLOCK_REALTIME, &t);
     return t.tv_nsec;
 }
 

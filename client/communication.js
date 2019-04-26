@@ -10,7 +10,6 @@ $(document).ready(() => {
 	connection.onopen = () => {
 		console.log('OPEN')
 		connection.send(JSON.stringify(randomization_request))
-		connection.send(JSON.stringify(simulation_request))
 	}
 
 	connection.onerror = error => {

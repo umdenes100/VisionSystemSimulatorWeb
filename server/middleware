@@ -71,8 +71,8 @@ async def middleware(websocket, path):
         print()
 
         request['id'] = uuid.uuid4().hex
-        print(f"Program Input: {json.dumps(request, indent=2)}")
-        print()
+        # print(f"Program Input: {json.dumps(request, indent=2)}")
+        # print()
 
         command, working_directory = REQUEST_TYPES[request['type']]
         result = await process_command(command, working_directory, request)

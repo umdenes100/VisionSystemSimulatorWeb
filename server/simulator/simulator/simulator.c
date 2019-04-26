@@ -1,16 +1,18 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <time.h>
+#include <sys/time.h>
 #include <fcntl.h>
+#include <sys/prctl.h>
+#include <signal.h>
 #include <unistd.h>
 #include <cjson/cJSON.h>
 
 #include "compile.h"
 
-#define TIMEOUT 10000
+#define TIMEOUT 10
 #define BUFFER_SIZE 100
-#define FRAME_RATE 10
+#define FRAME_RATE 1
 
 // this function is a debugging function which creates a string of the arduino code
 char* get_input() {
@@ -87,11 +89,75 @@ int ngets(char *new_buffer, int fd) {
     return read(fd, new_buffer, BUFFER_SIZE);
 }
 
-void frame(char **buff, int fd) {
+struct process {
+    int pid;
+    int input_fd;
+    int output_fd;
+};
+
+void frame(char **buff, struct process p) {
     // buff is current command (not nessesarily a full command)
     // can also be multiple commands and command fragments
     // write to fd on command.
     // should handle one command and adjust buff apropriately
+}
+
+struct process copen(char *command) {
+    char *argv[] = { command, NULL };
+    int in_pipe[2];
+    int out_pipe[2];
+    if(pipe(in_pipe) < 0) {
+        error("Unable to pipe.");
+    }
+
+    if(pipe(out_pipe) < 0) {
+        error("Unable to pipe.");
+    }
+
+    int pid = fork();
+    switch(pid) {
+        case -1:
+        // this error
+        error("Unable to fork.");
+        case 0:
+        // this is child
+        // we want stdout -> pipe, stdin -> pipe
+        close(out_pipe[1]);
+        close(in_pipe[0]);
+
+        dup2(out_pipe[0], STDIN_FILENO);
+        dup2(in_pipe[1], STDOUT_FILENO);
+
+        //ask kernel to deliver SIGTERM in case the parent dies
+        prctl(PR_SET_PDEATHSIG, SIGTERM);
+
+        // run the command
+        execvp(command, argv);
+        exit(0);
+        break;
+        default:
+        // this is parent with child pid
+        close(out_pipe[0]);
+        close(in_pipe[1]);
+        break;
+    }
+
+    struct process p;
+    p.pid = pid;
+    p.input_fd = in_pipe[0];
+    p.output_fd = out_pipe[1];
+
+    return p;
+}
+
+void cclose(struct process p) {
+    kill(p.pid, SIGKILL);
+}
+
+unsigned long time() {
+    struct timeval t;
+    gettimeofday(&t, NULL);
+    return t.tv_sec;
 }
 
 int main(int argc, char *argv[]) {
@@ -123,39 +189,35 @@ int main(int argc, char *argv[]) {
     char *command = (char*)malloc((strlen(program_input) + strlen("./../environments//") + 2 * strlen(get_id(child_json)) + strlen(" ")));
     sprintf(command, "./../environments/%s/%s %s", get_id(child_json), get_id(child_json), program_input);
     
-    FILE* p = popen(command, "r");
-    if(!p) {
-        return -1;
-    }
-    
-    int fd = fileno(p);
+    struct process p = copen(command);
     // we need a non-blocking read this is called ngetc
-    fcntl(fd, F_SETFL, O_NONBLOCK);
+    fcntl(p.input_fd, F_SETFL, O_NONBLOCK);
 
     char *buff = (char*)malloc(1 * sizeof(char));
     int size = 0;
     buff[size] = '\0';
     char *curr_buff = (char*)malloc(BUFFER_SIZE * sizeof(char));
-    time_t start = time(NULL);
-    time_t last = time(NULL);
 
-    while(last - start > TIMEOUT) {
-        while(time(NULL) - last < FRAME_RATE);
+    unsigned long start = time();
+    unsigned long last = time();
+
+    while(last - start < TIMEOUT) {
+        printf("Hello\n");
+        while(time() - last < FRAME_RATE);
         // This itteration happens each frame
-        int curr_size = ngets(curr_buff, fd);
-        buff = (char*)realloc(buff, (curr_size + size + 1) * (sizeof(char)));
+        int curr_size = ngets(curr_buff, p.input_fd);
+        // buff = (char*)realloc(buff, (curr_size + size + 1) * (sizeof(char)));
         strcat(buff, curr_buff);
-        frame(&buff, fd);
-        last = time(NULL);
+        frame(&buff, p);
+        last = time();
     }
 
-    pclose(p);
+    cclose(p);
     free(buff);
     free(curr_buff);
 
     // now we need to simulate
     cJSON_Delete(parent_json);
-    free(buff);
     free(input);
 
     fflush(stdout);

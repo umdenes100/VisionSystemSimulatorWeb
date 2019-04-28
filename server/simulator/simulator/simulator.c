@@ -174,6 +174,7 @@ int main(int argc, char *argv[]) {
     parent_json->child = child_json;
     char *json_output = cJSON_Print(parent_json);
     init(json_output);
+    free(json_output);
 
     // we have to run the processs
     char *command = (char*)malloc((strlen("./../environments//") + 2 * strlen(get_id(child_json))));
@@ -187,6 +188,7 @@ int main(int argc, char *argv[]) {
     unsigned long curr_nsec = time_nsec();
 
     struct process p = copen(command);
+    free(command);
     fcntl(p.input_fd, F_SETFL, O_NONBLOCK);
 
     while(curr_sec - start < TIMEOUT_SEC) {

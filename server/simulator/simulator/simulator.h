@@ -11,4 +11,6 @@ struct process {
     int output_fd;
 };
 
+int ngets(char *new_buffer, int fd);
+
 #endif

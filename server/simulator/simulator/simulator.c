@@ -11,6 +11,7 @@
 #include "compile.h"
 #include "vs.h"
 #include "simulator.h"
+#include "node.h"
 
 // this function is a debugging function which creates a string of the arduino code
 char* get_input() {
@@ -73,24 +74,20 @@ cJSON* clean_for_simulate(cJSON *json) {
     return json;
 }
 
-char ngetc(int fd) {
-    char c;
-    int size = read(fd, &c, 1);
-    if(size == 0) {
-        return (char)(-1);
+int ngets(char *new_buffer, int fd) {
+    int size = read(fd, new_buffer, BUFFER_SIZE);
+    if(size == -1) {
+        return 0;
     } else {
-        return c;
+        return size;
     }
 }
 
-int ngets(char *new_buffer, int fd) {
-    return read(fd, new_buffer, BUFFER_SIZE);
-}
-
 struct process copen(char *command) {
-    char *argv[] = { command, NULL };
+    char *argv[] = { NULL };
     int in_pipe[2];
     int out_pipe[2];
+
     if(pipe(in_pipe) < 0) {
         error("Unable to pipe.");
     }
@@ -110,14 +107,17 @@ struct process copen(char *command) {
         close(out_pipe[1]);
         close(in_pipe[0]);
 
-        dup2(out_pipe[0], STDIN_FILENO);
-        dup2(in_pipe[1], STDOUT_FILENO);
+        dup2(out_pipe[0], fileno(stdin));
+        dup2(in_pipe[1], fileno(stdout));
 
-        //ask kernel to deliver SIGTERM in case the parent dies
+        // ask kernel to deliver SIGTERM in case the parent dies
         prctl(PR_SET_PDEATHSIG, SIGTERM);
 
         // run the command
-        execvp(command, argv);
+        if(execvp(command, argv) == -1) {
+            error("An error occured in execvp");
+        }
+
         exit(0);
         break;
         default:
@@ -172,48 +172,52 @@ int main(int argc, char *argv[]) {
 
     child_json = clean_for_simulate(child_json);
     parent_json->child = child_json;
+    char *json_output = cJSON_Print(parent_json);
+    init(json_output);
 
     // we have to run the processs
-    char *json_output = cJSON_Print(parent_json);
-    char *program_input = (char*)malloc((strlen(json_output) + 2) * sizeof(char));
-    sprintf(program_input, "'%s'", json_output);
-    char *command = (char*)malloc((strlen(program_input) + strlen("./../environments//") + 2 * strlen(get_id(child_json)) + strlen(" ")));
-    sprintf(command, "./../environments/%s/%s %s", get_id(child_json), get_id(child_json), program_input);
-    
-    struct process p = copen(command);
-    // we need a non-blocking read this is called ngetc
-    fcntl(p.input_fd, F_SETFL, O_NONBLOCK);
+    char *command = (char*)malloc((strlen("./../environments//") + 2 * strlen(get_id(child_json))));
+    sprintf(command, "./../environments/%s/%s", get_id(child_json), get_id(child_json));
 
-    char *buff = (char*)malloc(1 * sizeof(char));
-    int size = 0;
-    buff[size] = '\0';
-    char *curr_buff = (char*)malloc(BUFFER_SIZE * sizeof(char));
+    struct node *head = NULL;
+    struct node *curr = head;
 
     unsigned long start = time_sec();
     unsigned long curr_sec = time_sec();
     unsigned long curr_nsec = time_nsec();
 
+    struct process p = copen(command);
+    fcntl(p.input_fd, F_SETFL, O_NONBLOCK);
+
     while(curr_sec - start < TIMEOUT_SEC) {
-        printf("Hello\n");
         while(time_nsec() - curr_nsec < FRAME_RATE_NSEC);
         // This itteration happens each frame
-        int curr_size = ngets(curr_buff, p.input_fd);
-        // buff = (char*)realloc(buff, (curr_size + size + 1) * (sizeof(char)));
-        strcat(buff, curr_buff);
-        frame(&buff, p);
 
+        char *curr_buff = (char*)malloc(BUFFER_SIZE * sizeof(char));
+        int curr_size = ngets(curr_buff, p.input_fd);
+        if(curr_size == 0) {
+            free(curr_buff);
+        } else {
+            // we want to create a linked list of packets (queue)
+            // resize for space (?)
+            curr_buff = (char*)realloc(curr_buff, curr_size * sizeof(char));
+            if(head == NULL) {
+                head = new_node(curr_buff, curr_size);
+                curr = head;
+            } else {
+                curr->next = new_node(curr_buff, curr_size);
+                curr = curr->next;
+            }
+        }
+
+        head = frame(head, p);
         curr_sec = time_sec();
         curr_nsec = time_nsec();
     }
 
     cclose(p);
-    free(buff);
-    free(curr_buff);
-
-    // now we need to simulate
     cJSON_Delete(parent_json);
     free(input);
-
     fflush(stdout);
     return 0;
 }

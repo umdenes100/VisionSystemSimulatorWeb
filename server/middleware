@@ -45,7 +45,7 @@ async def process_command(command, working_directory, data=None):
     print(f'Return Code: {process.returncode}')
     if stderr:
         print(f'Error: {stderr}')
-        print(f'General Process Info: {vars(process)}')
+        # print(f'General Process Info: {vars(process)}')
 
     return stdout.decode()
 

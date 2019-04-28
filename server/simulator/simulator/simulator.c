@@ -13,6 +13,14 @@
 #include "simulator.h"
 #include "node.h"
 
+// this is the standard error function. exits with code 1.
+void error(char *error_msg, int return_code) {
+    fprintf(stderr, "Error: {\r\n\t'msg': '%s',\r\n\t'code': '%d'\r\n}\r\n", error_msg, return_code);
+    fflush(stderr);
+    fflush(stdout);
+    exit(return_code);
+}
+
 // this function is a debugging function which creates a string of the arduino code
 char* get_input() {
     char *string = (char*)malloc(1 * sizeof(char));
@@ -40,7 +48,7 @@ char* get_id(cJSON *json) {
         json = json->next;
     }
 
-    error("Unable to get id.");
+    error("Unable to get id.", 8);
 }
 
 char* get_code(cJSON *json) {
@@ -52,7 +60,7 @@ char* get_code(cJSON *json) {
         json = json->next;
     }
 
-    error("Unable to get code.");
+    error("Unable to get code.", 7);
 }
 
 cJSON* get_randomization(cJSON *json) {
@@ -64,7 +72,7 @@ cJSON* get_randomization(cJSON *json) {
         json = json->next;
     }
 
-    error("Unable to get randomization.");
+    error("Unable to get randomization.", 6);
 }
 
 cJSON* clean_for_simulate(cJSON *json) {
@@ -89,18 +97,18 @@ struct process copen(char *command) {
     int out_pipe[2];
 
     if(pipe(in_pipe) < 0) {
-        error("Unable to pipe.");
+        error("Unable to pipe.", 3);
     }
 
     if(pipe(out_pipe) < 0) {
-        error("Unable to pipe.");
+        error("Unable to pipe.", 3);
     }
 
     int pid = fork();
     switch(pid) {
         case -1:
         // this error
-        error("Unable to fork.");
+        error("Unable to fork.", 4);
         case 0:
         // this is child
         // we want stdout -> pipe, stdin -> pipe
@@ -115,7 +123,7 @@ struct process copen(char *command) {
 
         // run the command
         if(execvp(command, argv) == -1) {
-            error("An error occured in execvp");
+            error("An error occured in execvp", 5);
         }
 
         exit(0);
@@ -156,9 +164,7 @@ int main(int argc, char *argv[]) {
     cJSON *json = cJSON_Parse(input);
 
     if(json == NULL) {
-        fprintf(stderr, "Unable to parse JSON.\n");
-        fflush(stderr);
-        return -1;
+        error("Unable to parse JSON.", 1);
     }
 
     cJSON *parent_json = json;
@@ -167,7 +173,7 @@ int main(int argc, char *argv[]) {
     // now that we have the JSON we need to perform initialization
     if(initialize(get_id(child_json), get_code(child_json)) != 0) {
         // initialize error:
-        return -1;
+        error("Unable to compile provided code.", 2);
     }
 
     child_json = clean_for_simulate(child_json);

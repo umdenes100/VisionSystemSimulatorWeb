@@ -18,6 +18,5 @@ struct file_names {
 };
 
 int initialize(char *program_name, char *code);
-void error(char *error_msg);
 
 #endif

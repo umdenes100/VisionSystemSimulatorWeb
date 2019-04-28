@@ -6,14 +6,6 @@
 
 #include "compile.h"
 
-// this is the standard error function. exits with code 1.
-void error(char *error_msg) {
-    fprintf(stderr, "Error: %s\n", error_msg);
-    fflush(stderr);
-    fflush(stdout);
-    exit(1);
-}
-
 // this function will retrieve all matches to the regex in the string
 struct match_list get_all_matches(regex_t r, char *to_match) {
     char **matches = (char**)malloc(1 * sizeof(char*));
@@ -56,8 +48,6 @@ struct match_list get_function_declarations(char *file_name, int *status_code) {
     struct match_list dummy;
 
     if(fp == NULL) {
-        fprintf(stderr, "Unable to open the file\n");
-        fflush(stderr);
         *status_code = -1;
         return dummy;
     }
@@ -107,8 +97,6 @@ struct match_list get_function_declarations(char *file_name, int *status_code) {
 
     regex_t regex;
     if(regcomp(&regex, function_pattern, REG_EXTENDED)) {
-        fprintf(stderr, "Could not compile regex.\n");
-        fflush(stderr);
         *status_code = -1;
         return dummy;
     }
@@ -134,8 +122,6 @@ int create_dir(char *name) {
     strcat(dest, name);
 
     if(mkdir(dest, 0777) != 0) {
-        fprintf(stderr, "Unable to create directory\n");
-        fflush(stderr);
         return -1;
     }
 
@@ -193,8 +179,6 @@ int create_src_file(char *code, struct file_names files) {
     FILE *fp = fopen(files.src, "w");
 
     if(fp == NULL) {
-        fprintf(stderr, "Unable to create src file\n");
-        fflush(stderr);
         return -1;
     }
 
@@ -217,8 +201,6 @@ int create_hdr_file(struct match_list functions, char *file) {
     FILE *fp = fopen(file, "w");
 
     if(fp == NULL) {
-        fprintf(stderr, "Unable to create header file.\n");
-        fflush(stderr);
         return -1;
     }
 
@@ -267,7 +249,7 @@ int compile(char *file) {
 
     FILE* p = popen(command, "r");
     if(!p) {
-        error("Could not read file.");
+        return -1;
     }
 
     char *buff = (char*)malloc(1 * sizeof(char));
@@ -281,8 +263,6 @@ int compile(char *file) {
     int code = pclose(p);
 
     if(code != 0) {
-        fprintf(stderr, "%s\n", buff);
-        fflush(stderr);
         return -1;
     }
 

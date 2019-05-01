@@ -11,14 +11,8 @@ void init(char *json) {
 }
 
 struct node * frame(struct node *in, struct process p) {
-    // buff is current command (not nessesarily a full command)
-    // can also be multiple commands and command fragments
-    // write to fd on command.
-    // should handle one command and adjust buff apropriately
-    // returns new head of list (properly adjusted for command fragments)
-
-    // as an example, we have a program where the process simply prints what it recvs and sends "hello process" to process
-    // process code:
+    // in is a linked list with the current command in parts
+    // the entire list will always contain a total of one commands or less
 
     /*
      * #include <stdio.h>

@@ -4,11 +4,11 @@
 #include <unistd.h>
 #include <sys/time.h>
 #include <cjson/cJSON.h>
+#include <math.h>
 
 #include "simulator.h"
 #include "node.h"
 #include "vs.h"
-#include <math.h>
 
 #define PI 3.1415926535f
 #define BUFF_SIZE 258
@@ -184,7 +184,7 @@ struct node * process_command(struct node *in, struct process p, struct arena *a
         // println() message
         // receives: 1 byte opcode, 1 byte length, length number of characters
         // returns: 1 byte ack
-        if(in->size == 1 || in->size < ((in->data)[1] - 2)) {
+        if(in->size == 1 || buffer[1] < buffer_pos - 2) {
             return in;
         } else {
             write(p.output_fd, &ack_code, sizeof(unsigned char));
@@ -220,7 +220,7 @@ struct node * process_command(struct node *in, struct process p, struct arena *a
         // Tank.readDistanceSensors()
         // receives: 1 byte opcode, 1 byte index
         // returns: 4 byte float
-        if(in->size < 2) {
+        if(buffer_pos < 2) {
             return in;
         } else {
             float distVal = readDistanceSensor((short)buffer[1]);

@@ -33,7 +33,6 @@ struct arena {
     struct osv osv;
 };
 
-void init(char *json);
 struct node * frame(struct node *in, struct process p, struct arena *arena);
 
 #endif

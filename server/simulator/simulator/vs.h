@@ -4,6 +4,9 @@
 #include "simulator.h"
 #include "node.h"
 
+
+float readDistanceSensor(short index);
+
 struct coordinate {
     float x;
     float y;

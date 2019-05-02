@@ -57,8 +57,6 @@ async def middleware(request):
 	print(f'Request: {json.dumps(request, indent=2)}')
 	command, working_directory = REQUEST_TYPES[request['type']]
 
-	breakpoint()
-
 	result = await process_command(command, working_directory, request)
 
 	try:
@@ -69,7 +67,9 @@ async def middleware(request):
 
 	print(f'Output: {json.dumps(result_json, indent=2)}')
 	print()
-	return web.json_response(result_json, headers={'Access-Control-Allow-Origin': '*'})
+	return web.json_response(result_json, headers={
+		'Access-Control-Allow-Origin': '*'
+	})
 
 
 if __name__ == '__main__':
@@ -78,7 +78,6 @@ if __name__ == '__main__':
 	parser.add_argument('--port', type=int, default=8888, help="e.g. 8888")
 	args = parser.parse_args()
 
-	print(f"Starting websocket server at http://{args.host}:{args.port}...")
 	app = web.Application()
 	app.add_routes([web.get('/', middleware)])
 	web.run_app(app, host=args.host, port=args.port)

@@ -5,8 +5,6 @@
 #include "node.h"
 
 
-float readDistanceSensor(short index);
-
 struct coordinate {
     float x;
     float y;
@@ -38,6 +36,9 @@ struct arena {
     struct osv osv;
 };
 
+float readDistanceSensor(struct arena arena, short index);
+int check_intersection(struct line l1, struct line l2);
 struct node * frame(struct node *in, struct process p, struct arena *arena);
+float distance(struct coordinate a, struct coordinate b);
 
 #endif

@@ -10,17 +10,91 @@
 #include "node.h"
 #include "vs.h"
 
+#define SENSOR_RANGE 1.0f
 #define PI 3.1415926535f
 #define BUFF_SIZE 258
-#define ROTATIONS_PER_SECOND 0.25
+#define ROTATIONS_PER_SECOND 0.25f
 #define max(x1,x2) ((x1) > (x2) ? (x1) : (x2))
 #define min(x1,x2) ((x1) < (x2) ? (x1) : (x2))
 
 char buffer [BUFF_SIZE];
 unsigned short buffer_pos = 0;
 
-float readDistanceSensor(short index) {
-    return 0.0;
+float readDistanceSensor(struct arena arena, short index) {
+    int i, j;
+
+    if(!arena.osv.distance_sensors[index]) {
+        return 0.0;
+    }
+
+    // we have to get the slope of the front side of the osv first
+    float cos_theta = cos(arena.osv.location.theta);
+    float sin_theta = sin(arena.osv.location.theta);
+    struct coordinate midPointFront;
+    midPointFront.x = arena.osv.location.x + arena.osv.height / 2 * cos_theta;
+    midPointFront.y = arena.osv.location.y + arena.osv.height / 2 * sin_theta;
+
+    struct coordinate a;
+    a.x = midPointFront.x - arena.osv.width / 2 * sin_theta;
+    a.y = midPointFront.y + arena.osv.width / 2 * cos_theta;
+
+    struct coordinate b;
+    b.x = midPointFront.x + arena.osv.width / 2 * sin_theta;
+    b.y = midPointFront.y - arena.osv.width / 2 * cos_theta;
+
+    struct coordinate midPointBack;
+    midPointBack.x = arena.osv.location.x - arena.osv.height / 2 * cos_theta;
+    midPointBack.y = arena.osv.location.y - arena.osv.height / 2 * sin_theta;
+
+    struct coordinate c;
+    c.x = midPointBack.x - arena.osv.width / 2 * sin_theta;
+    c.y = midPointBack.y + arena.osv.width / 2 * cos_theta;
+
+    struct coordinate d;
+    d.x = midPointBack.x + arena.osv.width / 2 * sin_theta;
+    d.y = midPointBack.y - arena.osv.width / 2 * cos_theta;
+
+    struct coordinate midPointLeft;
+    midPointLeft.x = (a.x + c.x) / 2;
+    midPointLeft.y = (a.y + c.y) / 2;
+
+    struct coordinate midPointRight;
+    midPointRight.x = (b.x + d.x) / 2;
+    midPointRight.y = (b.y + d.y) / 2;
+
+    struct coordinate sensor_locations[12] = {a, midPointFront, b, b, midPointRight, d, d, midPointBack, c, c, midPointLeft, a};
+
+    int sideIndex = index / 3;
+    float orientation = arena.osv.location.theta - sideIndex * PI / 2;
+
+    struct coordinate endPoint;
+    endPoint.x = sensor_locations[index].x + SENSOR_RANGE * cos(orientation);
+    endPoint.y = sensor_locations[index].y + SENSOR_RANGE * sin(orientation);
+
+    struct line sensor_trace = {sensor_locations[index].x, sensor_locations[index].y, endPoint.x, endPoint.y};
+    float minimum_distance = 1.0;
+    //QPointF *tempPoint = new QPointF(0,0);
+    for(i=0; i<arena.num_obstacles; i++) {
+        // for each of the arena.obstacles[i]s
+        struct line right = {{arena.obstacles[i].location.x + arena.obstacles[i].height, arena.obstacles[i].location.y}, {arena.obstacles[i].location.x + arena.obstacles[i].height, arena.obstacles[i].location.y - arena.obstacles[i].width}};
+        struct line bottom = {{arena.obstacles[i].location.x, arena.obstacles[i].location.y - arena.obstacles[i].width}, {arena.obstacles[i].location.x + arena.obstacles[i].height, arena.obstacles[i].location.y - arena.obstacles[i].width}};
+        struct line left = {{arena.obstacles[i].location.x, arena.obstacles[i].location.y - arena.obstacles[i].width}, {arena.obstacles[i].location.x, arena.obstacles[i].location.y}};
+        struct line top = {{arena.obstacles[i].location.x, arena.obstacles[i].location.y}, {arena.obstacles[i].location.x + arena.obstacles[i].height, arena.obstacles[i].location.y}};
+        struct line obstacle_sides [4] = {right, bottom, left, top};
+
+        for(j=0; j<sizeof(obstacle_sides) / sizeof(struct line); j++) {
+            if(check_intersection(obstacle_sides[j], sensor_trace)) {
+                //todo: need to find point on obstacle that is closest to the sensor location, and then find the distance
+                //minimum_distance = min(minimum_distance,distance(sensor_locations[index], ));
+            }
+        }
+    }
+
+    return minimum_distance;
+}
+
+float distance(struct coordinate a, struct coordinate b) {
+    return sqrt(pow(a.x - b.x, 2) + pow(a.y - b.y, 2));
 }
 
 struct line init_line(float x1, float y1, float x2, float y2) {
@@ -303,7 +377,7 @@ struct node * process_command(struct node *in, struct process p, struct arena *a
         if(buffer_pos < 2) {
             return in;
         } else {
-            float distVal = readDistanceSensor((short)buffer[1]);
+            float distVal = readDistanceSensor(*arena, (short)buffer[1]);
             write(p.output_fd, &distVal, sizeof(float));
         }
     } else {

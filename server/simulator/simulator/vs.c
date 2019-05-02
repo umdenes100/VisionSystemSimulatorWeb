@@ -5,12 +5,13 @@
 
 #include "simulator.h"
 #include "node.h"
+#include "vs.h"
 
 void init(char *json) {
 
 }
 
-struct node * frame(struct node *in, struct process p) {
+struct node * frame(struct node *in, struct process p, struct arena *arena) {
     // in is a linked list with the current command in parts
     // the entire list will always contain a total of one commands or less
 

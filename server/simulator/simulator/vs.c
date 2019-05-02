@@ -43,8 +43,8 @@ struct node * frame(struct node *in, struct process p, struct arena *arena) {
 
 
     static int frame_no = 0;
-    root = cJSON_CreateObject();
-    osv = cJSON_CreateObject();
+    cJSON *root = cJSON_CreateObject();
+    cJSON *osv = cJSON_CreateObject();
     cJSON_AddNumberToObject(root, "frame_no", frame_no);
     cJSON_AddNumberToObject(osv, "x", arena->osv.location.x);
     cJSON_AddNumberToObject(osv, "y", arena->osv.location.y);

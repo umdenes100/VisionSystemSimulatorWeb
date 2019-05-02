@@ -10,7 +10,7 @@ compile.o: compile.c compile.h
 	$(CC) -c compile.c $(CFLAGS)
 
 vs.o: vs.c vs.h
-	$(CC) -c vs.c
+	$(CC) -c vs.c $(CFLAGS)
 
 node.o: node.c node.h
 	$(CC) -c node.c

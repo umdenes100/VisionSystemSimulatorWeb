@@ -24,7 +24,7 @@ struct obstacle {
 
 struct osv {
     struct coordinate location;
-    int distance_sensors[12];
+    int *distance_sensors;
     float width, height;
     int left_motor_pwm, right_motor_pwm;
 };
@@ -37,7 +37,7 @@ struct arena {
 };
 
 float readDistanceSensor(struct arena arena, short index);
-int check_intersection(struct line l1, struct line l2);
+struct coordinate* get_intersection(struct line l1, struct line l2);
 struct node * frame(struct node *in, struct process p, struct arena *arena);
 float distance(struct coordinate a, struct coordinate b);
 

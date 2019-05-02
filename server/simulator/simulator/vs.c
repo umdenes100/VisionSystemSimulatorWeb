@@ -20,7 +20,7 @@
 char buffer [BUFF_SIZE];
 unsigned short buffer_pos = 0;
 
-float readDistanceSensor(struct arena arena, short index) {
+float read_distance_sensor(struct arena arena, short index) {
     int i, j;
 
     if(!arena.osv.distance_sensors[index]) {
@@ -73,7 +73,7 @@ float readDistanceSensor(struct arena arena, short index) {
 
     struct line sensor_trace = {sensor_locations[index].x, sensor_locations[index].y, endPoint.x, endPoint.y};
     float minimum_distance = 1.0;
-    //QPointF *tempPoint = new QPointF(0,0);
+
     for(i=0; i<arena.num_obstacles; i++) {
         // for each of the arena.obstacles[i]s
         struct line right = {{arena.obstacles[i].location.x + arena.obstacles[i].height, arena.obstacles[i].location.y}, {arena.obstacles[i].location.x + arena.obstacles[i].height, arena.obstacles[i].location.y - arena.obstacles[i].width}};
@@ -83,9 +83,10 @@ float readDistanceSensor(struct arena arena, short index) {
         struct line obstacle_sides [4] = {right, bottom, left, top};
 
         for(j=0; j<sizeof(obstacle_sides) / sizeof(struct line); j++) {
-            if(check_intersection(obstacle_sides[j], sensor_trace)) {
+        	struct coordinate *intersection_point = get_intersection(obstacle_sides[j], sensor_trace);
+            if(intersection_point != NULL) {
                 //todo: need to find point on obstacle that is closest to the sensor location, and then find the distance
-                //minimum_distance = min(minimum_distance,distance(sensor_locations[index], ));
+                minimum_distance = min(minimum_distance,distance(sensor_locations[index], *intersection_point));
             }
         }
     }
@@ -112,8 +113,15 @@ struct line init_line(float x1, float y1, float x2, float y2) {
     return temp;
 }
 
-int check_intersection(struct line l1, struct line l2) {
+struct coordinate* get_intersection(struct line l1, struct line l2) {
+	//returns null for unbounded collision, i.e. a collision outside the line segments
+    
     //get the slopes of the two lines
+    if (l1.p1.x == l1.p2.x || l2.p1.x == l2.p2.x) {
+    	//case where slope is infinity, need to figure out a fix for this
+    	//for now, just return NULL
+    	return NULL;
+    }
     float m1 = (l1.p1.y - l1.p2.y) / (l1.p1.x - l1.p2.x);
     float m2 = (l2.p1.y - l2.p2.y) / (l2.p1.x - l2.p2.x);
     //y=mx+b, calculate the b values for both lines
@@ -121,16 +129,21 @@ int check_intersection(struct line l1, struct line l2) {
     float b2 = l2.p1.y - m2*l2.p1.x;
 
     if (m1 == m2) {
-        return 0;
+        return NULL;
     }
 
     float intersection_x = (b2-b1)/(m1-m2);
+
     float left_bound = max(min(l2.p1.x, l2.p2.x), min(l1.p1.x, l1.p2.x));
     float right_bound = min(max(l2.p1.x, l2.p2.x), max(l1.p1.x, l1.p2.x)); 
-    if (intersection_x < right_bound && intersection_x > left_bound) {
-        return 1;
+
+    if (intersection_x > right_bound || intersection_x < left_bound) {
+        return NULL;
     } else {
-        return 0;
+    	struct coordinate* intersection_point = malloc(sizeof(*intersection_point));
+    	intersection_point->x = intersection_x;
+    	intersection_point->y = intersection_x * m1 + l1.p1.y;
+        return intersection_point;
     }
 }
 
@@ -220,14 +233,16 @@ int check_for_collisions(struct arena *arena) {
 
         for(j = 0; j < 4; j++) {
             for(k = 0; k < 4; k++) {
-                if(check_intersection(osv_sides[k], obstacle_sides[j])) {
-                    return 1;
+                if(get_intersection(osv_sides[k], obstacle_sides[j]) != NULL) {
+                    struct coordinate *inter = get_intersection(osv_sides[k], obstacle_sides[j]);
+                    printf("Index:(%d,%d,%d)\n",i,j,k);
+                    printf("Location:(%f,%f)\n",inter->x, inter->y);                    
+                    //return 1;
                 }
             }
 
         }
     }
-
     // now we want to define the walls:
     struct line right;
     struct coordinate r1, r2;
@@ -266,7 +281,7 @@ int check_for_collisions(struct arena *arena) {
     //need to check right and left sides of OSV in case OSV is perpendicular to wall
     for(i = 0; i < 4; i++) {
         for(j = 0; j < 4; j++) {
-            if(check_intersection(osv_sides[j], walls[i])) {
+            if(get_intersection(osv_sides[j], walls[i]) != NULL) {
                 return 1;
             }
         }
@@ -377,7 +392,7 @@ struct node * process_command(struct node *in, struct process p, struct arena *a
         if(buffer_pos < 2) {
             return in;
         } else {
-            float distVal = readDistanceSensor(*arena, (short)buffer[1]);
+            float distVal = read_distance_sensor(*arena, (short)buffer[1]);
             write(p.output_fd, &distVal, sizeof(float));
         }
     } else {

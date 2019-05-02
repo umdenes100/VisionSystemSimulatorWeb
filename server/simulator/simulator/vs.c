@@ -6,6 +6,7 @@
 #include <cjson/cJSON.h>
 #include "simulator.h"
 #include "node.h"
+#include "vs.h"
 
 #define BUFFER_SIZE 258
 #define ack_code 0x07
@@ -18,8 +19,14 @@ void init(char *json) {
 
 }
 
-struct node * frame(struct node *in, struct process p) {
-    char opcode;
+float readDistanceSensor(int index) {
+    return 0.0;
+}
+
+struct node * frame(struct node *in, struct process p, struct arena *arena) {
+    // in is a linked list with the current command in parts
+    // the entire list will always contain a total of one commands or less
+char opcode;
     int i;
     struct node* curr, next;
     buffer_pos = 0;
@@ -106,9 +113,18 @@ struct node * frame(struct node *in, struct process p) {
         curr = next;
     }    
 
-    return NULL;
-}
+    static int frame_no = 0;
+    cJSON *root = cJSON_CreateObject();
+    cJSON *osv = cJSON_CreateObject();
+    cJSON_AddNumberToObject(root, "frame_no", frame_no);
+    cJSON_AddNumberToObject(osv, "x", arena->osv.location.x);
+    cJSON_AddNumberToObject(osv, "y", arena->osv.location.y);
+    cJSON_AddNumberToObject(osv, "theta", arena->osv.location.theta);
+    cJSON_AddItemToObject(root, "osv", osv);
+    frame_no++;
 
-float readDistanceSensor(int index) {
-    return 0.0;
+    printf("%s,", cJSON_Print(root));
+    cJSON_Delete(root); 
+
+    return NULL;
 }

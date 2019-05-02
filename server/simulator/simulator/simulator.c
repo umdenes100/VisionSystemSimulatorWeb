@@ -236,6 +236,7 @@ int main(int argc, char *argv[]) {
     free(command);
     fcntl(p.input_fd, F_SETFL, O_NONBLOCK);
 
+    printf("[");
     while(curr_sec - start < TIMEOUT_SEC) {
         while(time_nsec() - curr_nsec < FRAME_RATE_NSEC);
         // This itteration happens each frame
@@ -261,6 +262,7 @@ int main(int argc, char *argv[]) {
         curr_sec = time_sec();
         curr_nsec = time_nsec();
     }
+    printf("]");
 
     cclose(p);
     cJSON_Delete(parent_json);

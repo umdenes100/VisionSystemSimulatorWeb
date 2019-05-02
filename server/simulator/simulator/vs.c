@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <cjson/cJSON.h>
 
 #include "simulator.h"
 #include "node.h"
@@ -39,6 +40,20 @@ struct node * frame(struct node *in, struct process p, struct arena *arena) {
         write(p.output_fd, "hello process", strlen("hello process"));
         in = in->next;
     }
+
+
+    static int frame_no = 0;
+    root = cJSON_CreateObject();
+    osv = cJSON_CreateObject();
+    cJSON_AddNumberToObject(root, "frame_no", frame_no);
+    cJSON_AddNumberToObject(osv, "x", arena->osv.location.x);
+    cJSON_AddNumberToObject(osv, "y", arena->osv.location.y);
+    cJSON_AddNumberToObject(osv, "theta", arena->osv.location.theta);
+    cJSON_AddItemToObject(root, "osv", osv);
+    frame_no++;
+
+    printf("%s,", cJSON_Print(root));
+    cJSON_Delete(root); 
 
     return in;
 }

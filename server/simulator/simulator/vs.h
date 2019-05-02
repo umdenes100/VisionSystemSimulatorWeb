@@ -13,6 +13,11 @@ struct coordinate {
     float theta;
 };
 
+struct line {
+    struct coordinate p1;
+    struct coordinate p2;
+};
+
 struct obstacle {
     struct coordinate location;
     float width;

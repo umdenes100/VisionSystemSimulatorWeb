@@ -22,6 +22,7 @@ struct obstacle {
 struct osv {
     struct coordinate location;
     int *distance_sensors;
+    short width, height;
 };
 
 struct arena {

@@ -54,7 +54,6 @@ int check_intersection(struct line l1, struct line l2) {
     float left_bound = max(min(l2.p1.x, l2.p2.x), min(l1.p1.x, l1.p2.x));
     float right_bound = min(max(l2.p1.x, l2.p2.x), max(l1.p1.x, l1.p2.x)); 
     if (intersection_x < right_bound && intersection_x > left_bound) {
-        l1.p1.x, l1.p1.y, l1.p2.x, l1.p2.y, l2.p1.x, l2.p1.y, l2.p2.x, l2.p2.y);
         return 1;
     } else {
         return 0;

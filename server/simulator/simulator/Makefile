@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -lcjson
+CFLAGS = -lcjson -lm
 src = $(wildcard *.c)
 obj = $(src:.c=.o)
 

@@ -100,6 +100,8 @@ struct arena get_init(cJSON *json) {
     arena.osv.location.theta = (float)osv->child->next->next->valuedouble;
     arena.osv.height = (float)osv->child->next->next->next->valuedouble;
     arena.osv.width = (float)osv->child->next->next->next->next->valuedouble;
+    arena.osv.left_motor_pwm = 0;
+    arena.osv.right_motor_pwm = 0;
 
     while(distance_sensors != NULL) {
         arena.osv.distance_sensors[distance_sensors->valueint] = 1;

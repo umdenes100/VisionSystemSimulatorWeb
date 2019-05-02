@@ -119,7 +119,6 @@ int check_for_collisions(struct arena *arena) {
 }
 
 void update_osv(struct arena *arena) {
-
     struct coordinate prev_location;
     prev_location.x = arena->osv.location.x;
     prev_location.y = arena->osv.location.y;
@@ -132,7 +131,7 @@ void update_osv(struct arena *arena) {
 
     arena->osv.location.theta += 2 * PI * ROTATIONS_PER_SECOND / 50 * (arena->osv.right_motor_pwm - arena->osv.left_motor_pwm) / 255.0;
 
-    if(check_for_collisions(arena)) {
+    if(!check_for_collisions(arena)) {
         arena->osv.location.x = prev_location.x;
         arena->osv.location.y = prev_location.y;
         arena->osv.location.theta = prev_location.theta;
@@ -195,7 +194,7 @@ struct node * process_command(struct node *in, struct process p, struct arena *a
             return in;
         } else {
             write(p.output_fd, &ack_code, sizeof(unsigned char));
-            arena->osv.left_motor_pwm = buffer[1] << 8 + buffer[2];
+            arena->osv.left_motor_pwm = (buffer[1] << 8) + buffer[2];
         }
     } else if(opcode == 0x04) {
         // Tank.setRightMotorPWM()
@@ -205,7 +204,7 @@ struct node * process_command(struct node *in, struct process p, struct arena *a
             return in;
         } else {
             write(p.output_fd, &ack_code, sizeof(unsigned char));
-            arena->osv.right_motor_pwm = buffer[1] << 8 + buffer[2];
+            arena->osv.right_motor_pwm = (buffer[1] << 8) + buffer[2];
         }
     } else if(opcode == 0x05) {
         // Tank.turnOffMotors()
@@ -240,6 +239,7 @@ struct node * process_command(struct node *in, struct process p, struct arena *a
 }
 
 struct node * frame(struct node *in, struct process p, struct arena *arena) {
+    update_osv(arena);
     struct node * ret_node = process_command(in, p, arena);
 
     static int frame_no = 0;

@@ -23,6 +23,7 @@ struct osv {
     struct coordinate location;
     int distance_sensors[12];
     float width, height;
+    int left_motor_pwm, right_motor_pwm;
 };
 
 struct arena {

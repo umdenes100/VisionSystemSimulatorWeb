@@ -8,27 +8,25 @@
 #include "node.h"
 #include "vs.h"
 
-#define BUFFER_SIZE 258
-#define ack_code 0x07
+#define BUFF_SIZE 258
 
 cJSON *root;
-char [BUFFER_SIZE] buffer;
+char buffer [BUFF_SIZE];
 unsigned short buffer_pos = 0;
 
 void init(char *json) {
 
 }
 
-float readDistanceSensor(int index) {
+float readDistanceSensor(short index) {
     return 0.0;
 }
 
-struct node * frame(struct node *in, struct process p, struct arena *arena) {
-    // in is a linked list with the current command in parts
-    // the entire list will always contain a total of one commands or less
-char opcode;
+struct node * process_command(struct node *in, struct process p, struct arena *arena) {
+    char opcode;
     int i;
-    struct node* curr, next;
+    unsigned char ack_code = '\x07';
+    struct node *curr, *next;
     buffer_pos = 0;
 
     if (in == NULL || in->size == 0) {
@@ -36,7 +34,7 @@ char opcode;
     }
 
     //read in all of the available data into the buffer
-    while (curr != NULL && buffer_pos < BUFFER_SIZE) {
+    while (curr != NULL && buffer_pos < BUFF_SIZE) {
         for(i=0; i<curr->size; i++) {
             buffer[i + buffer_pos] = (curr->data)[i];
         }
@@ -45,7 +43,7 @@ char opcode;
     }
 
     //we are at the beginning of a message, check for opcode
-    opcode = buffer[0]
+    opcode = buffer[0];
     if (opcode == 0x00) {
         //Enes100.begin() message
         //receives: 1 byte opcode
@@ -77,6 +75,7 @@ char opcode;
             return in;
         } else {
             write(p.output_fd, &ack_code, sizeof(int *));
+            arena->osv.left_motor_pwm = buffer[1] << 8 + buffer[2];
         }
     } else if (opcode == 0x04) {
         //Tank.setRightMotorPWM()
@@ -86,11 +85,14 @@ char opcode;
             return in;
         } else {
             write(p.output_fd, &ack_code, sizeof(int *));
+            arena->osv.right_motor_pwm = buffer[1] << 8 + buffer[2];
         }
     } else if (opcode == 0x05) {
         //Tank.turnOffMotors()
         //receives: 1 byte opcode
         //returns: 1 byte ack
+        arena->osv.left_motor_pwm = 0;
+        arena->osv.right_motor_pwm = 0;
         write(p.output_fd, &ack_code, sizeof(int *));
     } else if (opcode == 0x06) {
         //Tank.readDistanceSensors()
@@ -99,10 +101,11 @@ char opcode;
         if (in->size < 2) {
             return in;
         } else {
-            write(p.output_fd, readDistanceSensor((short)buffer[1]), sizeof(float *));
+            float distVal = readDistanceSensor((short)buffer[1]);
+            write(p.output_fd, &distVal, sizeof(float *));
         }
     } else {
-        error("Invalid opcode\n");
+        //error("Invalid opcode\n");
     }
 
     //free all of the data
@@ -111,7 +114,14 @@ char opcode;
         free(curr->data);
         free(curr);
         curr = next;
-    }    
+    }
+    return NULL;    
+}
+
+struct node * frame(struct node *in, struct process p, struct arena *arena) {
+    // in is a linked list with the current command in parts
+    // the entire list will always contain a total of one commands or less
+    struct node * ret_node = process_command(in, p, arena);
 
     static int frame_no = 0;
     cJSON *root = cJSON_CreateObject();
@@ -126,5 +136,5 @@ char opcode;
     printf("%s,", cJSON_Print(root));
     cJSON_Delete(root); 
 
-    return NULL;
+    return in;
 }

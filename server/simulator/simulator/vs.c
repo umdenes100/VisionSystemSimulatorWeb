@@ -23,6 +23,21 @@ float readDistanceSensor(short index) {
     return 0.0;
 }
 
+struct line init_line(float x1, float y1, float x2, float y2) {
+    struct line temp;
+    struct coordinate hold;
+    
+    hold.x = x1;
+    hold.y = y1;
+    temp.p1 = hold;
+    
+    hold.x = x2;
+    hold.y = y2;
+    temp.p2 = hold;
+
+    return temp;
+}
+
 int check_intersection(struct line l1, struct line l2) {
     //get the slopes of the two lines
     float m1 = (l1.p1.y - l1.p2.y) / (l1.p1.x - l1.p2.x);
@@ -39,7 +54,7 @@ int check_intersection(struct line l1, struct line l2) {
     float left_bound = max(min(l2.p1.x, l2.p2.x), min(l1.p1.x, l1.p2.x));
     float right_bound = min(max(l2.p1.x, l2.p2.x), max(l1.p1.x, l1.p2.x)); 
     if (intersection_x < right_bound && intersection_x > left_bound) {
-        printf("(%f,%f) -> (%f,%f) x (%f,%f) -> (%f,%f)\n", l1.p1.x, l1.p1.y, l1.p2.x, l1.p2.y, l2.p1.x, l2.p1.y, l2.p2.x, l2.p2.y);
+        l1.p1.x, l1.p1.y, l1.p2.x, l1.p2.y, l2.p1.x, l2.p1.y, l2.p2.x, l2.p2.y);
         return 1;
     } else {
         return 0;
@@ -76,24 +91,62 @@ int check_for_collisions(struct arena *arena) {
     d.x = coordinate_back.x + arena->osv.height / 2 * sin_theta;
     d.y = coordinate_back.y - arena->osv.height / 2 * cos_theta;
 
-    struct line front_osv = {a.x, a.y, b.x, b.y};
-    struct line left_osv = {a.x, a.y, c.x, c.y};
-    struct line back_osv = {c.x, c.y, d.x, d.y};
-    struct line right_osv = {b.x, b.y, d.x, d.y};
+    struct line front_osv;
+    front_osv.p1 = a;
+    front_osv.p2 = b;
+    
+    struct line left_osv;
+    left_osv.p1 = a;
+    left_osv.p2 = c;
+
+    struct line back_osv;
+    back_osv.p1 = c;
+    back_osv.p2 = d;
+
+    struct line right_osv;
+    right_osv.p1 = b;
+    right_osv.p2 = d;
 
     struct line osv_sides[4] = {front_osv, left_osv, back_osv, right_osv};
 
     for(i = 0; i < arena->num_obstacles; i++) {
         // for each of the obstacles
-        struct line right = {arena->obstacles[i].location.x + arena->obstacles[i].width, arena->obstacles[i].location.y, arena->obstacles[i].location.x + arena->obstacles[i].width, arena->obstacles[i].location.y - arena->obstacles[i].height};
-        struct line bottom = {arena->obstacles[i].location.x, arena->obstacles[i].location.y - arena->obstacles[i].height, arena->obstacles[i].location.x + arena->obstacles[i].width, arena->obstacles[i].location.y - arena->obstacles[i].height};
-        struct line left = {arena->obstacles[i].location.x, arena->obstacles[i].location.y - arena->obstacles[i].height, arena->obstacles[i].location.x, arena->obstacles[i].location.y};
-        struct line top = {arena->obstacles[i].location.x, arena->obstacles[i].location.y, arena->obstacles[i].location.x + arena->obstacles[i].width, arena->obstacles[i].location.y};
+        struct line right;
+        struct coordinate r1, r2;
+        r1.x = arena->obstacles[i].location.x + arena->obstacles[i].width;
+        r1.y = arena->obstacles[i].location.y;
+        r2.x = arena->obstacles[i].location.x + arena->obstacles[i].width;
+        r2.y = arena->obstacles[i].location.y - arena->obstacles[i].height;
+        right.p1 = r1; right.p2 = r2;
+
+        struct line bottom;
+        struct coordinate b1, b2;
+        b1.x = arena->obstacles[i].location.x;
+        b1.y = arena->obstacles[i].location.y - arena->obstacles[i].height;
+        b2.x = arena->obstacles[i].location.x + arena->obstacles[i].width;
+        b2.y = arena->obstacles[i].location.y - arena->obstacles[i].height;
+        bottom.p1 = b1; bottom.p2 = b2;
+
+        struct line left;
+        struct coordinate l1, l2;
+        l1.x = arena->obstacles[i].location.x;
+        l1.y = arena->obstacles[i].location.y - arena->obstacles[i].height;
+        l2.x = arena->obstacles[i].location.x;
+        l2.y = arena->obstacles[i].location.y;
+        left.p1 = l1; left.p2 = l2;
+
+        struct line top;
+        struct coordinate t1, t2;
+        t1.x = arena->obstacles[i].location.x;
+        t1.y = arena->obstacles[i].location.y;
+        t2.x = arena->obstacles[i].location.x + arena->obstacles[i].width;
+        t2.y = arena->obstacles[i].location.y;
+        top.p1 = t1; top.p2 = t2;
+        
         struct line obstacle_sides[4] = {right, bottom, left, top};
 
-        for(j = 0; j < sizeof(obstacle_sides); j++) {
-            for(k = 0; k < sizeof(osv_sides); k++) {
-                printf("[%d,%d]\n", i, j);
+        for(j = 0; j < 4; j++) {
+            for(k = 0; k < 4; k++) {
                 if(check_intersection(osv_sides[k], obstacle_sides[j])) {
                     return 1;
                 }
@@ -103,15 +156,43 @@ int check_for_collisions(struct arena *arena) {
     }
 
     // now we want to define the walls:
-    struct line right = {4.0, 0.0, 4.0, 2.0};
-    struct line bottom = {0.0, 0.0, 4.0, 0.0};
-    struct line left = {0.0, 0.0, 0.0, 2.0};
-    struct line top = {0.0, 2.0, 4.0, 2.0};
+    struct line right;
+    struct coordinate r1, r2;
+    r1.x = 4.0;
+    r1.y = 0.0;
+    r2.x = 4.0;
+    r2.y = 2.0;
+    right.p1 = r1; right.p2 = r2;
+    
+    struct line bottom;
+    struct coordinate b1, b2;
+    b1.x = 0.0;
+    b1.y = 0.0;
+    b2.x = 4.0;
+    b2.y = 0.0;
+    bottom.p1 = b1; bottom.p2 = b2;
+
+    struct line left;
+    struct coordinate l1, l2;
+    l1.x = 0.0;
+    l1.y = 0.0;
+    l2.x = 0.0;
+    l2.y = 2.0;
+    bottom.p1 = l1; bottom.p2 = l2;
+
+    struct line top;
+    struct coordinate t1, t2;
+    t1.x = 0.0;
+    t1.y = 2.0;
+    t2.x = 4.0;
+    t2.y = 2.0;
+    top.p1 = t1; top.p2 = t2;
+
     struct line walls[4] = {right, bottom, left, top};
 
     //need to check right and left sides of OSV in case OSV is perpendicular to wall
-    for(i = 0; i < sizeof(walls); i++) {
-        for(j = 0; j < sizeof(osv_sides); j++) {
+    for(i = 0; i < 4; i++) {
+        for(j = 0; j < 4; j++) {
             if(check_intersection(osv_sides[j], walls[i])) {
                 return 1;
             }

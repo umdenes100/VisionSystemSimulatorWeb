@@ -230,16 +230,15 @@ int main(int argc, char *argv[]) {
     struct node *head = NULL;
     struct node *curr = head;
 
-    unsigned long start = time_sec();
-    unsigned long curr_sec = time_sec();
     unsigned long curr_nsec = time_nsec();
+    int frame_no = 0;
 
     struct process p = copen(command);
     free(command);
     fcntl(p.input_fd, F_SETFL, O_NONBLOCK);
 
     printf("[");
-    while(curr_sec - start < TIMEOUT_SEC) {
+    while(frame_no < NUM_FRAMES) {
         while(time_nsec() - curr_nsec < FRAME_RATE_NSEC);
         // This itteration happens each frame
 
@@ -260,9 +259,10 @@ int main(int argc, char *argv[]) {
             }
         }
 
-        head = frame(head, p, &arena);
-        curr_sec = time_sec();
+        head = frame(head, p, &arena, frame_no);
         curr_nsec = time_nsec();
+
+        frame_no++;
     }
     printf("]");
 

@@ -12,6 +12,7 @@
 
 #define PI 3.1415926535f
 #define BUFF_SIZE 258
+#define EPSILON 0.00001
 #define ROTATIONS_PER_SECOND 0.25
 #define max(x1,x2) ((x1) > (x2) ? (x1) : (x2))
 #define min(x1,x2) ((x1) < (x2) ? (x1) : (x2))
@@ -38,26 +39,60 @@ struct line init_line(float x1, float y1, float x2, float y2) {
     return temp;
 }
 
+int on_segment(struct coordinate p, struct coordinate q, struct coordinate r) { 
+    if(q.x <= max(p.x, r.x) && q.x >= min(p.x, r.x) && q.y <= max(p.y, r.y) && q.y >= min(p.y, r.y)) {
+        return 1; 
+    }
+  
+    return 0; 
+} 
+  
+// To find orientation of ordered triplet (p, q, r). 
+// The function returns following values 
+// 0 --> p, q and r are colinear 
+// 1 --> Clockwise 
+// 2 --> Counterclockwise 
+int orientation(struct coordinate p, struct coordinate q, struct coordinate r) { 
+    // See https://www.geeksforgeeks.org/orientation-3-ordered-points/ 
+    // for details of below formula. 
+    int val = (q.y - p.y) * (r.x - q.x) - (q.x - p.x) * (r.y - q.y); 
+    if (val == 0) return 0;     // colinear 
+    return (val > 0) ? 1 : 2;   // clock or counterclock wise 
+} 
+  
+// The main function that returns true if line segment 'p1q1' 
+// and 'p2q2' intersect. 
+int do_intersect(struct coordinate p1, struct coordinate q1, struct coordinate p2, struct coordinate q2) { 
+    // Find the four orientations needed for general and 
+    // special cases 
+    int o1 = orientation(p1, q1, p2); 
+    int o2 = orientation(p1, q1, q2); 
+    int o3 = orientation(p2, q2, p1); 
+    int o4 = orientation(p2, q2, q1); 
+  
+    // General case 
+    if (o1 != o2 && o3 != o4) {
+        return 1; 
+    }
+
+    // Special Cases 
+    // p1, q1 and p2 are colinear and p2 lies on segment p1q1 
+    if (o1 == 0 && on_segment(p1, p2, q1)) return 1; 
+  
+    // p1, q1 and q2 are colinear and q2 lies on segment p1q1 
+    if (o2 == 0 && on_segment(p1, q2, q1)) return 1; 
+  
+    // p2, q2 and p1 are colinear and p1 lies on segment p2q2 
+    if (o3 == 0 && on_segment(p2, p1, q2)) return 1; 
+  
+    // p2, q2 and q1 are colinear and q1 lies on segment p2q2 
+    if (o4 == 0 && on_segment(p2, q1, q2)) return 1; 
+  
+    return 0;   // Doesn't fall in any of the above cases 
+} 
+
 int check_intersection(struct line l1, struct line l2) {
-    //get the slopes of the two lines
-    float m1 = (l1.p1.y - l1.p2.y) / (l1.p1.x - l1.p2.x);
-    float m2 = (l2.p1.y - l2.p2.y) / (l2.p1.x - l2.p2.x);
-    //y=mx+b, calculate the b values for both lines
-    float b1 = l1.p1.y - m1*l1.p1.x;
-    float b2 = l2.p1.y - m2*l2.p1.x;
-
-    if (m1 == m2) {
-        return 0;
-    }
-
-    float intersection_x = (b2-b1)/(m1-m2);
-    float left_bound = max(min(l2.p1.x, l2.p2.x), min(l1.p1.x, l1.p2.x));
-    float right_bound = min(max(l2.p1.x, l2.p2.x), max(l1.p1.x, l1.p2.x)); 
-    if (intersection_x < right_bound && intersection_x > left_bound) {
-        return 1;
-    } else {
-        return 0;
-    }
+    do_intersect(l1.p1, l1.p2, l2.p1, l2.p2);
 }
 
 int check_for_collisions(struct arena *arena) {
@@ -189,7 +224,7 @@ int check_for_collisions(struct arena *arena) {
 
     struct line walls[4] = {right, bottom, left, top};
 
-    //need to check right and left sides of OSV in case OSV is perpendicular to wall
+    // need to check right and left sides of OSV in case OSV is perpendicular to wall
     for(i = 0; i < 4; i++) {
         for(j = 0; j < 4; j++) {
             if(check_intersection(osv_sides[j], walls[i])) {
@@ -219,7 +254,6 @@ void update_osv(struct arena *arena) {
         arena->osv.location.y = prev_location.y;
         arena->osv.location.theta = prev_location.theta;
     }
-
 }
 
 struct node * process_command(struct node *in, struct process p, struct arena *arena) {
@@ -321,11 +355,10 @@ struct node * process_command(struct node *in, struct process p, struct arena *a
     return NULL;    
 }
 
-struct node * frame(struct node *in, struct process p, struct arena *arena) {
+struct node * frame(struct node *in, struct process p, struct arena *arena, int frame_no) {
     update_osv(arena);
     struct node * ret_node = process_command(in, p, arena);
 
-    static int frame_no = 0;
     cJSON *root = cJSON_CreateObject();
     cJSON *osv = cJSON_CreateObject();
     cJSON_AddNumberToObject(root, "frame_no", frame_no);
@@ -333,7 +366,6 @@ struct node * frame(struct node *in, struct process p, struct arena *arena) {
     cJSON_AddNumberToObject(osv, "y", arena->osv.location.y);
     cJSON_AddNumberToObject(osv, "theta", arena->osv.location.theta);
     cJSON_AddItemToObject(root, "osv", osv);
-    frame_no++;
 
     printf("%s,", cJSON_Print(root));
     cJSON_Delete(root);

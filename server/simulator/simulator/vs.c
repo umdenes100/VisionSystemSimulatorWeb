@@ -326,7 +326,6 @@ struct node * frame(struct node *in, struct process p, struct arena *arena) {
     update_osv(arena);
     struct node * ret_node = process_command(in, p, arena);
 
-    /*
     static int frame_no = 0;
     cJSON *root = cJSON_CreateObject();
     cJSON *osv = cJSON_CreateObject();
@@ -339,7 +338,6 @@ struct node * frame(struct node *in, struct process p, struct arena *arena) {
 
     printf("%s,", cJSON_Print(root));
     cJSON_Delete(root);
-    */
 
     return ret_node;
 }

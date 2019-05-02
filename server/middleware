@@ -14,38 +14,38 @@ Executable = namedtuple('Executable', ['command', 'working_directory'])
 BASE_DIR = os.path.dirname(os.path.realpath(__file__))
 
 REQUEST_TYPES = {
-    'randomization': Executable(
-        command='./randomize',
-        working_directory=os.path.join(BASE_DIR, 'randomization')
-    ),
-    'simulation': Executable(
-        command='./simulate',
-        working_directory=os.path.join(BASE_DIR, 'simulator', 'simulator')
-    ),
-    'test': Executable(
-        command='python3.7 c_program.py',
-        working_directory=os.path.join(os.path.dirname(BASE_DIR), 'tests')
-    ),
+	'randomization': Executable(
+		command='./randomize',
+		working_directory=os.path.join(BASE_DIR, 'randomization')
+	),
+	'simulation': Executable(
+		command='./simulate',
+		working_directory=os.path.join(BASE_DIR, 'simulator', 'simulator')
+	),
+	'test': Executable(
+		command='python3.7 c_program.py',
+		working_directory=os.path.join(os.path.dirname(BASE_DIR), 'tests')
+	),
 }
 
 
 async def process_command(command, working_directory, data=None):
 	start_time = time.time_ns()
 	process = await create_subprocess_exec(*command.split(),
-											cwd=working_directory,
-											stdin=subprocess.PIPE,
-											stdout=subprocess.PIPE,
-											stderr=subprocess.PIPE)
+	                                       cwd=working_directory,
+	                                       stdin=subprocess.PIPE,
+	                                       stdout=subprocess.PIPE,
+	                                       stderr=subprocess.PIPE)
 	if data is None:
 		stdout, stderr = await process.communicate()
 	else:
 		stdout, stderr = await process.communicate(input=bytes(json.dumps(data),
-													encoding='utf-8'))
+		                                                       encoding='utf-8'))
 	print(f'Total Time (ns): {time.time_ns() - start_time}')
 	print(f'Return Code: {process.returncode}')
 	if stderr:
 		print(f'Error: {stderr}')
-		# print(f'General Process Info: {vars(process)}')
+	# print(f'General Process Info: {vars(process)}')
 
 	return stdout.decode()
 

@@ -82,6 +82,48 @@ cJSON* clean_for_simulate(cJSON *json) {
     return json;
 }
 
+struct arena get_init(cJSON *json) {
+    cJSON *randomization = json->child;
+    cJSON *distance_sensors = json->next->child;
+
+    randomization = randomization->next;
+    cJSON *osv = randomization;
+    cJSON *obstacles = randomization->next->child;
+    cJSON *destination = randomization->next->next;
+
+    struct arena arena;
+    arena.destination.x = (float)destination->child->valuedouble;
+    arena.destination.y = (float)destination->child->next->valuedouble;
+
+    arena.osv.location.x = (float)osv->child->valuedouble;
+    arena.osv.location.y = (float)osv->child->next->valuedouble;
+    arena.osv.location.theta = (float)osv->child->next->next->valuedouble;
+    arena.osv.height = (float)osv->child->next->next->next->valuedouble;
+    arena.osv.width = (float)osv->child->next->next->next->next->valuedouble;
+
+    while(distance_sensors != NULL) {
+        arena.osv.distance_sensors[distance_sensors->valueint] = 1;
+        distance_sensors = distance_sensors->next;
+    }
+
+    arena.obstacles = (struct obstacle *)malloc(1 * sizeof(struct obstacle));
+    int num_obstacles = 0;
+    cJSON *curr = obstacles;
+    while(curr != NULL) {
+        num_obstacles++;
+        arena.obstacles = (struct obstacle *)realloc(arena.obstacles, num_obstacles * sizeof(struct obstacle));
+        arena.obstacles[num_obstacles - 1].location.x = curr->child->valuedouble;
+        arena.obstacles[num_obstacles - 1].location.y = curr->child->next->valuedouble;
+        arena.obstacles[num_obstacles - 1].width = curr->child->next->next->valuedouble;
+        arena.obstacles[num_obstacles - 1].height = curr->child->next->next->next->valuedouble;
+        curr = curr->next;
+    }
+
+    arena.num_obstacles = num_obstacles;
+
+    return arena;    
+}
+
 int ngets(char *new_buffer, int fd) {
     int size = read(fd, new_buffer, BUFFER_SIZE);
     if(size == -1) {
@@ -177,10 +219,7 @@ int main(int argc, char *argv[]) {
     }
 
     child_json = clean_for_simulate(child_json);
-    parent_json->child = child_json;
-    char *json_output = cJSON_Print(parent_json);
-    init(json_output);
-    free(json_output);
+    struct arena arena = get_init(child_json);
 
     // we have to run the processs
     char *command = (char*)malloc((strlen("./../environments//") + 2 * strlen(get_id(child_json))));
@@ -218,7 +257,7 @@ int main(int argc, char *argv[]) {
             }
         }
 
-        head = frame(head, p);
+        head = frame(head, p, &arena);
         curr_sec = time_sec();
         curr_nsec = time_nsec();
     }

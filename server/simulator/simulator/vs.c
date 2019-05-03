@@ -13,12 +13,50 @@
 #define SENSOR_RANGE 1.0f
 #define PI 3.1415926535f
 #define BUFF_SIZE 258
+#define EPSILON 0.000001f
 #define ROTATIONS_PER_SECOND 0.25f
 #define max(x1,x2) ((x1) > (x2) ? (x1) : (x2))
 #define min(x1,x2) ((x1) < (x2) ? (x1) : (x2))
 
 char buffer [BUFF_SIZE];
 unsigned short buffer_pos = 0;
+
+float cross_product(struct coordinate v, struct coordinate w) {
+    return v.x * w.y - v.y * w.x;
+}
+
+struct coordinate * get_intersection(struct line l1, struct line l2) {
+    struct coordinate p = l1.p1;
+    struct coordinate q = l2.p1;
+    struct coordinate r = l1.p2; r.x -= p.x; r.y -= p.y;
+    struct coordinate s = l2.p2; s.x -= q.x; s.y -= q.y;
+
+    float c_rs = cross_product(r, s);
+    struct coordinate qminp; qminp.x = q.x - p.x; qminp.y = q.y - p.y;
+    c_qminpr = cross_product(qminp, r);
+    c_qminps = cross_product(qminp, s);
+
+    if(fabs(c_rs) < EPSILON) {
+        if(fabs(c_qminpr) < EPSILON) {
+            // colinear --
+
+        } else {
+            // paralell and non-intersecting --
+            return NULL;
+        }
+    } else {
+        float t = c_qminps / c_rs;
+        float u = c_qminpr / c_rs;
+
+        if((t <= 1.0 && t >= 0.0) && (u <= 1.0 && u >= 0.0)) {
+            // intersecting --
+
+        } else {
+            // non-parallel but not intersecting --
+            return NULL;
+        }
+    }
+}
 
 float distance(struct coordinate a, struct coordinate b) {
     return sqrt(pow(a.x - b.x, 2) + pow(a.y - b.y, 2));
@@ -132,77 +170,6 @@ float read_distance_sensor(struct arena arena, short index) {
     return minimum_distance;
 }
 
-struct line init_line(float x1, float y1, float x2, float y2) {
-    struct line temp;
-    struct coordinate hold;
-    
-    hold.x = x1;
-    hold.y = y1;
-    temp.p1 = hold;
-    
-    hold.x = x2;
-    hold.y = y2;
-    temp.p2 = hold;
-
-    return temp;
-}
-
-int on_segment(struct coordinate p, struct coordinate q, struct coordinate r) { 
-    if(q.x <= max(p.x, r.x) && q.x >= min(p.x, r.x) && q.y <= max(p.y, r.y) && q.y >= min(p.y, r.y)) {
-        return 1; 
-    }
-  
-    return 0; 
-} 
-  
-// To find orientation of ordered triplet (p, q, r). 
-// The function returns following values 
-// 0 --> p, q and r are colinear 
-// 1 --> Clockwise 
-// 2 --> Counterclockwise 
-int orientation(struct coordinate p, struct coordinate q, struct coordinate r) { 
-    // See https://www.geeksforgeeks.org/orientation-3-ordered-points/ 
-    // for details of below formula. 
-    int val = (q.y - p.y) * (r.x - q.x) - (q.x - p.x) * (r.y - q.y); 
-    if (val == 0) return 0;     // colinear 
-    return (val > 0) ? 1 : 2;   // clock or counterclock wise 
-} 
-  
-// The main function that returns true if line segment 'p1q1' 
-// and 'p2q2' intersect. 
-int do_intersect(struct coordinate p1, struct coordinate q1, struct coordinate p2, struct coordinate q2) { 
-    // Find the four orientations needed for general and 
-    // special cases 
-    int o1 = orientation(p1, q1, p2); 
-    int o2 = orientation(p1, q1, q2); 
-    int o3 = orientation(p2, q2, p1); 
-    int o4 = orientation(p2, q2, q1); 
-  
-    // General case 
-    if (o1 != o2 && o3 != o4) {
-        return 1; 
-    }
-
-    // Special Cases 
-    // p1, q1 and p2 are colinear and p2 lies on segment p1q1 
-    if (o1 == 0 && on_segment(p1, p2, q1)) return 1; 
-  
-    // p1, q1 and q2 are colinear and q2 lies on segment p1q1 
-    if (o2 == 0 && on_segment(p1, q2, q1)) return 1; 
-  
-    // p2, q2 and p1 are colinear and p1 lies on segment p2q2 
-    if (o3 == 0 && on_segment(p2, p1, q2)) return 1; 
-  
-    // p2, q2 and q1 are colinear and q1 lies on segment p2q2 
-    if (o4 == 0 && on_segment(p2, q1, q2)) return 1; 
-  
-    return 0;   // Doesn't fall in any of the above cases 
-} 
-
-int check_intersection(struct line l1, struct line l2) {
-    do_intersect(l1.p1, l1.p2, l2.p1, l2.p2);
-}
-
 int check_for_collisions(struct arena *arena) {
     int i, j, k;
     // struct coordinates a,b,c,d represent the four corners of the OSV
@@ -289,7 +256,7 @@ int check_for_collisions(struct arena *arena) {
 
         for(j = 0; j < 4; j++) {
             for(k = 0; k < 4; k++) {
-                if(check_intersection(osv_sides[k], obstacle_sides[j])) {         
+                if(get_intersection(osv_sides[k], obstacle_sides[j]) != NULL) {         
                     return 1;
                 }
             }
@@ -334,7 +301,7 @@ int check_for_collisions(struct arena *arena) {
     // need to check right and left sides of OSV in case OSV is perpendicular to wall
     for(i = 0; i < 4; i++) {
         for(j = 0; j < 4; j++) {
-            if(check_intersection(osv_sides[j], walls[i])) {
+            if(get_intersection(osv_sides[j], walls[i]) != NULL) {
                 return 1;
             }
         }

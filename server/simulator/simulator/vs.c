@@ -20,6 +20,10 @@
 char buffer [BUFF_SIZE];
 unsigned short buffer_pos = 0;
 
+float distance(struct coordinate a, struct coordinate b) {
+    return sqrt(pow(a.x - b.x, 2) + pow(a.y - b.y, 2));
+}
+
 float read_distance_sensor(struct arena arena, short index) {
     int i, j;
 
@@ -92,10 +96,6 @@ float read_distance_sensor(struct arena arena, short index) {
     }
 
     return minimum_distance;
-}
-
-float distance(struct coordinate a, struct coordinate b) {
-    return sqrt(pow(a.x - b.x, 2) + pow(a.y - b.y, 2));
 }
 
 struct line init_line(float x1, float y1, float x2, float y2) {

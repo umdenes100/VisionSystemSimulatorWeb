@@ -36,13 +36,6 @@ struct arena {
     struct osv osv;
 };
 
-<<<<<<< HEAD
 struct node * frame(struct node *in, struct process p, struct arena *arena, int frame_no);
-=======
-float readDistanceSensor(struct arena arena, short index);
-struct coordinate* get_intersection(struct line l1, struct line l2);
-struct node * frame(struct node *in, struct process p, struct arena *arena);
-float distance(struct coordinate a, struct coordinate b);
->>>>>>> a050b97582171772149e12ac9aca6f824b01fc92
 
 #endif

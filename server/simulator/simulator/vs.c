@@ -28,12 +28,13 @@ float read_distance_sensor(struct arena arena, short index) {
     int i, j;
 
     if(!arena.osv.distance_sensors[index]) {
-        return 0.0;
+        return -1.0;
     }
 
     // we have to get the slope of the front side of the osv first
     float cos_theta = cos(arena.osv.location.theta);
     float sin_theta = sin(arena.osv.location.theta);
+
     struct coordinate midPointFront;
     midPointFront.x = arena.osv.location.x + arena.osv.height / 2 * cos_theta;
     midPointFront.y = arena.osv.location.y + arena.osv.height / 2 * sin_theta;
@@ -75,22 +76,55 @@ float read_distance_sensor(struct arena arena, short index) {
     endPoint.x = sensor_locations[index].x + SENSOR_RANGE * cos(orientation);
     endPoint.y = sensor_locations[index].y + SENSOR_RANGE * sin(orientation);
 
-    struct line sensor_trace = {sensor_locations[index].x, sensor_locations[index].y, endPoint.x, endPoint.y};
+    struct line sensor_trace;
+    sensor_trace.p1.x = sensor_locations[index].x;
+    sensor_trace.p1.y = sensor_locations[index].y;
+    sensor_trace.p2.x = endPoint.x;
+    sensor_trace.p2.y = endPoint.y;
+
     float minimum_distance = 1.0;
 
-    for(i=0; i<arena.num_obstacles; i++) {
+    for(i = 0; i < arena.num_obstacles; i++) {
         // for each of the arena.obstacles[i]s
-        struct line right = {{arena.obstacles[i].location.x + arena.obstacles[i].height, arena.obstacles[i].location.y}, {arena.obstacles[i].location.x + arena.obstacles[i].height, arena.obstacles[i].location.y - arena.obstacles[i].width}};
-        struct line bottom = {{arena.obstacles[i].location.x, arena.obstacles[i].location.y - arena.obstacles[i].width}, {arena.obstacles[i].location.x + arena.obstacles[i].height, arena.obstacles[i].location.y - arena.obstacles[i].width}};
-        struct line left = {{arena.obstacles[i].location.x, arena.obstacles[i].location.y - arena.obstacles[i].width}, {arena.obstacles[i].location.x, arena.obstacles[i].location.y}};
-        struct line top = {{arena.obstacles[i].location.x, arena.obstacles[i].location.y}, {arena.obstacles[i].location.x + arena.obstacles[i].height, arena.obstacles[i].location.y}};
-        struct line obstacle_sides [4] = {right, bottom, left, top};
+        struct line right;
+        struct coordinate r1, r2;
+        r1.x = arena.obstacles[i].location.x + arena.obstacles[i].width;
+        r1.y = arena.obstacles[i].location.y;
+        r2.x = arena.obstacles[i].location.x + arena.obstacles[i].width;
+        r2.y = arena.obstacles[i].location.y - arena.obstacles[i].height;
+        right.p1 = r1; right.p2 = r2;
 
-        for(j=0; j<sizeof(obstacle_sides) / sizeof(struct line); j++) {
+        struct line bottom;
+        struct coordinate b1, b2;
+        b1.x = arena.obstacles[i].location.x;
+        b1.y = arena.obstacles[i].location.y - arena.obstacles[i].height;
+        b2.x = arena.obstacles[i].location.x + arena.obstacles[i].width;
+        b2.y = arena.obstacles[i].location.y - arena.obstacles[i].height;
+        bottom.p1 = b1; bottom.p2 = b2;
+
+        struct line left;
+        struct coordinate l1, l2;
+        l1.x = arena.obstacles[i].location.x;
+        l1.y = arena.obstacles[i].location.y - arena.obstacles[i].height;
+        l2.x = arena.obstacles[i].location.x;
+        l2.y = arena.obstacles[i].location.y;
+        left.p1 = l1; left.p2 = l2;
+
+        struct line top;
+        struct coordinate t1, t2;
+        t1.x = arena.obstacles[i].location.x;
+        t1.y = arena.obstacles[i].location.y;
+        t2.x = arena.obstacles[i].location.x + arena.obstacles[i].width;
+        t2.y = arena.obstacles[i].location.y;
+        top.p1 = t1; top.p2 = t2;
+        
+        struct line obstacle_sides[4] = {right, bottom, left, top};
+
+        for(j = 0; j < 4; j++) {
         	struct coordinate *intersection_point = get_intersection(obstacle_sides[j], sensor_trace);
             if(intersection_point != NULL) {
                 //todo: need to find point on obstacle that is closest to the sensor location, and then find the distance
-                minimum_distance = min(minimum_distance,distance(sensor_locations[index], *intersection_point));
+                minimum_distance = min(minimum_distance, distance(sensor_locations[index], *intersection_point));
             }
         }
     }
@@ -255,16 +289,13 @@ int check_for_collisions(struct arena *arena) {
 
         for(j = 0; j < 4; j++) {
             for(k = 0; k < 4; k++) {
-                if(get_intersection(osv_sides[k], obstacle_sides[j]) != NULL) {
-                    struct coordinate *inter = get_intersection(osv_sides[k], obstacle_sides[j]);
-                    printf("Index:(%d,%d,%d)\n",i,j,k);
-                    printf("Location:(%f,%f)\n",inter->x, inter->y);                    
-                    //return 1;
+                if(check_intersection(osv_sides[k], obstacle_sides[j])) {         
+                    return 1;
                 }
             }
-
         }
     }
+
     // now we want to define the walls:
     struct line right;
     struct coordinate r1, r2;
@@ -303,7 +334,7 @@ int check_for_collisions(struct arena *arena) {
     // need to check right and left sides of OSV in case OSV is perpendicular to wall
     for(i = 0; i < 4; i++) {
         for(j = 0; j < 4; j++) {
-            if(get_intersection(osv_sides[j], walls[i]) != NULL) {
+            if(check_intersection(osv_sides[j], walls[i])) {
                 return 1;
             }
         }

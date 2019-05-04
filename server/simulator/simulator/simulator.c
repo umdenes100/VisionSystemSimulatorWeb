@@ -122,7 +122,6 @@ struct arena get_init(cJSON *json) {
     }
 
     arena.num_obstacles = num_obstacles;
-
     return arena;    
 }
 

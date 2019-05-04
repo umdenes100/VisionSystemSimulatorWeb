@@ -25,6 +25,10 @@ float cross_product(struct coordinate v, struct coordinate w) {
     return v.x * w.y - v.y * w.x;
 }
 
+float dot_product(struct coordinate v, struct coordinate w) {
+    return v.x * w.x + v.y * w.y;
+}
+
 struct coordinate * get_intersection(struct line l1, struct line l2) {
     struct coordinate p = l1.p1;
     struct coordinate q = l2.p1;
@@ -33,13 +37,44 @@ struct coordinate * get_intersection(struct line l1, struct line l2) {
 
     float c_rs = cross_product(r, s);
     struct coordinate qminp; qminp.x = q.x - p.x; qminp.y = q.y - p.y;
-    c_qminpr = cross_product(qminp, r);
-    c_qminps = cross_product(qminp, s);
+    float c_qminpr = cross_product(qminp, r);
+    float c_qminps = cross_product(qminp, s);
 
     if(fabs(c_rs) < EPSILON) {
         if(fabs(c_qminpr) < EPSILON) {
             // colinear --
+            float d_qminpr = dot_product(qminp, r);
+            float d_rr = dot_product(r, r);
+            float d_sr = dot_product(s, r);
 
+            float t0 = d_qminpr / d_rr;
+            float t1 = t0 + d_sr / d_rr;
+
+            if(d_sr < 0) {
+                float temp = t0;
+                t0 = t1; t1 = temp;
+            }
+
+            // check intersection with 0-1
+            if(t0 >= 0 && t0 <= 1) {
+                // t0 has intersection
+                struct coordinate *ret = (struct coordinate *)malloc(1 * sizeof(struct coordinate));
+                ret->x = p.x + t0 * r.x;
+                ret->y = p.y + t0 * r.y;
+
+                return ret;
+            }
+
+            if(t1 >= 0 && t1 <= 1) {
+                // t1 has intersection
+                struct coordinate *ret = (struct coordinate *)malloc(1 * sizeof(struct coordinate));
+                ret->x = p.x + t1 * r.x;
+                ret->y = p.y + t1 * r.y;
+
+                return ret;
+            }
+
+            return NULL;
         } else {
             // paralell and non-intersecting --
             return NULL;
@@ -50,12 +85,18 @@ struct coordinate * get_intersection(struct line l1, struct line l2) {
 
         if((t <= 1.0 && t >= 0.0) && (u <= 1.0 && u >= 0.0)) {
             // intersecting --
+            struct coordinate *ret = (struct coordinate *)malloc(1 * sizeof(struct coordinate));
+            ret->x = p.x + t * r.x;
+            ret->y = p.y + t * r.y;
 
+            return ret;
         } else {
             // non-parallel but not intersecting --
             return NULL;
         }
     }
+
+    return NULL;
 }
 
 float distance(struct coordinate a, struct coordinate b) {
@@ -163,6 +204,7 @@ float read_distance_sensor(struct arena arena, short index) {
             if(intersection_point != NULL) {
                 //todo: need to find point on obstacle that is closest to the sensor location, and then find the distance
                 minimum_distance = min(minimum_distance, distance(sensor_locations[index], *intersection_point));
+                free(intersection_point);
             }
         }
     }
@@ -256,7 +298,9 @@ int check_for_collisions(struct arena *arena) {
 
         for(j = 0; j < 4; j++) {
             for(k = 0; k < 4; k++) {
-                if(get_intersection(osv_sides[k], obstacle_sides[j]) != NULL) {         
+                struct coordinate *intersection_point = get_intersection(osv_sides[k], obstacle_sides[j]);
+                if(intersection_point != NULL) {
+                    free(intersection_point);    
                     return 1;
                 }
             }
@@ -301,7 +345,9 @@ int check_for_collisions(struct arena *arena) {
     // need to check right and left sides of OSV in case OSV is perpendicular to wall
     for(i = 0; i < 4; i++) {
         for(j = 0; j < 4; j++) {
-            if(get_intersection(osv_sides[j], walls[i]) != NULL) {
+            struct coordinate *intersection_point = get_intersection(osv_sides[j], walls[i]);
+            if(intersection_point != NULL) {
+                free(intersection_point);
                 return 1;
             }
         }

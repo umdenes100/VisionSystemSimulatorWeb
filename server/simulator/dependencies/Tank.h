@@ -13,8 +13,10 @@ public:
   void begin();
   float readDistanceSensor(int id);
   void turnOffMotors();
-  void setRightMotorPWM(int pwm);
-  void setLeftMotorPWM(int pwm);
+  void setRightMotorPWM(short pwm);
+  void setLeftMotorPWM(short pwm);
+private:
+  bool init = false;
 };
 
 #endif

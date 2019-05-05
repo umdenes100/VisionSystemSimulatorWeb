@@ -202,7 +202,6 @@ float read_distance_sensor(struct arena arena, short index) {
         for(j = 0; j < 4; j++) {
         	struct coordinate *intersection_point = get_intersection(obstacle_sides[j], sensor_trace);
             if(intersection_point != NULL) {
-                //todo: need to find point on obstacle that is closest to the sensor location, and then find the distance
                 minimum_distance = min(minimum_distance, distance(sensor_locations[index], *intersection_point));
                 free(intersection_point);
             }
@@ -376,10 +375,10 @@ void update_osv(struct arena *arena) {
     }
 }
 
-struct node * process_command(struct node *in, struct process p, struct arena *arena) {
+struct node * process_command(struct node *in, struct process p, struct arena *arena, int *frame_no) {
     char opcode;
     int i;
-    unsigned char ack_code = '\x07';
+    unsigned char ack_code = '\x08';
     struct node *curr, *next;
     buffer_pos = 0;
 
@@ -431,7 +430,7 @@ struct node * process_command(struct node *in, struct process p, struct arena *a
             return in;
         } else {
             write(p.output_fd, &ack_code, sizeof(unsigned char));
-            arena->osv.left_motor_pwm = (buffer[1] << 8) + buffer[2];
+            arena->osv.left_motor_pwm = *(short *)(buffer + 1);
         }
     } else if(opcode == 0x04) {
         // Tank.setRightMotorPWM()
@@ -441,7 +440,7 @@ struct node * process_command(struct node *in, struct process p, struct arena *a
             return in;
         } else {
             write(p.output_fd, &ack_code, sizeof(unsigned char));
-            arena->osv.right_motor_pwm = (buffer[1] << 8) + buffer[2];
+            arena->osv.right_motor_pwm = *(short *)(buffer + 1);
         }
     } else if(opcode == 0x05) {
         // Tank.turnOffMotors()
@@ -457,8 +456,8 @@ struct node * process_command(struct node *in, struct process p, struct arena *a
         if(buffer_pos < 2) {
             return in;
         } else {
-            float distVal = read_distance_sensor(*arena, (short)buffer[1]);
-            write(p.output_fd, &distVal, sizeof(float));
+            float dist_val = read_distance_sensor(*arena, (short)buffer[1]);
+            write(p.output_fd, &dist_val, sizeof(float));
         }
     } else {
         // error("Invalid opcode\n");
@@ -475,13 +474,13 @@ struct node * process_command(struct node *in, struct process p, struct arena *a
     return NULL;    
 }
 
-struct node * frame(struct node *in, struct process p, struct arena *arena, int frame_no) {
+struct node * frame(struct node *in, struct process p, struct arena *arena, int *frame_no) {
     update_osv(arena);
-    struct node * ret_node = process_command(in, p, arena);
+    struct node * ret_node = process_command(in, p, arena, frame_no);
 
     cJSON *root = cJSON_CreateObject();
     cJSON *osv = cJSON_CreateObject();
-    cJSON_AddNumberToObject(root, "frame_no", frame_no);
+    cJSON_AddNumberToObject(root, "frame_no", *frame_no);
     cJSON_AddNumberToObject(osv, "x", arena->osv.location.x);
     cJSON_AddNumberToObject(osv, "y", arena->osv.location.y);
     cJSON_AddNumberToObject(osv, "theta", arena->osv.location.theta);

@@ -258,7 +258,7 @@ int main(int argc, char *argv[]) {
             }
         }
 
-        head = frame(head, p, &arena, frame_no);
+        head = frame(head, p, &arena, &frame_no);
         curr_nsec = time_nsec();
 
         frame_no++;

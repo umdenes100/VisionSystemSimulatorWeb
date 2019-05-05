@@ -36,6 +36,6 @@ struct arena {
     struct osv osv;
 };
 
-struct node * frame(struct node *in, struct process p, struct arena *arena, int frame_no);
+struct node * frame(struct node *in, struct process p, struct arena *arena, int *frame_no);
 
 #endif

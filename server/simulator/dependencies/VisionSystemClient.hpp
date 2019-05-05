@@ -36,9 +36,9 @@ public:
   Coordinate destination;
 
 private:
-  bool receive(Coordinate *coordinate);
-
-  int mMarkerId;
+  bool init = false;
 };
+
+void delay(int msec);
 
 #endif /* VisionSystemClient_hpp */

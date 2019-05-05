@@ -414,7 +414,7 @@ struct node * process_command(struct node *in, struct process p, struct arena *a
         write(p.output_fd, &(arena->osv.location.y), sizeof(float));
         write(p.output_fd, &(arena->osv.location.theta), sizeof(float));  
     } else if(opcode == 0x02) {
-        // println() message
+        // print() message
         // receives: 1 byte opcode, 1 byte length, length number of characters
         // returns: 1 byte ack
         if(in->size == 1 || buffer[1] < buffer_pos - 2) {
@@ -458,6 +458,15 @@ struct node * process_command(struct node *in, struct process p, struct arena *a
         } else {
             float dist_val = read_distance_sensor(*arena, (short)buffer[1]);
             write(p.output_fd, &dist_val, sizeof(float));
+        }
+    } else if(opcode == 0x07) {
+        // delay()
+        // receives: 1 byte op code, 4 bytes delay val
+        // returns: 1 byte ack
+        if(buffer_pos < 5) {
+            return in;
+        } else {
+            write(p.output_fd, &ack_code, sizeof(unsigned char));
         }
     } else {
         // error("Invalid opcode\n");

@@ -84,7 +84,7 @@ cJSON* clean_for_simulate(cJSON *json) {
 
 struct arena get_init(cJSON *json) {
     cJSON *randomization = json->child;
-    cJSON *distance_sensors = json->next->child;
+    cJSON *distance_sensors = json->next;
 
     randomization = randomization->next;
     cJSON *osv = randomization;
@@ -103,9 +103,9 @@ struct arena get_init(cJSON *json) {
     arena.osv.left_motor_pwm = 0;
     arena.osv.right_motor_pwm = 0;
 
-    while(distance_sensors != NULL) {
-        arena.osv.distance_sensors[distance_sensors->valueint] = 1;
-        distance_sensors = distance_sensors->next;
+    int i;
+    for(i = 0; i < cJSON_GetArraySize(distance_sensors); i++) {
+        arena.osv.distance_sensors[cJSON_GetArrayItem(distance_sensors, i)->valueint] = 1;
     }
 
     arena.obstacles = (struct obstacle *)malloc(1 * sizeof(struct obstacle));
@@ -122,7 +122,7 @@ struct arena get_init(cJSON *json) {
     }
 
     arena.num_obstacles = num_obstacles;
-    return arena;    
+    return arena;
 }
 
 int ngets(char *new_buffer, int fd) {
@@ -221,7 +221,7 @@ int main(int argc, char *argv[]) {
 
     child_json = clean_for_simulate(child_json);
     struct arena arena = get_init(child_json);
-
+    
     // we have to run the processs
     char *command = (char*)malloc((strlen("./../environments//") + 2 * strlen(get_id(child_json))));
     sprintf(command, "./../environments/%s/%s", get_id(child_json), get_id(child_json));

@@ -28,3 +28,7 @@ void digitalWrite(int pin, int val) {
 int digitalRead(int pin) {
     // do what we want
 }
+
+void delay(int msec) {
+    // do what we want
+}

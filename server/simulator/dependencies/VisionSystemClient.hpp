@@ -41,6 +41,4 @@ private:
   int mMarkerId;
 };
 
-void delay(int msec);
-
 #endif /* VisionSystemClient_hpp */

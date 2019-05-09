@@ -151,24 +151,61 @@ void VisionSystemClient::print(int ln, double message) {
 void VisionSystemClient::println(int ln, const char *message) {
     // do what we want
     if(this->init) {
-        this->print(ln, message);
-        this->print(ln, "\n");
+        int s_len = strlen(message);
+        if(s_len <= 254) {
+            fputc('\x02', stdout);
+            fputc((char)(ln), stdout);
+            fputc((char)(ln >> 8), stdout);
+            fputc((char)(ln >> 16), stdout);
+            fputc((char)(ln >> 24), stdout);
+            fputc((char)(s_len + 2), stdout);
+            fputs(message, stdout);
+            fputc('\n', stdout);
+            fputc('\x0', stdout);
+            fflush(stdout);
+            
+            while(fgetc(stdin) != '\x08');
+        }
     }
 }
 
 void VisionSystemClient::println(int ln, int message) {
     // do what we want
     if(this->init) {
-        this->print(ln, message);
-        this->print(ln, "\n");
+        char str[256];
+        sprintf(str, "%d", message);
+        fputc('\x02', stdout);
+        fputc((char)(ln), stdout);
+        fputc((char)(ln >> 8), stdout);
+        fputc((char)(ln >> 16), stdout);
+        fputc((char)(ln >> 24), stdout);
+        fputc((char)(strlen(str) + 2), stdout);
+        fputs(str, stdout);
+        fputc('\n', stdout);
+        fputc('\x0', stdout);
+        fflush(stdout);
+        
+        while(fgetc(stdin) != '\x08');
     }
 }
 
 void VisionSystemClient::println(int ln, double message) {
     // do what we want
     if(this->init) {
-        this->print(ln, message);
-        this->print(ln, "\n");
+        char str[256];
+        sprintf(str, "%f", message);
+        fputc('\x02', stdout);
+        fputc((char)(ln), stdout);
+        fputc((char)(ln >> 8), stdout);
+        fputc((char)(ln >> 16), stdout);
+        fputc((char)(ln >> 24), stdout);
+        fputc((char)(strlen(str) + 2), stdout);
+        fputs(str, stdout);
+        fputc('\n', stdout);
+        fputc('\x0', stdout);
+        fflush(stdout);
+        
+        while(fgetc(stdin) != '\x08');
     }
 }
 

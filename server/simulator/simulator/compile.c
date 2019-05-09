@@ -263,6 +263,7 @@ int compile(char *file) {
     int code = pclose(p);
 
     if(code != 0) {
+        printf("%s\n", buff);
         return -1;
     }
 

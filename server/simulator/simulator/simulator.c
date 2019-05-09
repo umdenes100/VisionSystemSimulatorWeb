@@ -229,7 +229,7 @@ int main(int argc, char *argv[]) {
     struct node *head = NULL;
     struct node *curr = head;
 
-    unsigned long curr_nsec = time_nsec();
+    unsigned long curr_nsec;
     int frame_no = 0;
 
     struct process p = copen(command);
@@ -238,6 +238,7 @@ int main(int argc, char *argv[]) {
 
     printf("[");
     while(frame_no < NUM_FRAMES) {
+        curr_nsec = time_nsec();
         while(time_nsec() - curr_nsec < FRAME_RATE_NSEC);
         // This itteration happens each frame
 
@@ -259,9 +260,6 @@ int main(int argc, char *argv[]) {
         }
 
         head = frame(head, p, &arena, &frame_no);
-        curr_nsec = time_nsec();
-
-        frame_no++;
     }
     printf("]");
 

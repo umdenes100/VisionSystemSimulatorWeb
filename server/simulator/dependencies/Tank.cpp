@@ -12,7 +12,7 @@ void Tank::begin(){
     this->init = true;
 };
 
-void Tank::setLeftMotorPWM(short pwm) {
+void Tank::setLeftMotorPWM(int ln, short pwm) {
     // do what we want
     if(pwm > 255) {
         pwm = 255;
@@ -22,6 +22,10 @@ void Tank::setLeftMotorPWM(short pwm) {
 
     if(this->init) {
         fputc('\x03', stdout);
+        fputc((char)(ln), stdout);
+        fputc((char)(ln >> 8), stdout);
+        fputc((char)(ln >> 16), stdout);
+        fputc((char)(ln >> 24), stdout);
         fputc((char)(pwm), stdout);
         fputc((char)(pwm >> 8), stdout);
         fflush(stdout);
@@ -30,7 +34,7 @@ void Tank::setLeftMotorPWM(short pwm) {
     }
 };
 
-void Tank::setRightMotorPWM(short pwm) {
+void Tank::setRightMotorPWM(int ln, short pwm) {
     // do what we want
     if(pwm > 255) {
         pwm = 255;
@@ -40,6 +44,10 @@ void Tank::setRightMotorPWM(short pwm) {
 
     if(this->init) {
         fputc('\x04', stdout);
+        fputc((char)(ln), stdout);
+        fputc((char)(ln >> 8), stdout);
+        fputc((char)(ln >> 16), stdout);
+        fputc((char)(ln >> 24), stdout);
         fputc((char)(pwm), stdout);
         fputc((char)(pwm >> 8), stdout);
         fflush(stdout);
@@ -48,16 +56,20 @@ void Tank::setRightMotorPWM(short pwm) {
     }
 };
 
-void Tank::turnOffMotors(){
+void Tank::turnOffMotors(int ln){
     // do what we want
     if(this->init) {
         fputc('\x05', stdout);
+        fputc((char)(ln), stdout);
+        fputc((char)(ln >> 8), stdout);
+        fputc((char)(ln >> 16), stdout);
+        fputc((char)(ln >> 24), stdout);
         fflush(stdout);
         while(fgetc(stdin) != '\x08');
     }
 };
 
-float Tank::readDistanceSensor(int id) {
+float Tank::readDistanceSensor(int ln, int id) {
     // do what we want
     if(id > 11) {
         return -1.0;
@@ -65,6 +77,10 @@ float Tank::readDistanceSensor(int id) {
 
     if(this->init) {
         fputc('\x06', stdout);
+        fputc((char)(ln), stdout);
+        fputc((char)(ln >> 8), stdout);
+        fputc((char)(ln >> 16), stdout);
+        fputc((char)(ln >> 24), stdout);
         fputc((char)(id), stdout);
         fflush(stdout);
         

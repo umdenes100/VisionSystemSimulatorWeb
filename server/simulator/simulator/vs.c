@@ -12,7 +12,7 @@
 
 #define SENSOR_RANGE 1.0f
 #define PI 3.1415926535f
-#define BUFF_SIZE 258
+#define BUFF_SIZE 262
 #define EPSILON 0.000001f
 #define ROTATIONS_PER_SECOND 0.25f
 #define max(x1,x2) ((x1) > (x2) ? (x1) : (x2))
@@ -355,7 +355,7 @@ int check_for_collisions(struct arena *arena) {
     return 0;
 }
 
-void update_osv(struct arena *arena) {
+void update_osv(struct arena *arena, int frame_no) {
     struct coordinate prev_location;
     prev_location.x = arena->osv.location.x;
     prev_location.y = arena->osv.location.y;
@@ -373,6 +373,31 @@ void update_osv(struct arena *arena) {
         arena->osv.location.y = prev_location.y;
         arena->osv.location.theta = prev_location.theta;
     }
+    
+    cJSON *root = cJSON_CreateObject();
+    cJSON *osv = cJSON_CreateObject();
+    cJSON_AddNumberToObject(root, "frame_no", frame_no);
+    cJSON_AddNumberToObject(osv, "x", arena->osv.location.x);
+    cJSON_AddNumberToObject(osv, "y", arena->osv.location.y);
+    cJSON_AddNumberToObject(osv, "theta", arena->osv.location.theta);
+    cJSON_AddItemToObject(root, "osv", osv);
+
+    printf("%s,", cJSON_Print(root));
+    cJSON_Delete(root);
+}
+
+void print_command(char *command, char *data, int ln) {
+    cJSON *root = cJSON_CreateObject();
+    cJSON_AddItemToObject(root, "command", cJSON_CreateString(command));
+
+    if(data != NULL) {
+        cJSON_AddItemToObject(root, "data", cJSON_CreateString(data));
+    }
+
+    cJSON_AddNumberToObject(root, "line_number", ln);
+    
+    printf("%s,", cJSON_Print(root));
+    cJSON_Delete(root);
 }
 
 struct node * process_command(struct node *in, struct process p, struct arena *arena, int *frame_no) {
@@ -401,71 +426,102 @@ struct node * process_command(struct node *in, struct process p, struct arena *a
     opcode = buffer[0];
     if(opcode == 0x00) {
         // Enes100.begin() message
-        // receives: 1 byte opcode
+        // receives: 1 byte opcode, 4 byte line number
         // returns: 3 floats
-        write(p.output_fd, &(arena->destination.x), sizeof(float));
-        write(p.output_fd, &(arena->destination.y), sizeof(float));
-        write(p.output_fd, &(arena->destination.theta), sizeof(float));
-    } else if(opcode == 0x01) {
-        // updateLocation() message
-        // receives: 1 byte opcode
-        // returns: 3 floats
-        write(p.output_fd, &(arena->osv.location.x), sizeof(float));
-        write(p.output_fd, &(arena->osv.location.y), sizeof(float));
-        write(p.output_fd, &(arena->osv.location.theta), sizeof(float));  
-    } else if(opcode == 0x02) {
-        // print() message
-        // receives: 1 byte opcode, 1 byte length, length number of characters
-        // returns: 1 byte ack
-        if(in->size == 1 || buffer[1] < buffer_pos - 2) {
+        if(in->size < 5) {
             return in;
         } else {
+            print_command("begin", NULL, *(int *)(buffer + 1));
+            write(p.output_fd, &(arena->destination.x), sizeof(float));
+            write(p.output_fd, &(arena->destination.y), sizeof(float));
+            write(p.output_fd, &(arena->destination.theta), sizeof(float));
+        }
+    } else if(opcode == 0x01) {
+        // updateLocation() message
+        // receives: 1 byte opcode, 4 byte line number
+        // returns: 3 floats
+        if(in->size < 5) {
+            return in;
+        } else {
+            print_command("update_location", NULL, *(int *)(buffer + 1));
+            write(p.output_fd, &(arena->osv.location.x), sizeof(float));
+            write(p.output_fd, &(arena->osv.location.y), sizeof(float));
+            write(p.output_fd, &(arena->osv.location.theta), sizeof(float));
+        }
+    } else if(opcode == 0x02) {
+        // print() message
+        // receives: 1 byte opcode, 4 byte line number, 1 byte length, length number of characters
+        // returns: 1 byte ack
+        if(in->size < 6 || buffer[5] < buffer_pos - 6) {
+            return in;
+        } else {
+            print_command("print", buffer + 6, *(int *)(buffer + 1));
             write(p.output_fd, &ack_code, sizeof(unsigned char));
         }
     } else if(opcode == 0x03) {
         // Tank.setLeftMotorPWM()
-        // receives: 1 byte opcode, 2 byte pwm value
+        // receives: 1 byte opcode, 4 byte line number, 2 byte pwm value
         // returns: 1 byte ack
-        if(in->size < 3) {
+        if(in->size < 7) {
             return in;
         } else {
+            print_command("setLeftMotorPWM", NULL, *(int *)(buffer + 1));
             write(p.output_fd, &ack_code, sizeof(unsigned char));
-            arena->osv.left_motor_pwm = *(short *)(buffer + 1);
+            arena->osv.left_motor_pwm = *(short *)(buffer + 5);
         }
     } else if(opcode == 0x04) {
         // Tank.setRightMotorPWM()
-        // receives: 1 byte opcode, 2 byte pwm value
+        // receives: 1 byte opcode, 4 byte line number, 2 byte pwm value
         // returns: 1 byte ack
-        if(in->size < 3) {
+        if(in->size < 7) {
             return in;
         } else {
+            print_command("setRightMotorPWM", NULL, *(int *)(buffer + 1));
             write(p.output_fd, &ack_code, sizeof(unsigned char));
-            arena->osv.right_motor_pwm = *(short *)(buffer + 1);
+            arena->osv.right_motor_pwm = *(short *)(buffer + 5);
         }
     } else if(opcode == 0x05) {
         // Tank.turnOffMotors()
-        // receives: 1 byte opcode
+        // receives: 1 byte opcode, 4 byte line number
         // returns: 1 byte ack
-        arena->osv.left_motor_pwm = 0;
-        arena->osv.right_motor_pwm = 0;
-        write(p.output_fd, &ack_code, sizeof(unsigned char));
-    } else if(opcode == 0x06) {
-        // Tank.readDistanceSensors()
-        // receives: 1 byte opcode, 1 byte index
-        // returns: 4 byte float
-        if(buffer_pos < 2) {
+        if(in->size < 5) {
             return in;
         } else {
-            float dist_val = read_distance_sensor(*arena, (short)buffer[1]);
+            print_command("turnOffMotors", NULL, *(int *)(buffer + 1));
+            arena->osv.left_motor_pwm = 0;
+            arena->osv.right_motor_pwm = 0;
+            write(p.output_fd, &ack_code, sizeof(unsigned char));
+        }
+    } else if(opcode == 0x06) {
+        // Tank.readDistanceSensors()
+        // receives: 1 byte opcode, 4 byte line number, 1 byte index
+        // returns: 4 byte float
+        if(buffer_pos < 6) {
+            return in;
+        } else {
+            print_command("readDistanceSensor", NULL, *(int *)(buffer + 1));
+            float dist_val = read_distance_sensor(*arena, (short)buffer[5]);
             write(p.output_fd, &dist_val, sizeof(float));
         }
     } else if(opcode == 0x07) {
         // delay()
-        // receives: 1 byte op code, 4 bytes delay val
+        // receives: 1 byte op code, 4 byte line number, 4 bytes delay val
         // returns: 1 byte ack
-        if(buffer_pos < 5) {
+        if(buffer_pos < 9) {
             return in;
         } else {
+            print_command("delay", NULL, *(int *)(buffer + 1));
+            int delay_msec = *(int *)(buffer + 5);
+            // garbage fast forward:
+            for(i = 0; i < delay_msec; i++) {
+                update_osv(arena, *frame_no);
+                *frame_no += 1;
+
+                if(*frame_no >= NUM_FRAMES) {
+                    break;
+                }
+            }
+
             write(p.output_fd, &ack_code, sizeof(unsigned char));
         }
     } else {
@@ -484,19 +540,9 @@ struct node * process_command(struct node *in, struct process p, struct arena *a
 }
 
 struct node * frame(struct node *in, struct process p, struct arena *arena, int *frame_no) {
-    update_osv(arena);
+    update_osv(arena, *frame_no);
     struct node * ret_node = process_command(in, p, arena, frame_no);
 
-    cJSON *root = cJSON_CreateObject();
-    cJSON *osv = cJSON_CreateObject();
-    cJSON_AddNumberToObject(root, "frame_no", *frame_no);
-    cJSON_AddNumberToObject(osv, "x", arena->osv.location.x);
-    cJSON_AddNumberToObject(osv, "y", arena->osv.location.y);
-    cJSON_AddNumberToObject(osv, "theta", arena->osv.location.theta);
-    cJSON_AddItemToObject(root, "osv", osv);
-
-    printf("%s,", cJSON_Print(root));
-    cJSON_Delete(root);
-
+    *frame_no += 1;
     return ret_node;
 }

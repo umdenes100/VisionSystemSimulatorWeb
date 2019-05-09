@@ -11,10 +11,10 @@ class Tank
 public:
   Tank();
   void begin();
-  float readDistanceSensor(int id);
-  void turnOffMotors();
-  void setRightMotorPWM(short pwm);
-  void setLeftMotorPWM(short pwm);
+  float readDistanceSensor(int ln, int id);
+  void turnOffMotors(int ln);
+  void setRightMotorPWM(int ln, short pwm);
+  void setLeftMotorPWM(int ln, short pwm);
 private:
   bool init = false;
 };

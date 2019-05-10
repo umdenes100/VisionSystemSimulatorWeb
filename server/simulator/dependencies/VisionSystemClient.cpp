@@ -153,14 +153,15 @@ void VisionSystemClient::println(int ln, const char *message) {
     if(this->init) {
         int s_len = strlen(message);
         if(s_len <= 254) {
+            char str[256];
+            sprintf(str, "%s\n", message);
             fputc('\x02', stdout);
             fputc((char)(ln), stdout);
             fputc((char)(ln >> 8), stdout);
             fputc((char)(ln >> 16), stdout);
             fputc((char)(ln >> 24), stdout);
             fputc((char)(s_len + 2), stdout);
-            fputs(message, stdout);
-            fputc('\n', stdout);
+            fputs(str, stdout);
             fputc('\x0', stdout);
             fflush(stdout);
             
@@ -173,7 +174,7 @@ void VisionSystemClient::println(int ln, int message) {
     // do what we want
     if(this->init) {
         char str[256];
-        sprintf(str, "%d", message);
+        sprintf(str, "%d\n", message);
         fputc('\x02', stdout);
         fputc((char)(ln), stdout);
         fputc((char)(ln >> 8), stdout);
@@ -181,7 +182,6 @@ void VisionSystemClient::println(int ln, int message) {
         fputc((char)(ln >> 24), stdout);
         fputc((char)(strlen(str) + 2), stdout);
         fputs(str, stdout);
-        fputc('\n', stdout);
         fputc('\x0', stdout);
         fflush(stdout);
         
@@ -193,7 +193,7 @@ void VisionSystemClient::println(int ln, double message) {
     // do what we want
     if(this->init) {
         char str[256];
-        sprintf(str, "%f", message);
+        sprintf(str, "%f\n", message);
         fputc('\x02', stdout);
         fputc((char)(ln), stdout);
         fputc((char)(ln >> 8), stdout);
@@ -201,7 +201,6 @@ void VisionSystemClient::println(int ln, double message) {
         fputc((char)(ln >> 24), stdout);
         fputc((char)(strlen(str) + 2), stdout);
         fputs(str, stdout);
-        fputc('\n', stdout);
         fputc('\x0', stdout);
         fflush(stdout);
         

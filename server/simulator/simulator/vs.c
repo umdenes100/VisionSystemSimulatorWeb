@@ -29,74 +29,98 @@ float dot_product(struct coordinate v, struct coordinate w) {
     return v.x * w.x + v.y * w.y;
 }
 
-struct coordinate * get_intersection(struct line l1, struct line l2) {
-    struct coordinate p = l1.p1;
-    struct coordinate q = l2.p1;
-    struct coordinate r = l1.p2; r.x -= p.x; r.y -= p.y;
-    struct coordinate s = l2.p2; s.x -= q.x; s.y -= q.y;
-
-    float c_rs = cross_product(r, s);
-    struct coordinate qminp; qminp.x = q.x - p.x; qminp.y = q.y - p.y;
-    float c_qminpr = cross_product(qminp, r);
-    float c_qminps = cross_product(qminp, s);
-
-    if(fabs(c_rs) < EPSILON) {
-        if(fabs(c_qminpr) < EPSILON) {
-            // colinear --
-            float d_qminpr = dot_product(qminp, r);
-            float d_rr = dot_product(r, r);
-            float d_sr = dot_product(s, r);
-
-            float t0 = d_qminpr / d_rr;
-            float t1 = t0 + d_sr / d_rr;
-
-            if(d_sr < 0) {
-                float temp = t0;
-                t0 = t1; t1 = temp;
+struct coordinate* get_intersection(struct line l1, struct line l2) {
+	//returns null for unbounded collision, i.e. a collision outside the line segments
+    
+    //get the slopes of the two lines
+    if (l1.p1.x == l1.p2.x || l2.p1.x == l2.p2.x) {
+    	//one or both of the slopes is equal to infinity
+        printf("Slope is infinite\n");
+        if (l1.p1.x == l1.p2.x && l2.p1.x == l2.p2.x) {
+            //both slopes are equal to infinity
+            if (l1.p1.x != l2.p1.x) {
+                return NULL;
             }
+            printf("case 1\n");
+            float top_bound_l2 = max(l2.p1.y, l2.p2.y);
+            float bottom_bound_l2 = min(l2.p1.y, l2.p2.y);
 
-            // check intersection with 0-1
-            if(t0 >= 0 && t0 <= 1) {
-                // t0 has intersection
-                struct coordinate *ret = (struct coordinate *)malloc(1 * sizeof(struct coordinate));
-                ret->x = p.x + t0 * r.x;
-                ret->y = p.y + t0 * r.y;
+            float top_bound_l1 = max(l1.p1.y, l1.p2.y);
+            float bottom_bound_l1 = min(l1.p1.y, l1.p2.y);
 
-                return ret;
+            //check if l1 is strictly beneath l2
+            if (top_bound_l1 < bottom_bound_l2) {
+                return NULL;
+            } else if (bottom_bound_l1 > top_bound_l2) {
+                return NULL;
+            } else {
+                struct coordinate* intersection_point = malloc(sizeof(*intersection_point));
+                intersection_point->x = l1.p1.x;
+                intersection_point->y = min(top_bound_l1, top_bound_l2);
+                printf("intersection_x: %f\n", intersection_point->x);
+                printf("intersection_y: %f\n", intersection_point->y);            
+                return intersection_point;
             }
+        } else if (l1.p1.x == l1.p2.x) {
+            //m1 is infinity
+            float m2 = (l2.p1.y - l2.p2.y) / (l2.p1.x - l2.p2.x);
+            float intersection_x = l1.p1.x;
+            float intersection_y = m2 * (l1.p1.x - l2.p1.x) + l2.p1.y;
+            printf("intersection_x: %f\n", intersection_x);
+            printf("intersection_y: %f\n", intersection_y);
 
-            if(t1 >= 0 && t1 <= 1) {
-                // t1 has intersection
-                struct coordinate *ret = (struct coordinate *)malloc(1 * sizeof(struct coordinate));
-                ret->x = p.x + t1 * r.x;
-                ret->y = p.y + t1 * r.y;
-
-                return ret;
+            if (intersection_y < max(l2.p1.y, l2.p2.y) && intersection_y > min(l2.p1.y, l2.p2.y)) {
+                struct coordinate* intersection_point = malloc(sizeof(*intersection_point));
+                intersection_point->x = intersection_x;
+                intersection_point->y = intersection_y;
+                return intersection_point;
+            } else {
+                return NULL;
             }
+        }else {
+            //m2 is infinity
+            printf("case 3\n");
+            float m1 = (l1.p1.y - l1.p2.y) / (l1.p1.x - l1.p2.x);
 
-            return NULL;
-        } else {
-            // paralell and non-intersecting --
-            return NULL;
-        }
-    } else {
-        float t = c_qminps / c_rs;
-        float u = c_qminpr / c_rs;
-
-        if((t <= 1.0 && t >= 0.0) && (u <= 1.0 && u >= 0.0)) {
-            // intersecting --
-            struct coordinate *ret = (struct coordinate *)malloc(1 * sizeof(struct coordinate));
-            ret->x = p.x + t * r.x;
-            ret->y = p.y + t * r.y;
-
-            return ret;
-        } else {
-            // non-parallel but not intersecting --
-            return NULL;
+            float intersection_x = l2.p1.x;
+            float intersection_y = m1 * (l2.p1.x - l1.p1.x) + l1.p1.y;
+            if (intersection_y < max(l1.p1.y, l1.p2.y) && intersection_y > min(l1.p1.y, l1.p2.y)) {
+                struct coordinate* intersection_point = malloc(sizeof(*intersection_point));
+                intersection_point->x = intersection_x;
+                intersection_point->y = intersection_y;
+                return intersection_point;
+            } else {
+                return NULL;
+            }
         }
     }
 
-    return NULL;
+
+    float m1 = (l1.p1.y - l1.p2.y) / (l1.p1.x - l1.p2.x);
+    float m2 = (l2.p1.y - l2.p2.y) / (l2.p1.x - l2.p2.x);
+    //y=mx+b, calculate the b values for both lines
+    float b1 = l1.p1.y - m1*l1.p1.x;
+    float b2 = l2.p1.y - m2*l2.p1.x;
+
+    if (m1 == m2) {
+        //check whether they overlap
+        //fix this later
+        return NULL;
+    }
+
+    float intersection_x = (b2-b1)/(m1-m2);
+
+    float left_bound = max(min(l2.p1.x, l2.p2.x), min(l1.p1.x, l1.p2.x));
+    float right_bound = min(max(l2.p1.x, l2.p2.x), max(l1.p1.x, l1.p2.x)); 
+
+    if (intersection_x > right_bound || intersection_x < left_bound) {
+        return NULL;
+    } else {
+    	struct coordinate* intersection_point = malloc(sizeof(*intersection_point));
+    	intersection_point->x = intersection_x;
+    	intersection_point->y = intersection_x * m1 + l1.p1.y;
+        return intersection_point;
+    }
 }
 
 float distance(struct coordinate a, struct coordinate b) {
@@ -513,7 +537,8 @@ struct node * process_command(struct node *in, struct process p, struct arena *a
             print_command("delay", NULL, *(int *)(buffer + 1));
             int delay_msec = *(int *)(buffer + 5);
             // garbage fast forward:
-            for(i = 0; i < delay_msec; i++) {
+            int num_frames = ((float)delay_msec) * FE_FPS / 1000.0f;
+            for(i = 0; i < num_frames; i++) {
                 update_osv(arena, *frame_no);
                 *frame_no += 1;
 

@@ -20,6 +20,7 @@ void Tank::setLeftMotorPWM(int ln, short pwm) {
         pwm = -255;
     }
 
+    if(this->init) {
         fputc('\x03', stdout);
         fputc((char)(ln), stdout);
         fputc((char)(ln >> 8), stdout);
@@ -30,19 +31,7 @@ void Tank::setLeftMotorPWM(int ln, short pwm) {
         fflush(stdout);
 
         while(fgetc(stdin) != '\x08');
-
-    // if(this->init) {
-    //     fputc('\x03', stdout);
-    //     fputc((char)(ln), stdout);
-    //     fputc((char)(ln >> 8), stdout);
-    //     fputc((char)(ln >> 16), stdout);
-    //     fputc((char)(ln >> 24), stdout);
-    //     fputc((char)(pwm), stdout);
-    //     fputc((char)(pwm >> 8), stdout);
-    //     fflush(stdout);
-
-    //     while(fgetc(stdin) != '\x08');
-    // }
+    }
 };
 
 void Tank::setRightMotorPWM(int ln, short pwm) {

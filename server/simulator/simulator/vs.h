@@ -5,8 +5,6 @@
 #include "node.h"
 
 
-float readDistanceSensor(short index);
-
 struct coordinate {
     float x;
     float y;
@@ -26,7 +24,7 @@ struct obstacle {
 
 struct osv {
     struct coordinate location;
-    int distance_sensors[12];
+    int *distance_sensors;
     float width, height;
     int left_motor_pwm, right_motor_pwm;
 };
@@ -38,6 +36,6 @@ struct arena {
     struct osv osv;
 };
 
-struct node * frame(struct node *in, struct process p, struct arena *arena);
+struct node * frame(struct node *in, struct process p, struct arena *arena, int *frame_no);
 
 #endif

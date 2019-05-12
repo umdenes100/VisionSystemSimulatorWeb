@@ -28,7 +28,6 @@ REQUEST_TYPES = {
 	),
 }
 
-
 async def process_command(command, working_directory, data=None):
 	start_time = time.time_ns()
 	process = await create_subprocess_exec(*command.split(),

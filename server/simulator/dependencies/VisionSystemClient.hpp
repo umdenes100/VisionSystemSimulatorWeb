@@ -20,27 +20,25 @@ class VisionSystemClient
 {
 public:
   bool ping();
-  bool begin(const char *teamName, int teamType, int markerId, int rxPin, int txPin);
-  bool updateLocation();
-  bool mission(int message);
-  bool mission(double message);
-  bool mission(Coordinate &message);
-  void print(const char *message);
-  void print(int message);
-  void print(double message);
-  void println(const char *message);
-  void println(int message);
-  void println(double message);
+  bool begin(int ln, const char *teamName, int teamType, int markerId, int rxPin, int txPin);
+  bool updateLocation(int ln);
+  bool mission(int ln, int message);
+  bool mission(int ln, double message);
+  bool mission(int ln, Coordinate &message);
+  void print(int ln, const char *message);
+  void print(int ln, int message);
+  void print(int ln, double message);
+  void println(int ln, const char *message);
+  void println(int ln, int message);
+  void println(int ln, double message);
 
   Coordinate location;
   Coordinate destination;
 
 private:
-  bool receive(Coordinate *coordinate);
-
-  int mMarkerId;
+  bool init = false;
 };
 
-void delay(int msec);
+void delay(int ln, int msec);
 
 #endif /* VisionSystemClient_hpp */

@@ -51,7 +51,7 @@ async def process_command(command, working_directory, data=None):
 
 
 async def middleware(request):
-	request = dict(request.rel_url.query)
+	request = dict(json.loads(request.rel_url.query))
 
 	request['id'] = uuid.uuid4().hex
 	print(f'Request: {json.dumps(request, indent=2)}')

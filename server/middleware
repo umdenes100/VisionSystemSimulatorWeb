@@ -50,6 +50,7 @@ async def process_command(command, working_directory, data=None):
 
 
 async def middleware(request):
+	breakpoint()
 	request = dict(json.loads(request.rel_url.query))
 
 	request['id'] = uuid.uuid4().hex

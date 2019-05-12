@@ -66,8 +66,7 @@ async def middleware(request):
 
 		result_json = json.loads(result)
 	except json.decoder.JSONDecodeError:
-		print('Invalid JSON')
-		# print(f'Invalid JSON: Received result {result}')
+		print(f'Invalid JSON: Received result {result}')
 		return
 
 	print(f'Output: {json.dumps(result_json, indent=2)}')

@@ -60,7 +60,8 @@ async def middleware(request):
 	command, working_directory = REQUEST_TYPES[request['type']]
 
 	result = await process_command(command, working_directory, request)
-	result = result[:-2] + result[-1:]  # Removing trailing comma.
+	if request['type'] == 'simulation':
+		result = result[:-2] + result[-1:]  # Removing trailing comma.
 
 	try:
 

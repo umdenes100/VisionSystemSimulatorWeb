@@ -64,7 +64,6 @@ async def middleware(request):
 		result = result[:-2] + result[-1:]  # Removing trailing comma.
 
 	try:
-
 		result_json = json.loads(result)
 	except json.decoder.JSONDecodeError:
 		print(f'Invalid JSON: Received result {result}')

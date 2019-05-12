@@ -361,12 +361,12 @@ void update_osv(struct arena *arena, int frame_no) {
     prev_location.y = arena->osv.location.y;
     prev_location.theta = arena->osv.location.theta;
 
-    double speed = (arena->osv.right_motor_pwm + arena->osv.left_motor_pwm) / (255.0 * 50.0);
+    double dist_traveled = METERS_PER_FRAME * (arena->osv.right_motor_pwm + arena->osv.left_motor_pwm) / 255.0f;
 
-    arena->osv.location.x = arena->osv.location.x + speed * cos(arena->osv.location.theta);
-    arena->osv.location.y = arena->osv.location.y + speed * sin(arena->osv.location.theta);
+    arena->osv.location.x = arena->osv.location.x + dist_traveled * cos(arena->osv.location.theta);
+    arena->osv.location.y = arena->osv.location.y + dist_traveled * sin(arena->osv.location.theta);
 
-    arena->osv.location.theta += 2 * PI * ROTATIONS_PER_SECOND / 50 * (arena->osv.right_motor_pwm - arena->osv.left_motor_pwm) / 255.0;
+    arena->osv.location.theta += RAD_PER_FRAME * (arena->osv.right_motor_pwm - arena->osv.left_motor_pwm) / 510.0f;
 
     if(check_for_collisions(arena)) {
         arena->osv.location.x = prev_location.x;

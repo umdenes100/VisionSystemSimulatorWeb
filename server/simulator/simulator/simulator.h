@@ -1,7 +1,7 @@
 #ifndef SIMULATOR_H
 #define SIMULATOR_H
 
-#define NUM_FRAMES 1000
+#define NUM_FRAMES 18000
 #define BUFFER_SIZE 100
 #define FRAME_RATE_NSEC 200000
 

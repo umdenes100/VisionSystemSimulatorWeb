@@ -407,6 +407,8 @@ struct node * process_command(struct node *in, struct process p, struct arena *a
     struct node *curr, *next;
     buffer_pos = 0;
 
+    printf("Banana");
+    printf("%d\n", in->size);
     if(in == NULL || in->size == 0) {
         return in;
     }

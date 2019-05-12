@@ -31,7 +31,7 @@ RUN echo "Installing cJSON..." && \
 	make install
 
 RUN python3.7 -m pip install setuptools
-RUN python3.7 -m pip install websockets aiohttp
+RUN python3.7 -m pip install websockets aiohttp json5
 
 COPY ./server /server
 

@@ -60,11 +60,14 @@ async def middleware(request):
 	command, working_directory = REQUEST_TYPES[request['type']]
 
 	result = await process_command(command, working_directory, request)
+	result = result[:-2] + result[-1:]  # Removing trailing comma.
 
 	try:
+
 		result_json = json.loads(result)
 	except json.decoder.JSONDecodeError:
-		print(f'Invalid JSON: Received result {result}')
+		print('Invalid JSON')
+		# print(f'Invalid JSON: Received result {result}')
 		return
 
 	print(f'Output: {json.dumps(result_json, indent=2)}')

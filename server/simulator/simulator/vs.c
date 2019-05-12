@@ -424,6 +424,7 @@ struct node * process_command(struct node *in, struct process p, struct arena *a
 
     // we are at the beginning of a message, check for opcode
     opcode = buffer[0];
+    printf("%d\n", opcode);
     if(opcode == 0x00) {
         // Enes100.begin() message
         // receives: 1 byte opcode, 4 byte line number

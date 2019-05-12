@@ -69,8 +69,8 @@ async def middleware(request):
 		print(f'Invalid JSON: Received result {result}')
 		return
 
-	print(f'Output: {json.dumps(result_json, indent=2)}')
-	print()
+	# print(f'Output: {json.dumps(result_json, indent=2)}')
+	# print()
 	return web.json_response(result_json, headers={
 		'Access-Control-Allow-Origin': '*'
 	})

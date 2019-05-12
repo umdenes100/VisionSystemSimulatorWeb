@@ -1,15 +1,5 @@
 version: '3.6'
 services:
-  client:
-    container_name: client
-    restart: always
-    build:
-      context: .
-      dockerfile: ./client/Dockerfile
-    volumes:
-      - ./client:/usr/share/nginx/html
-    ports:
-      - "8080:80"
   server:
     container_name: server
     restart: always

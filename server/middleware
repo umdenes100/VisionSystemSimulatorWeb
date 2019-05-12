@@ -2,7 +2,7 @@
 
 from asyncio import create_subprocess_exec, subprocess, get_event_loop
 from collections import namedtuple
-import websockets
+from aiohttp import web
 import argparse
 import uuid
 import json
@@ -14,86 +14,75 @@ Executable = namedtuple('Executable', ['command', 'working_directory'])
 BASE_DIR = os.path.dirname(os.path.realpath(__file__))
 
 REQUEST_TYPES = {
-    'randomization': Executable(
-	        command='./randomize',
-	        working_directory=os.path.join(BASE_DIR, 'randomization')
-        ),
-    'simulation': Executable(
-	        command='./simulate',
-	        working_directory=os.path.join(BASE_DIR, 'simulator', 'simulator')
-        ),
-    'test': Executable(
-	        command='python3.7 c_program.py',
-	        working_directory=os.path.join(os.path.dirname(BASE_DIR), 'tests')
-        ),
+	'randomization': Executable(
+		command='./randomize',
+		working_directory=os.path.join(BASE_DIR, 'randomization')
+	),
+	'simulation': Executable(
+		command='./simulate',
+		working_directory=os.path.join(BASE_DIR, 'simulator', 'simulator')
+	),
+	'test': Executable(
+		command='python3.7 c_program.py',
+		working_directory=os.path.join(os.path.dirname(BASE_DIR), 'tests')
+	),
 }
 
 async def process_command(command, working_directory, data=None):
-    start_time = time.time_ns()
-    process = await create_subprocess_exec(*command.split(),
-                                           cwd=working_directory,
-                                           stdin=subprocess.PIPE,
-                                           stdout=subprocess.PIPE,
-                                           stderr=subprocess.PIPE)
-    if data is None:
-        stdout, stderr = await process.communicate()
-    else:
-        stdout, stderr = await process.communicate(input=bytes(json.dumps(data),
-                                                               encoding='utf-8'))
-    print(f'Total Time (ns): {time.time_ns() - start_time}')
-    print(f'Return Code: {process.returncode}')
-    if stderr:
-        print(f'Error: {stderr}')
-        # print(f'General Process Info: {vars(process)}')
+	start_time = time.time_ns()
+	process = await create_subprocess_exec(*command.split(),
+	                                       cwd=working_directory,
+	                                       stdin=subprocess.PIPE,
+	                                       stdout=subprocess.PIPE,
+	                                       stderr=subprocess.PIPE)
+	if data is None:
+		stdout, stderr = await process.communicate()
+	else:
+		stdout, stderr = await process.communicate(input=bytes(json.dumps(data),
+		                                                       encoding='utf-8'))
+	print(f'Total Time (ns): {time.time_ns() - start_time}')
+	print(f'Return Code: {process.returncode}')
+	if stderr:
+		print(f'Error: {stderr}')
+	# print(f'General Process Info: {vars(process)}')
 
-    return stdout.decode()
+	return stdout.decode()
 
 
-async def middleware(websocket, path):
-    async for request in websocket:
-        try:
-            request = json.loads(request)
-            assert isinstance(request, dict)
-        except BaseException:
-            error = f'Invalid JSON: Received request - {json.dumps(request, indent=2)}'
-            print(error)
-            print()
+async def middleware(request):
+	if 'json' in request.url.query:
+		request = json.loads(request.url.query['json'])
+	else:
+		request = dict(request.rel_url.query)
 
-            await websocket.send(json.dumps({
-                'type': 'error',
-                'error_type': 'InvalidJSON',
-                'request': request,
-            }))
-            continue
+	request['id'] = uuid.uuid4().hex
+	print(f'Request: {json.dumps(request, indent=2)}')
+	command, working_directory = REQUEST_TYPES[request['type']]
 
-        print(f'Request: {json.dumps(request, indent=2)}')
-        print()
+	result = await process_command(command, working_directory, request)
+	result = result[:-2] + result[-1:]  # Removing trailing comma.
 
-        request['id'] = uuid.uuid4().hex
-        # print(f"Program Input: {json.dumps(request, indent=2)}")
-        # print()
+	try:
 
-        command, working_directory = REQUEST_TYPES[request['type']]
-        result = await process_command(command, working_directory, request)
+		result_json = json.loads(result)
+	except json.decoder.JSONDecodeError:
+		print('Invalid JSON')
+		# print(f'Invalid JSON: Received result {result}')
+		return
 
-        try:
-            result_json = json.loads(result)
-        except json.decoder.JSONDecodeError:
-            print(f'Invalid JSON: Received result {result}')
-            continue
-
-        print(f'Output: {json.dumps(result_json, indent=2)}')
-        print()
-        await websocket.send(result)
+	print(f'Output: {json.dumps(result_json, indent=2)}')
+	print()
+	return web.json_response(result_json, headers={
+		'Access-Control-Allow-Origin': '*'
+	})
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--host', type=str, default='0.0.0.0', help="e.g. 0.0.0.0")
-    parser.add_argument('--port', type=int, default=8888, help="e.g. 8888")
-    args = parser.parse_args()
+	parser = argparse.ArgumentParser()
+	parser.add_argument('--host', type=str, default='0.0.0.0', help="e.g. 0.0.0.0")
+	parser.add_argument('--port', type=int, default=8888, help="e.g. 8888")
+	args = parser.parse_args()
 
-    print(f"Starting websocket server at http://{args.host}:{args.port}...")
-    loop = get_event_loop()
-    loop.run_until_complete(websockets.serve(middleware, args.host, args.port))
-    loop.run_forever()
+	app = web.Application()
+	app.add_routes([web.get('/', middleware)])
+	web.run_app(app, host=args.host, port=args.port)

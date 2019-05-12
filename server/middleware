@@ -50,8 +50,10 @@ async def process_command(command, working_directory, data=None):
 
 
 async def middleware(request):
-	print(request.rel_url.query)
-	request = dict(request.rel_url.query)
+	if 'json' in request.url.query:
+		request = json.loads(request.url.query['json'])
+	else:
+		request = dict(request.rel_url.query)
 
 	request['id'] = uuid.uuid4().hex
 	print(f'Request: {json.dumps(request, indent=2)}')

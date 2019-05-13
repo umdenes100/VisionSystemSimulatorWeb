@@ -35,13 +35,12 @@ struct coordinate* get_intersection(struct line l1, struct line l2) {
     //get the slopes of the two lines
     if (l1.p1.x == l1.p2.x || l2.p1.x == l2.p2.x) {
     	//one or both of the slopes is equal to infinity
-        printf("Slope is infinite\n");
         if (l1.p1.x == l1.p2.x && l2.p1.x == l2.p2.x) {
             //both slopes are equal to infinity
             if (l1.p1.x != l2.p1.x) {
                 return NULL;
             }
-            printf("case 1\n");
+            
             float top_bound_l2 = max(l2.p1.y, l2.p2.y);
             float bottom_bound_l2 = min(l2.p1.y, l2.p2.y);
 
@@ -56,9 +55,7 @@ struct coordinate* get_intersection(struct line l1, struct line l2) {
             } else {
                 struct coordinate* intersection_point = malloc(sizeof(*intersection_point));
                 intersection_point->x = l1.p1.x;
-                intersection_point->y = min(top_bound_l1, top_bound_l2);
-                printf("intersection_x: %f\n", intersection_point->x);
-                printf("intersection_y: %f\n", intersection_point->y);            
+                intersection_point->y = min(top_bound_l1, top_bound_l2);          
                 return intersection_point;
             }
         } else if (l1.p1.x == l1.p2.x) {
@@ -66,8 +63,6 @@ struct coordinate* get_intersection(struct line l1, struct line l2) {
             float m2 = (l2.p1.y - l2.p2.y) / (l2.p1.x - l2.p2.x);
             float intersection_x = l1.p1.x;
             float intersection_y = m2 * (l1.p1.x - l2.p1.x) + l2.p1.y;
-            printf("intersection_x: %f\n", intersection_x);
-            printf("intersection_y: %f\n", intersection_y);
 
             if (intersection_y < max(l2.p1.y, l2.p2.y) && intersection_y > min(l2.p1.y, l2.p2.y)) {
                 struct coordinate* intersection_point = malloc(sizeof(*intersection_point));
@@ -79,7 +74,6 @@ struct coordinate* get_intersection(struct line l1, struct line l2) {
             }
         }else {
             //m2 is infinity
-            printf("case 3\n");
             float m1 = (l1.p1.y - l1.p2.y) / (l1.p1.x - l1.p2.x);
 
             float intersection_x = l2.p1.x;

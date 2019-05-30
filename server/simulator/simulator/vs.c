@@ -388,7 +388,7 @@ void update_osv(struct arena *arena, int frame_no) {
 
     if(arena->osv.location.theta > PI) {
         arena->osv.location.theta -= 2 * PI;
-    } else if(arena->osv.location.theta < PI) {
+    } else if(arena->osv.location.theta < -PI) {
         arena->osv.location.theta += 2 * PI;
     }
 

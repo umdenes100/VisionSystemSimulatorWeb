@@ -386,6 +386,12 @@ void update_osv(struct arena *arena, int frame_no) {
 
     arena->osv.location.theta += RAD_PER_FRAME * (arena->osv.right_motor_pwm - arena->osv.left_motor_pwm) / 510.0f;
 
+    if(arena->osv.location.theta > PI) {
+        arena->osv.location -= 2 * PI;
+    } else if(arena->osv.location.theta < PI) {
+        arena->osv.location += 2 * PI;
+    }
+
     if(check_for_collisions(arena)) {
         arena->osv.location.x = prev_location.x;
         arena->osv.location.y = prev_location.y;

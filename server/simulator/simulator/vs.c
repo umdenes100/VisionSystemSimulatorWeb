@@ -642,7 +642,7 @@ void update_osv(struct arena *arena, int frame_no) {
     double dist_traveled = METERS_PER_FRAME * (arena->osv.right_motor_pwm + arena->osv.left_motor_pwm) / 255.0f;
 
     arena->osv.location.x = arena->osv.location.x + dist_traveled * cos(arena->osv.location.theta);
-    arena->osv.location.y = arena->osv.location.y + dist_traveled * sin(-arena->osv.location.theta);
+    arena->osv.location.y = arena->osv.location.y + dist_traveled * sin(arena->osv.location.theta);
 
     arena->osv.location.theta += RAD_PER_FRAME * ((arena->osv.right_motor_pwm - arena->osv.left_motor_pwm) / 510.0f);
 

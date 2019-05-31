@@ -577,6 +577,9 @@ int check_for_collisions(struct arena *arena) {
             for(k = 0; k < 4; k++) {
                 struct coordinate *res = get_intersection(osv_sides[k], obstacle_sides[j]);
                 if(res != NULL) {
+                    FILE* fp = fopen("collision.test", "w");
+                    fprintf(fp, "collided osv side %d with obstacle %d at coordinate (%f,%f)\n", k, i, res->x, res->y);
+                    fclose(fp);
                     free(res);
                     return 1;
                 }

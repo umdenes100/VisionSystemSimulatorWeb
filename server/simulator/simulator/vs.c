@@ -607,7 +607,7 @@ int check_for_collisions(struct arena *arena) {
     l1.y = 0.0;
     l2.x = 0.0;
     l2.y = 2.0;
-    bottom.p1 = l1; bottom.p2 = l2;
+    left.p1 = l1; left.p2 = l2;
 
     struct line top;
     struct coordinate t1, t2;

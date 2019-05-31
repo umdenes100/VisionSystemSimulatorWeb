@@ -17,16 +17,42 @@
 #define ROTATIONS_PER_SECOND 0.25f
 #define max(x1,x2) ((x1) > (x2) ? (x1) : (x2))
 #define min(x1,x2) ((x1) < (x2) ? (x1) : (x2))
+#define abs(x) ((x > 0) ? x : -x)
 
 char buffer [BUFF_SIZE];
 unsigned short buffer_pos = 0;
 
-float cross_product(struct coordinate v, struct coordinate w) {
-    return v.x * w.y - v.y * w.x;
+float cross_product(struct coordinate a, struct coordinate b) {
+    return a.x * b.y - b.x * a.y;
 }
 
-float dot_product(struct coordinate v, struct coordinate w) {
-    return v.x * w.x + v.y * w.y;
+int do_bounding_boxes_intersect(struct line a, struct line b) {
+	struct line temp_a = {min(a.p1.x, a.p2.x), min(a.p1.y, a.p2.y), 0.0, max(a.p1.x, a.p2.x), max(a.p1.y, a.p2.y), 0.0};
+	struct line temp_b = {min(b.p1.x, b.p2.x), min(b.p1.y, b.p2.y), 0.0, max(b.p1.x, b.p2.x), max(b.p1.y, b.p2.y), 0.0};
+    return temp_a.p1.x <= temp_b.p2.x && temp_a.p2.x >= temp_b.p1.x && temp_a.p1.y <= temp_b.p2.y && temp_a.p2.y >= temp_b.p1.y;
+}
+
+int is_point_on_line(struct line a, struct coordinate b) {
+    // Move the image, so that a.first is on (0|0)
+    struct line a_tmp = {0.0, 0.0, 0.0, a.p2.x - a.p1.x, a.p2.y - a.p1.y, 0.0};
+    struct coordinate b_tmp = {b.x - a.p1.x, b.y - a.p1.y, 0.0};
+    float r = cross_product(a_tmp.p2, b_tmp);
+    return abs(r) < EPSILON;
+}
+
+int is_point_right_of_line(struct line a, struct coordinate b) {
+    // Move the image, so that a.first is on (0|0)
+    struct line a_tmp = {0.0, 0.0, 0.0, a.p2.x - a.p1.x, a.p2.y - a.p1.y, 0.0};
+    struct coordinate b_tmp = {b.x - a.p1.x, b.y - a.p1.y, 0.0};
+    return cross_product(a_tmp.p2, b_tmp) < 0;
+}
+
+int line_segment_touches_or_crosses_line(struct line a, struct line b) {
+    return is_point_on_line(a, b.p1) || is_point_on_line(a, b.p2) || (is_point_right_of_line(a, b.p1) ^ is_point_right_of_line(a, b.p2));
+}
+
+int do_lines_intersect(struct line a, struct line b) {
+    return do_bounding_boxes_intersect(a, b) && line_segment_touches_or_crosses_line(a, b) && line_segment_touches_or_crosses_line(b, a);
 }
 
 struct coordinate* get_intersection(struct line l1, struct line l2) {
@@ -344,9 +370,7 @@ int check_for_collisions(struct arena *arena) {
 
         for(j = 0; j < 4; j++) {
             for(k = 0; k < 4; k++) {
-                struct coordinate *intersection_point = get_intersection(osv_sides[k], obstacle_sides[j]);
-                if(intersection_point != NULL) {
-                    free(intersection_point);    
+                if(do_lines_intersect(osv_sides[k], obstacle_sides[j])) {
                     return 1;
                 }
             }
@@ -391,9 +415,7 @@ int check_for_collisions(struct arena *arena) {
     // need to check right and left sides of OSV in case OSV is perpendicular to wall
     for(i = 0; i < 4; i++) {
         for(j = 0; j < 4; j++) {
-            struct coordinate *intersection_point = get_intersection(osv_sides[j], walls[i]);
-            if(intersection_point != NULL) {
-                free(intersection_point);
+            if(do_lines_intersect(osv_sides[i], walls[j])) {
                 return 1;
             }
         }

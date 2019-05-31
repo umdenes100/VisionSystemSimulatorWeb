@@ -73,7 +73,7 @@ struct coordinate* get_intersection(struct line l1, struct line l2) {
             // printf("intersection point: (%f, %f)\n", intersection_x, intersection_y);
             // printf("max y: %f, min y: %f\n", max(l2.p1.y, l2.p2.y), min(l2.p1.y, l2.p2.y));
 
-            if (intersection_y <= max(l2.p1.y, l2.p2.y) && intersection_y >= min(l2.p1.y, l2.p2.y)) {
+            if (intersection_y <= max(l2.p1.y, l2.p2.y) && intersection_y >= min(l2.p1.y, l2.p2.y) && intersection_y <= max(l1.p1.y, l1.p2.y) && intersection_y >= min(l1.p1.y, l1.p2.y)) {
                 struct coordinate* intersection_point = malloc(sizeof(*intersection_point));
                 intersection_point->x = intersection_x;
                 intersection_point->y = intersection_y;
@@ -91,9 +91,9 @@ struct coordinate* get_intersection(struct line l1, struct line l2) {
             float intersection_y = m1 * (l2.p1.x - l1.p1.x) + l1.p1.y;
 
             // printf("intersection point: (%f, %f)\n", intersection_x, intersection_y);
-            // printf("max y: %f, min y: %f\n", max(l2.p1.y, l2.p2.y), min(l2.p1.y, l2.p2.y));
+            // printf("max y: %f, min y: %f\n", max(l1.p1.y, l1.p2.y), min(l1.p1.y, l1.p2.y));
 
-            if (intersection_y <= max(l1.p1.y, l1.p2.y) && intersection_y >= min(l1.p1.y, l1.p2.y)) {
+            if (intersection_y <= max(l1.p1.y, l1.p2.y) && intersection_y >= min(l1.p1.y, l1.p2.y) && intersection_y <= max(l2.p1.y, l2.p2.y) && intersection_y >= min(l2.p1.y, l2.p2.y)) {
                 struct coordinate* intersection_point = malloc(sizeof(*intersection_point));
                 intersection_point->x = intersection_x;
                 intersection_point->y = intersection_y;

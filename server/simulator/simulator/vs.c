@@ -31,12 +31,16 @@ float dot_product(struct coordinate v, struct coordinate w) {
 
 struct coordinate* get_intersection(struct line l1, struct line l2) {
 	//returns null for unbounded collision, i.e. a collision outside the line segments
+	// printf("line 1: (%f, %f) -> (%f, %f)\n", l1.p1.x, l1.p1.y, l1.p2.x, l1.p2.y);
+	// printf("line 2: (%f, %f) -> (%f, %f)\n", l2.p1.x, l2.p1.y, l2.p2.x, l2.p2.y);
     
-    //get the slopes of the two lines
+    // get the slopes of the two lines
     if (l1.p1.x == l1.p2.x || l2.p1.x == l2.p2.x) {
-    	//one or both of the slopes is equal to infinity
+    	// printf("we have a vertical line.\n");
+    	// one or both of the slopes is equal to infinity
         if (l1.p1.x == l1.p2.x && l2.p1.x == l2.p2.x) {
-            //both slopes are equal to infinity
+        	// printf("both lines are vertical.\n");
+            // both slopes are equal to infinity
             if (l1.p1.x != l2.p1.x) {
                 return NULL;
             }
@@ -47,7 +51,7 @@ struct coordinate* get_intersection(struct line l1, struct line l2) {
             float top_bound_l1 = max(l1.p1.y, l1.p2.y);
             float bottom_bound_l1 = min(l1.p1.y, l1.p2.y);
 
-            //check if l1 is strictly beneath l2
+            // check if l1 is strictly beneath l2
             if (top_bound_l1 < bottom_bound_l2) {
                 return NULL;
             } else if (bottom_bound_l1 > top_bound_l2) {
@@ -59,12 +63,17 @@ struct coordinate* get_intersection(struct line l1, struct line l2) {
                 return intersection_point;
             }
         } else if (l1.p1.x == l1.p2.x) {
-            //m1 is infinity
+        	// printf("line 1 is vertical.\n");
+            // m1 is infinity
             float m2 = (l2.p1.y - l2.p2.y) / (l2.p1.x - l2.p2.x);
+            // printf("m2 is %f\n", m2);
             float intersection_x = l1.p1.x;
             float intersection_y = m2 * (l1.p1.x - l2.p1.x) + l2.p1.y;
 
-            if (intersection_y < max(l2.p1.y, l2.p2.y) && intersection_y > min(l2.p1.y, l2.p2.y)) {
+            // printf("intersection point: (%f, %f)\n", intersection_x, intersection_y);
+            // printf("max y: %f, min y: %f\n", max(l2.p1.y, l2.p2.y), min(l2.p1.y, l2.p2.y));
+
+            if (intersection_y <= max(l2.p1.y, l2.p2.y) && intersection_y >= min(l2.p1.y, l2.p2.y)) {
                 struct coordinate* intersection_point = malloc(sizeof(*intersection_point));
                 intersection_point->x = intersection_x;
                 intersection_point->y = intersection_y;
@@ -72,13 +81,19 @@ struct coordinate* get_intersection(struct line l1, struct line l2) {
             } else {
                 return NULL;
             }
-        }else {
-            //m2 is infinity
+        } else {
+        	// printf("line 2 is vertical.\n");
+            // m2 is infinity
             float m1 = (l1.p1.y - l1.p2.y) / (l1.p1.x - l1.p2.x);
+            // printf("m2 is %f\n", m1);
 
             float intersection_x = l2.p1.x;
             float intersection_y = m1 * (l2.p1.x - l1.p1.x) + l1.p1.y;
-            if (intersection_y < max(l1.p1.y, l1.p2.y) && intersection_y > min(l1.p1.y, l1.p2.y)) {
+
+            // printf("intersection point: (%f, %f)\n", intersection_x, intersection_y);
+            // printf("max y: %f, min y: %f\n", max(l2.p1.y, l2.p2.y), min(l2.p1.y, l2.p2.y));
+
+            if (intersection_y <= max(l1.p1.y, l1.p2.y) && intersection_y >= min(l1.p1.y, l1.p2.y)) {
                 struct coordinate* intersection_point = malloc(sizeof(*intersection_point));
                 intersection_point->x = intersection_x;
                 intersection_point->y = intersection_y;
@@ -89,20 +104,34 @@ struct coordinate* get_intersection(struct line l1, struct line l2) {
         }
     }
 
+    // printf("no vertical lines.\n");
 
     float m1 = (l1.p1.y - l1.p2.y) / (l1.p1.x - l1.p2.x);
     float m2 = (l2.p1.y - l2.p2.y) / (l2.p1.x - l2.p2.x);
-    //y=mx+b, calculate the b values for both lines
-    float b1 = l1.p1.y - m1*l1.p1.x;
-    float b2 = l2.p1.y - m2*l2.p1.x;
+    // y = mx + b, calculate the b values for both lines
+    float b1 = l1.p1.y - m1 * l1.p1.x;
+    float b2 = l2.p1.y - m2 * l2.p1.x;
 
     if (m1 == m2) {
-        //check whether they overlap
-        //fix this later
-        return NULL;
+        // check whether they overlap
+    	if (m1 == 0.0) {
+    		if (b1 == b2) {
+    			// printf("horizontal and even.\n");
+    			if(min(l1.p1.x, l1.p2.x) > max(l2.p1.x, l2.p2.x) || min(l2.p1.x, l2.p2.x) > max(l1.p1.x, l1.p2.x)) {
+    				return NULL;
+    			} else {
+    				struct coordinate* intersection_point = malloc(sizeof(*intersection_point));
+	                intersection_point->x = l1.p1.x;
+	                intersection_point->y = l1.p1.y;
+	                return intersection_point;
+    			}
+    		}
+    	} else {
+        	return NULL;
+    	}
     }
 
-    float intersection_x = (b2-b1)/(m1-m2);
+    float intersection_x = (b2 - b1) / (m1 - m2);
 
     float left_bound = max(min(l2.p1.x, l2.p2.x), min(l1.p1.x, l1.p2.x));
     float right_bound = min(max(l2.p1.x, l2.p2.x), max(l1.p1.x, l1.p2.x)); 

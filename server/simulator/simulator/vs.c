@@ -26,6 +26,67 @@ float cross_product(struct coordinate a, struct coordinate b) {
     return a.x * b.y - b.x * a.y;
 }
 
+float dot_product(struct coordinate a, struct coordinate b) {
+	return a.x * b.x + a.y * b.y;
+}
+
+struct coordinate * line_segment_intersect(struct coordinate p, struct coordinate p2, struct coordinate q, struct coordinate q2) {
+    struct coordinate r = {p2.x - p.x, p2.y - p.y, 0.0};
+    struct coordinate s = {q2.x - q.x, q2.y - q.y, 0.0};
+    struct coordinate qminp = {q.x - p.x, q.y - p.y, 0.0};
+    float rxs = cross_product(r, s);
+    float qpxr = cross_product(qminp, r);
+    float qminp_dot_r = dot_product(qminp, r);
+    float qminp_dot_s = dot_product(qminp, s);
+
+    // If r x s = 0 and (q - p) x r = 0, then the two lines are collinear.
+    if(abs(rxs) < EPSILON && abs(qpxr) < EPSILON) {
+        // 1. If either  0 <= (q - p) * r <= r * r or 0 <= (p - q) * s <= * s
+        // then the two lines are overlapping,
+        if ((0 <= qminp_dot_r && qminp_dot_r <= dot_product(r, r)) || (0 <= qminp_dot_s && qminp_dot_s <= dot_product(s, s))) {
+    		struct coordinate * intersection = (struct coordinate *)malloc(1 * sizeof(struct coordinate));
+        	intersection->x = p.x;
+        	intersection->y = p.y;
+            return intersection;
+        }
+
+        // 2. If neither 0 <= (q - p) * r = r * r nor 0 <= (p - q) * s <= s * s
+        // then the two lines are collinear but disjoint.
+        // No need to implement this expression, as it follows from the expression above.
+        return NULL;
+    }
+
+    // 3. If r x s = 0 and (q - p) x r != 0, then the two lines are parallel and non-intersecting.
+    if (abs(rxs) < EPSILON && !(abs(qpxr) < EPSILON)) {
+        return NULL;
+    }
+
+    // t = (q - p) x s / (r x s)
+    float t = cross_product(qminp, s) / rxs;
+
+    // u = (q - p) x r / (r x s)
+    float u = cross_product(qminp, r) / rxs;
+
+    // 4. If r x s != 0 and 0 <= t <= 1 and 0 <= u <= 1
+    // the two line segments meet at the point p + t r = q + u s.
+    if (!(abs(rxs) < EPSILON) && (0 <= t && t <= 1) && (0 <= u && u <= 1)) {
+        // We can calculate the intersection point using either t or u.
+    	struct coordinate * intersection = (struct coordinate *)malloc(1 * sizeof(struct coordinate));
+        struct coordinate tr = {r.x * t, r.y * t, 0.0};
+        intersection->x = p.x + tr.x;
+        intersection->y = p.y + tr.y;
+        return intersection;
+    }
+
+    // 5. Otherwise, the two line segments are not parallel but do not intersect.
+    return NULL;
+}
+
+struct coordinate * get_intersection(struct line a, struct line b) {
+    return line_segment_intersect(a.p1, a.p2, b.p1, b.p2);
+}
+
+/*
 int do_bounding_boxes_intersect(struct line a, struct line b) {
 	struct line temp_a = {min(a.p1.x, a.p2.x), min(a.p1.y, a.p2.y), 0.0, max(a.p1.x, a.p2.x), max(a.p1.y, a.p2.y), 0.0};
 	struct line temp_b = {min(b.p1.x, b.p2.x), min(b.p1.y, b.p2.y), 0.0, max(b.p1.x, b.p2.x), max(b.p1.y, b.p2.y), 0.0};
@@ -195,6 +256,7 @@ struct coordinate * get_intersection(struct line a, struct line b) {
     res->y = y1;
     return res;
 }
+*/
 
 /*
 struct coordinate* get_intersection(struct line l1, struct line l2) {

@@ -55,6 +55,148 @@ int do_lines_intersect(struct line a, struct line b) {
     return do_bounding_boxes_intersect(a, b) && line_segment_touches_or_crosses_line(a, b) && line_segment_touches_or_crosses_line(b, a);
 }
 
+struct coordinate * get_intersection(struct line a, struct line b) {
+    if(!do_lines_intersect(a, b)) {
+        return NULL;
+    }
+
+    // the intersection [(x1,y1), (x2, y2)]
+    // it might be a line or a single point. If it is a line,
+    // then x1 = x2 and y1 = y2.
+    float x1, y1, x2, y2;
+
+    if(a.p1.x == a.p2.x) {
+        // Case (A)
+        // As a is a perfect vertical line, it cannot be represented
+        // nicely in a mathematical way. But we directly know that
+        x1 = a.p1.x;
+        x2 = x1;
+
+        if(b.p1.x == b.p2.x) {
+            // Case (AA): all x are the same!
+            // Normalize
+            if(a.p1.y > a.p2.y) {
+            	struct coordinate tmp;
+            	tmp = a.p1;
+            	a.p1 = a.p2;
+            	a.p2 = tmp;
+            }
+
+            if(b.p1.y > b.p2.y) {
+            	struct coordinate tmp;
+            	tmp = b.p1;
+            	b.p1 = b.p2;
+            	b.p2 = tmp;
+            }
+
+            if(a.p1.y > b.p1.y) {
+                struct line tmp = a;
+                a = b;
+                b = tmp;
+            }
+
+            // Now we know that the y-value of a["first"] is the 
+            // lowest of all 4 y values
+            // this means, we are either in case (AAA):
+            //   a: x--------------x
+            //   b:    x---------------x
+            // or in case (AAB)
+            //   a: x--------------x
+            //   b:    x-------x
+            // in both cases:
+            // get the relavant y interval
+            y1 = b.p1.y;
+            y2 = min(a.p2.y, b.p2.y);
+        } else {
+            // Case (AB)
+            // we can mathematically represent line b as
+            //     y = m*x + t <=> t = y - m*x
+            // m = (y1-y2)/(x1-x2)
+            float m, t;
+            m = (b.p1.y - b.p2.y) / (b.p1.x - b.p2.x);
+            t = b.p1.y - m * b.p1.x;
+            y1 = m * x1 + t;
+            y2 = y1;
+        }
+    } else if (b.p1.x == b.p2.x) {
+        // Case (B)
+        // essentially the same as Case (AB), but with
+        // a and b switched
+        x1 = b.p1.x;
+        x2 = x1;
+
+        struct line tmp = a;
+        a = b;
+        b = tmp;
+
+        float m, t;
+        m = (b.p1.y - b.p2.y) / (b.p1.x - b.p2.x);
+        t = b.p1.y - m * b.p1.x;
+        y1 = m * x1 + t;
+        y2 = y1;
+    } else {
+        // Case (C)
+        // Both lines can be represented mathematically
+        float ma, mb, ta, tb;
+        ma = (a.p1.y - a.p2.y) / (a.p1.x - a.p2.x);
+        mb = (b.p1.y - b.p2.y) / (b.p1.x - b.p2.x);
+        ta = a.p1.y - ma * a.p1.x;
+        tb = b.p1.y - mb * b.p1.x;
+
+        if (ma == mb) {
+            // Case (CA)
+            // both lines are in parallel. As we know that they 
+            // intersect, the intersection could be a line
+            // when we rotated this, it would be the same situation 
+            // as in case (AA)
+
+            // Normalize
+            if(a.p1.x > a.p2.x) {
+            	struct coordinate tmp;
+            	tmp = a.p1;
+            	a.p1 = a.p2;
+            	a.p2 = tmp;
+            }
+
+            if(b.p1.x > b.p2.x) {
+            	struct coordinate tmp;
+            	tmp = b.p1;
+            	b.p1 = b.p2;
+            	b.p2 = tmp;
+            }
+
+            if(a.p1.x > b.p1.x) {
+                struct line tmp = a;
+                a = b;
+                b = tmp;
+            }
+
+            // get the relavant x interval
+            x1 = b.p1.x;
+            x2 = min(a.p2.x, b.p2.x);
+            y1 = ma * x1 + ta;
+            y2 = ma * x2 + ta;
+        } else {
+            // Case (CB): only a point as intersection:
+            // y = ma*x+ta
+            // y = mb*x+tb
+            // ma*x + ta = mb*x + tb
+            // (ma-mb)*x = tb - ta
+            // x = (tb - ta)/(ma-mb)
+            x1 = (tb - ta) / (ma - mb);
+            y1 = ma * x1 + ta;
+            x2 = x1;
+            y2 = y1;
+        }
+    }
+
+    struct coordinate *res = (struct coordinate *)malloc(1 * sizeof(struct coordinate));
+    res->x = x1;
+    res->y = y1;
+    return res;
+}
+
+/*
 struct coordinate* get_intersection(struct line l1, struct line l2) {
 	//returns null for unbounded collision, i.e. a collision outside the line segments
 	// printf("line 1: (%f, %f) -> (%f, %f)\n", l1.p1.x, l1.p1.y, l1.p2.x, l1.p2.y);
@@ -171,6 +313,7 @@ struct coordinate* get_intersection(struct line l1, struct line l2) {
         return intersection_point;
     }
 }
+*/
 
 float distance(struct coordinate a, struct coordinate b) {
     return sqrt(pow(a.x - b.x, 2) + pow(a.y - b.y, 2));
@@ -370,7 +513,9 @@ int check_for_collisions(struct arena *arena) {
 
         for(j = 0; j < 4; j++) {
             for(k = 0; k < 4; k++) {
-                if(do_lines_intersect(osv_sides[k], obstacle_sides[j])) {
+                struct coordinate *res = get_intersection(osv_sides[k], obstacle_sides[j]);
+                if(res != NULL) {
+                    free(res);
                     return 1;
                 }
             }
@@ -415,7 +560,9 @@ int check_for_collisions(struct arena *arena) {
     // need to check right and left sides of OSV in case OSV is perpendicular to wall
     for(i = 0; i < 4; i++) {
         for(j = 0; j < 4; j++) {
-            if(do_lines_intersect(osv_sides[i], walls[j])) {
+            struct coordinate *res = get_intersection(osv_sides[i], walls[j]);
+            if(res != NULL) {
+                free(res);
                 return 1;
             }
         }

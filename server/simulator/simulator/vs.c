@@ -17,7 +17,7 @@
 #define ROTATIONS_PER_SECOND 0.25f
 #define max(x1,x2) ((x1) > (x2) ? (x1) : (x2))
 #define min(x1,x2) ((x1) < (x2) ? (x1) : (x2))
-#define abs(x) ((x > 0) ? x : -x)
+#define abs(x) ((x > 0) ? (x) : (-x))
 
 char buffer [BUFF_SIZE];
 unsigned short buffer_pos = 0;

@@ -97,11 +97,11 @@ struct arena get_init(cJSON *json) {
 
     randomization = randomization->next;
     cJSON *osv = randomization;
-    fprintf(fp, "osv\n");
+    fprintf(fp, "osv: %s\n\n\n", cJSON_Print(osv));
     cJSON *obstacles = randomization->next->child;
-    fprintf(fp, "obstacle\n");
+    fprintf(fp, "obstacle: %s\n\n\n", cJSON_Print(obstacles));
     cJSON *destination = randomization->next->next;
-    fprintf(fp, "destination\n");
+    fprintf(fp, "destination: %s\n\n\n", cJSON_Print(destination));
     fclose(fp);
 
     struct arena arena;

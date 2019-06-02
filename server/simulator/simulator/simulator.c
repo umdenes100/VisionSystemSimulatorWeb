@@ -83,12 +83,14 @@ cJSON* clean_for_simulate(cJSON *json) {
 }
 
 struct arena get_init(cJSON *json) {
-    FILE* fp = fopen("debugging_segfault", "w");
+    FILE* fp = fopen("debugging_segfault1", "w");
     fprintf(fp, "starting init\n");
+    fclose(fp);
 
     cJSON *randomization = json->child;
     cJSON *distance_sensors = json->next;
 
+    FILE* fp = fopen("debugging_segfault2", "w");
     fprintf(fp, "got randomization and sensors\n");
 
     randomization = randomization->next;
@@ -98,10 +100,12 @@ struct arena get_init(cJSON *json) {
     fprintf(fp, "obstacle\n");
     cJSON *destination = randomization->next->next;
     fprintf(fp, "destination\n");
+    fclose(fp);
 
     struct arena arena;
     arena.destination.x = (float)destination->child->valuedouble;
     arena.destination.y = (float)destination->child->next->valuedouble;
+    FILE* fp = fopen("debugging_segfault3", "w");
     fprintf(fp, "arena destination %f %f\n", arena.destination.x, arena.destination.y);
 
     arena.osv.location.x = (float)osv->child->valuedouble;
@@ -118,11 +122,13 @@ struct arena get_init(cJSON *json) {
     arena.osv.right_motor_pwm = 0;
     
     fprintf(fp, "osv width and height %f %f\n", arena.osv.width, arena.osv.height);
+    fclose(fp);
 
     int i;
     for(i = 0; i < cJSON_GetArraySize(distance_sensors); i++) {
         arena.osv.distance_sensors[cJSON_GetArrayItem(distance_sensors, i)->valueint] = 1;
     }
+    FILE* fp = fopen("debugging_segfault4", "w");
     fprintf(fp, "distance sensors\n");
 
     arena.obstacles = (struct obstacle *)malloc(1 * sizeof(struct obstacle));

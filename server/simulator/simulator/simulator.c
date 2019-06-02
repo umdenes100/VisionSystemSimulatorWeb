@@ -107,6 +107,8 @@ struct arena get_init(cJSON *json) {
     arena.destination.y = (float)destination->child->next->valuedouble;
     fp = fopen("debugging_segfault3", "w");
     fprintf(fp, "arena destination %f %f\n", arena.destination.x, arena.destination.y);
+    fclose(fp);
+    fp = fopen("wowza", "w");
 
     arena.osv.location.x = (float)osv->child->valuedouble;
     fprintf(fp, "osv 1\n");

@@ -83,45 +83,72 @@ cJSON* clean_for_simulate(cJSON *json) {
 }
 
 struct arena get_init(cJSON *json) {
+    FILE* fp = fopen("debugging_segfault", "w");
+    fprintf(fp, "starting init\n");
+
     cJSON *randomization = json->child;
     cJSON *distance_sensors = json->next;
 
+    fprintf(fp, "got randomization and sensors\n");
+
     randomization = randomization->next;
     cJSON *osv = randomization;
+    fprintf(fp, "osv\n");
     cJSON *obstacles = randomization->next->child;
+    fprintf(fp, "obstacle\n");
     cJSON *destination = randomization->next->next;
+    fprintf(fp, "destination\n");
 
     struct arena arena;
     arena.destination.x = (float)destination->child->valuedouble;
     arena.destination.y = (float)destination->child->next->valuedouble;
+    fprintf(fp, "arena destination %f %f\n", arena.destination.x, arena.destination.y);
 
     arena.osv.location.x = (float)osv->child->valuedouble;
+    fprintf(fp, "osv 1\n");
     arena.osv.location.y = (float)osv->child->next->valuedouble;
+    fprintf(fp, "osv 2\n");
     arena.osv.location.theta = (float)osv->child->next->next->valuedouble;
+    fprintf(fp, "osv 3\n");
     arena.osv.height = (float)osv->child->next->next->next->valuedouble;
+    fprintf(fp, "osv 4\n");
     arena.osv.width = (float)osv->child->next->next->next->next->valuedouble;
+    fprintf(fp, "osv 5\n");
     arena.osv.left_motor_pwm = 0;
     arena.osv.right_motor_pwm = 0;
+    
+    fprintf(fp, "osv width and height %f %f\n", arena.osv.width, arena.osv.height);
 
     int i;
     for(i = 0; i < cJSON_GetArraySize(distance_sensors); i++) {
         arena.osv.distance_sensors[cJSON_GetArrayItem(distance_sensors, i)->valueint] = 1;
     }
+    fprintf(fp, "distance sensors\n");
 
     arena.obstacles = (struct obstacle *)malloc(1 * sizeof(struct obstacle));
     int num_obstacles = 0;
     cJSON *curr = obstacles;
     while(curr != NULL) {
+        fprintf(fp, "obstacle againnnnnn\n");
         num_obstacles++;
         arena.obstacles = (struct obstacle *)realloc(arena.obstacles, num_obstacles * sizeof(struct obstacle));
+        fprintf(fp, "a\n");
         arena.obstacles[num_obstacles - 1].location.x = curr->child->valuedouble;
+        fprintf(fp, "b\n");
         arena.obstacles[num_obstacles - 1].location.y = curr->child->next->valuedouble;
+        fprintf(fp, "c\n");
         arena.obstacles[num_obstacles - 1].width = curr->child->next->next->valuedouble;
+        fprintf(fp, "d\n");
         arena.obstacles[num_obstacles - 1].height = curr->child->next->next->next->valuedouble;
+        fprintf(fp, "e\n");
         curr = curr->next;
+        fprintf(fp, "f\n");
     }
 
     arena.num_obstacles = num_obstacles;
+    fprintf(fp, "num obstacles %d\n", num_obstacles);
+
+    fclose(fp);
     return arena;
 }
 

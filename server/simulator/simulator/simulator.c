@@ -85,7 +85,7 @@ cJSON* clean_for_simulate(cJSON *json) {
 struct arena get_init(cJSON *json) {
     FILE* fp = fopen("debugging_segfault1", "w");
     
-    fprintf(fp, "%s\n\n", cJSON_Print(root));
+    fprintf(fp, "%s\n\n", cJSON_Print(json));
     fprintf(fp, "starting init\n");
     fclose(fp);
 

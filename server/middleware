@@ -75,7 +75,7 @@ async def middleware(request):
 
 	if request['type'] == 'simulation':
 		# we have to add line indications to all enes and tank function calls
-		code = request['code']
+		code = request['code'].decode()
 		for regex, replacement in zip(regexes, replacements):
 			code = re.sub(regex, replacement, code)
 

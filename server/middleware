@@ -3,6 +3,7 @@
 from asyncio import create_subprocess_exec, subprocess, get_event_loop
 from collections import namedtuple
 from aiohttp import web
+import re
 import argparse
 import uuid
 import json
@@ -27,6 +28,15 @@ REQUEST_TYPES = {
 		working_directory=os.path.join(os.path.dirname(BASE_DIR), 'tests')
 	),
 }
+
+functions = {
+	'Enes100': ['begin', 'updateLocation', 'mission', 'print', 'println'],
+	'Tank': ['readDistanceSensor', 'turnOffMotors', 'setRightMotorPWM', 'setLeftMotorPWM'],
+	'None': ['delay']
+}
+
+regexes = [re.compile(f'{key}\s*\.\s*{function}\s*\((.*)\);', re.MULTILINE) for function in functions[key] for key in functions]
+replacements = [re.compile(f'{key}\s*\.\s*{function}\s*\(__LINE__ - 1, \1\);', re.MULTILINE) for function in functions[key] for key in functions]
 
 async def process_command(command, working_directory, data=None):
 	start_time = time.time_ns()
@@ -58,6 +68,14 @@ async def middleware(request):
 	request['id'] = uuid.uuid4().hex
 	print(f'Request: {json.dumps(request, indent=2)}')
 	command, working_directory = REQUEST_TYPES[request['type']]
+
+	if request['type'] == 'simulation':
+		# we have to add line indications to all enes and tank function calls
+		code = request['code']
+		for regex, replacement in zip(regexes, replacements):
+			code = re.sub(regex, replacement, code)
+
+		request['code'] = code
 
 	result = await process_command(command, working_directory, request)
 	if request['type'] == 'simulation':

@@ -29,10 +29,11 @@ REQUEST_TYPES = {
 	),
 }
 
+
 functions = {
-	'Enes100': [['begin', True,], ['updateLocation', False,], ['mission', True,], ['print', True,], ['println', True,]],
-	'Tank': [['readDistanceSensor', True,], ['turnOffMotors', False,], ['setRightMotorPWM', True,], ['setLeftMotorPWM', True,]],
-	'None': [['delay', True,]]
+	'Enes100': ['begin', 'updateLocation', 'mission', 'print', 'println'],
+	'Tank': ['readDistanceSensor', 'turnOffMotors', 'setRightMotorPWM', 'setLeftMotorPWM'],
+	'None': ['delay']
 }
 
 regexes = []
@@ -40,17 +41,11 @@ replacements = []
 for key in functions:
 	for function in functions[key]:
 		if key == 'None':
-			reg = f'{function[0]}\s*\((.*)\)\s*;'
-			if function[1]:
-				rep = f'{function[0]}(__LINE__ - 1, \\1);'
-			else:
-				rep = f'{function[0]}(__LINE__ - 1);'
+			reg = f'{function}\s*'
+			rep = f'{function}'
 		else:
-			reg = f'{key}\s*\.\s*{function[0]}\s*\((.*)\)\s*;'
-			if function[1]:
-				rep = f'{key}.{function[0]}(__LINE__ - 1, \\1);'
-			else:
-				rep = f'{key}.{function[0]}(__LINE__ - 1);'
+			reg = f'{key}\s*\.\s*{function}\s*'
+			rep = f'{key}.{function}'
 
 		regexes += [re.compile(reg, re.MULTILINE)]
 		replacements += [rep]
@@ -75,6 +70,42 @@ async def process_command(command, working_directory, data=None):
 
 	return stdout.decode()
 
+def preprocess(code):
+	for regex, rep in zip(regexes, replacements):
+		find = regex.split(code)
+		curr_code = ''
+
+		for sector in find:
+			if curr_code == '':
+				curr_code += sector
+			else:
+				# if we have a new one that means we need to get the remains of the last function and bop it on
+				tack_on = ''
+				stack = 0
+				done = False
+				for i in range(len(sector)):
+					if done:
+						curr_code += sector[i]
+					else:
+						tack_on += sector[i]
+						if sector[i] == '(':
+							stack += 1
+						elif sector[i] == ')':
+							stack -= 1
+
+						if stack == 0:
+							# we have reached the end of what we need to tack on
+							tack_on = tack_on[1:len(tack_on) - 1].strip()
+							if tack_on == '':
+								tack_on = '(__LINE__ - 1)'
+							else:
+								tack_on = '(__LINE__ - 1, ' + tack_on + ')'
+
+							curr_code += rep + tack_on
+							done = True
+		code = curr_code
+
+	return code
 
 async def middleware(request):
 	if 'json' in request.url.query:
@@ -87,12 +118,7 @@ async def middleware(request):
 	command, working_directory = REQUEST_TYPES[request['type']]
 
 	if request['type'] == 'simulation':
-		# we have to add line indications to all enes and tank function calls
-		code = request['code']
-		for regex, replacement in zip(regexes, replacements):
-			code = regex.sub(replacement, code)
-
-		request['code'] = code
+		request['code'] = preprocess(request['code'])
 
 	result = await process_command(command, working_directory, request)
 	if request['type'] == 'simulation':

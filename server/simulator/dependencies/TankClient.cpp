@@ -1,18 +1,18 @@
-#include "Tank.h"
+#include "TankClient.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-Tank::Tank() {
+TankClient::TankClient() {
 
 };
 
-void Tank::begin(){
+void TankClient::begin(){
     // do what we want
     this->init = true;
 };
 
-void Tank::setLeftMotorPWM(int ln, short pwm) {
+void TankClient::setLeftMotorPWM(int ln, short pwm) {
     // do what we want
     if(pwm > 255) {
         pwm = 255;
@@ -34,7 +34,7 @@ void Tank::setLeftMotorPWM(int ln, short pwm) {
     }
 };
 
-void Tank::setRightMotorPWM(int ln, short pwm) {
+void TankClient::setRightMotorPWM(int ln, short pwm) {
     // do what we want
     if(pwm > 255) {
         pwm = 255;
@@ -56,7 +56,7 @@ void Tank::setRightMotorPWM(int ln, short pwm) {
     }
 };
 
-void Tank::turnOffMotors(int ln){
+void TankClient::turnOffMotors(int ln){
     // do what we want
     if(this->init) {
         fputc('\x05', stdout);
@@ -69,7 +69,7 @@ void Tank::turnOffMotors(int ln){
     }
 };
 
-float Tank::readDistanceSensor(int ln, int id) {
+float TankClient::readDistanceSensor(int ln, int id) {
     // do what we want
     if(id > 11) {
         return -1.0;

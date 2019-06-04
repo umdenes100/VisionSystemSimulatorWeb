@@ -35,8 +35,12 @@ functions = {
 	'None': ['delay']
 }
 
-regexes = [re.compile(f'{key}\s*\.\s*{function}\s*\((.*)\);', re.MULTILINE) for function in functions[key] for key in functions]
-replacements = [re.compile(f'{key}\s*\.\s*{function}\s*\(__LINE__ - 1, \1\);', re.MULTILINE) for function in functions[key] for key in functions]
+regexes = []
+replacements = []
+for key in functions:
+	for function in functions[key]:
+		regexes += [re.compile(f'{key}\s*\.\s*{function}\s*\((.*)\);', re.MULTILINE)]
+		replacements += [re.compile(f'{key}\s*\.\s*{function}\s*\(__LINE__ - 1, \1\);', re.MULTILINE)]
 
 async def process_command(command, working_directory, data=None):
 	start_time = time.time_ns()

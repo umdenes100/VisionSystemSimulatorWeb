@@ -48,9 +48,9 @@ for key in functions:
 		else:
 			reg = f'{key}\s*\.\s*{function[0]}\s*\((.*)\)\s*;'
 			if function[1]:
-				rep = f'{key[0]}.{function[0]}(__LINE__ - 1, \\1);'
+				rep = f'{key}.{function[0]}(__LINE__ - 1, \\1);'
 			else:
-				rep = f'{key[0]}.{function[0]}(__LINE__ - 1);'
+				rep = f'{key}.{function[0]}(__LINE__ - 1);'
 
 		regexes += [re.compile(reg, re.MULTILINE)]
 		replacements += [rep]

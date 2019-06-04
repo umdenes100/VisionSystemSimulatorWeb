@@ -30,9 +30,9 @@ REQUEST_TYPES = {
 }
 
 functions = {
-	'Enes100': [('begin', True), ('updateLocation', False), ('mission', True), ('print', True), ('println', True)],
-	'Tank': [('readDistanceSensor', True), ('turnOffMotors', False), ('setRightMotorPWM', True), ('setLeftMotorPWM', True)],
-	'None': [('delay', True)]
+	'Enes100': [('begin', True,), ('updateLocation', False,), ('mission', True,), ('print', True,), ('println', True,)],
+	'Tank': [('readDistanceSensor', True,), ('turnOffMotors', False,), ('setRightMotorPWM', True,), ('setLeftMotorPWM', True,)],
+	'None': [('delay', True,)]
 }
 
 regexes = []

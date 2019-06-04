@@ -38,19 +38,19 @@ functions = {
 regexes = []
 replacements = []
 for key in functions:
-	for function in functions[key[0]]:
-		if key[0] == 'None':
-			reg = f'{function}\s*\((.*)\)\s*;'
-			if key[1]:
-				rep = f'{function}(__LINE__ - 1, \\1);'
+	for function in functions[key]:
+		if key == 'None':
+			reg = f'{function[0]}\s*\((.*)\)\s*;'
+			if function[1]:
+				rep = f'{function[0]}(__LINE__ - 1, \\1);'
 			else:
-				rep = f'{function}(__LINE__ - 1);'
+				rep = f'{function[0]}(__LINE__ - 1);'
 		else:
-			reg = f'{key[0]}\s*\.\s*{function}\s*\((.*)\)\s*;'
-			if key[1]:
-				rep = f'{key[0]}.{function}(__LINE__ - 1, \\1);'
+			reg = f'{key}\s*\.\s*{function[0]}\s*\((.*)\)\s*;'
+			if function[1]:
+				rep = f'{key[0]}.{function[0]}(__LINE__ - 1, \\1);'
 			else:
-				rep = f'{key[0]}.{function}(__LINE__ - 1);'
+				rep = f'{key[0]}.{function[0]}(__LINE__ - 1);'
 
 		regexes += [re.compile(reg, re.MULTILINE)]
 		replacements += [rep]

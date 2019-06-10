@@ -12,14 +12,7 @@
 #include "vs.h"
 #include "simulator.h"
 #include "node.h"
-
-// this is the standard error function. exits with code 1.
-void error(char *error_msg, int return_code) {
-    fprintf(stderr, "Error: {\r\n\t'msg': '%s',\r\n\t'code': '%d'\r\n}\r\n", error_msg, return_code);
-    fflush(stderr);
-    fflush(stdout);
-    exit(return_code);
-}
+#include "error.h"
 
 // this function is a debugging function which creates a string of the arduino code
 char* get_input() {

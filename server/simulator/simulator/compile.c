@@ -5,6 +5,7 @@
 #include <sys/stat.h>
 
 #include "compile.h"
+#include "error.h"
 
 // this function will retrieve all matches to the regex in the string
 struct match_list get_all_matches(regex_t r, char *to_match) {
@@ -48,6 +49,7 @@ struct match_list get_function_declarations(char *file_name, int *status_code) {
     struct match_list dummy;
 
     if(fp == NULL) {
+        error("Unable to read file.", 2);
         *status_code = -1;
         return dummy;
     }
@@ -97,6 +99,7 @@ struct match_list get_function_declarations(char *file_name, int *status_code) {
 
     regex_t regex;
     if(regcomp(&regex, function_pattern, REG_EXTENDED)) {
+        error("Unable to compile regular expression.", 2);
         *status_code = -1;
         return dummy;
     }
@@ -122,6 +125,7 @@ int create_dir(char *name) {
     strcat(dest, name);
 
     if(mkdir(dest, 0777) != 0) {
+        error("Unable to create environment.", 2);
         return -1;
     }
 
@@ -179,6 +183,7 @@ int create_src_file(char *code, struct file_names files) {
     FILE *fp = fopen(files.src, "w");
 
     if(fp == NULL) {
+        error("Unable to create src file.", 2);
         return -1;
     }
 
@@ -201,6 +206,7 @@ int create_hdr_file(struct match_list functions, char *file) {
     FILE *fp = fopen(file, "w");
 
     if(fp == NULL) {
+        error("Unable to create hdr file.", 2);
         return -1;
     }
 
@@ -249,6 +255,7 @@ int compile(char *file) {
 
     FILE* p = popen(command, "r");
     if(!p) {
+        error("Unable to open gcc command.", 2);
         return -1;
     }
 
@@ -263,7 +270,7 @@ int compile(char *file) {
     int code = pclose(p);
 
     if(code != 0) {
-        printf("%s\n", buff);
+        error(buff, 2);
         return -1;
     }
 

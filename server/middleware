@@ -66,9 +66,10 @@ async def process_command(command, working_directory, data=None):
 	print(f'Return Code: {process.returncode}')
 	if stderr:
 		print(f'{stderr}')
+		return stderr.decode(), False
 	# print(f'General Process Info: {vars(process)}')
 
-	return stdout.decode()
+	return stdout.decode(), True
 
 def preprocess(code):
 	for regex, rep in zip(regexes, replacements):
@@ -120,8 +121,8 @@ async def middleware(request):
 	if request['type'] == 'simulation':
 		request['code'] = preprocess(request['code'])
 
-	result = await process_command(command, working_directory, request)
-	if request['type'] == 'simulation':
+	result, success = await process_command(command, working_directory, request)
+	if request['type'] == 'simulation' and success:
 		result = result[:-2] + result[-1:]  # Removing trailing comma.
 
 	try:

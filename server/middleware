@@ -65,7 +65,6 @@ async def process_command(command, working_directory, data=None):
 	print(f'Total Time (ns): {time.time_ns() - start_time}')
 	print(f'Return Code: {process.returncode}')
 	if stderr:
-		print(f'{stderr}')
 		return stderr.decode(), False
 	# print(f'General Process Info: {vars(process)}')
 
@@ -124,6 +123,8 @@ async def middleware(request):
 	result, success = await process_command(command, working_directory, request)
 	if request['type'] == 'simulation' and success:
 		result = result[:-2] + result[-1:]  # Removing trailing comma.
+
+	print(result.replace('\n', ' ').replace('\r', ' ').replace('\t', ' '))
 
 	try:
 		result_json = json.loads(result)

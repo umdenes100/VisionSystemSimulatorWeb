@@ -65,7 +65,7 @@ async def process_command(command, working_directory, data=None):
 	print(f'Total Time (ns): {time.time_ns() - start_time}')
 	print(f'Return Code: {process.returncode}')
 	if stderr:
-		print(f'Error: {stderr}')
+		print(f'{stderr}')
 	# print(f'General Process Info: {vars(process)}')
 
 	return stdout.decode()

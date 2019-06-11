@@ -44,8 +44,12 @@ for key in functions:
 			reg = f'{function}\s*'
 			rep = f'{function}'
 		else:
-			reg = f'{key}\s*\.\s*{function}\s*'
-			rep = f'{key}.{function}'
+			if function == 'println':
+				reg = f'Enes100\s*\.\s*HELPER_println\s*'
+				rep = f'Enes100.println'
+			else:
+				reg = f'{key}\s*\.\s*{function}\s*'
+				rep = f'{key}.{function}'
 
 		regexes += [re.compile(reg, re.MULTILINE)]
 		replacements += [rep]
@@ -71,6 +75,11 @@ async def process_command(command, working_directory, data=None):
 	return stdout.decode(), True
 
 def preprocess(code):
+	# first we need to address the fact that print is subset of println
+	println_reg = f'Enes100\s*\.\s*println\s*'
+	println_reg = re.compile(println_reg, re.MULTILINE)
+	println_reg.sub(code, 'Enes100.HELPER_println')
+
 	for regex, rep in zip(regexes, replacements):
 		find = regex.split(code)
 		curr_code = ''

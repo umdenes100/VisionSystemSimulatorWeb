@@ -31,7 +31,7 @@ REQUEST_TYPES = {
 
 
 functions = {
-	'Enes100': ['begin', 'updateLocation', 'mission', 'println', 'print'],
+	'Enes100': ['begin', 'updateLocation', 'mission', 'print', 'println'],
 	'Tank': ['readDistanceSensor', 'turnOffMotors', 'setRightMotorPWM', 'setLeftMotorPWM'],
 	'None': ['delay']
 }

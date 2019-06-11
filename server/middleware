@@ -78,8 +78,7 @@ def preprocess(code):
 	# first we need to address the fact that print is subset of println
 	println_reg = f'Enes100\s*\.\s*println\s*'
 	println_reg = re.compile(println_reg, re.MULTILINE)
-	code = println_reg.sub(code, 'Enes100.HELPER_println')
-	print(code)
+	code = println_reg.sub('Enes100.HELPER_println', code)
 
 	for regex, rep in zip(regexes, replacements):
 		find = regex.split(code)

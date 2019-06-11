@@ -436,6 +436,9 @@ struct node * process_command(struct node *in, struct process p, struct arena *a
         if(in->size < 5) {
             return in;
         } else {
+            FILE* fp = fopen("location_testing", "a");
+            fprintf("%f, %f", arena->osv.location.x, arena->osv.location.y);
+            fclose(fp);
             print_command("update_location", NULL, *(int *)(buffer + 1));
             write(p.output_fd, &(arena->osv.location.x), sizeof(float));
             write(p.output_fd, &(arena->osv.location.y), sizeof(float));

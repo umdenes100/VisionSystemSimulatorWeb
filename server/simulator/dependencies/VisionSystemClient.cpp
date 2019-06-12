@@ -47,12 +47,12 @@ bool VisionSystemClient::begin(int ln, const char *teamName, int teamType, int m
     fputc((char)(ln >> 24), stdout);
     fflush(stdout);
 
-    char x[5];
-    fgets(x, 5, stdin);
-    char y[5];
-    fgets(y, 5, stdin);
-    char theta[5];
-    fgets(theta, 5, stdin);
+    char x[4];
+    x[0] = fgetc(stdin); x[1] = fgetc(stdin); x[2] = fgetc(stdin); x[3] = fgetc(stdin);
+    char y[4];
+    y[0] = fgetc(stdin); y[1] = fgetc(stdin); y[2] = fgetc(stdin); y[3] = fgetc(stdin);
+    char theta[4];
+    theta[0] = fgetc(stdin); theta[1] = fgetc(stdin); theta[2] = fgetc(stdin); theta[3] = fgetc(stdin);
     
     float x_f = *(float *)x;
     float y_f = *(float *)y;
@@ -72,12 +72,12 @@ bool VisionSystemClient::updateLocation(int ln) {
         fputc((char)(ln >> 24), stdout);
         fflush(stdout);
 
-        char x[5];
-        fgets(x, 5, stdin);
-        char y[5];
-        fgets(y, 5, stdin);
-        char theta[5];
-        fgets(theta, 5, stdin);
+        char x[4];
+        x[0] = fgetc(stdin); x[1] = fgetc(stdin); x[2] = fgetc(stdin); x[3] = fgetc(stdin);
+        char y[4];
+        y[0] = fgetc(stdin); y[1] = fgetc(stdin); y[2] = fgetc(stdin); y[3] = fgetc(stdin);
+        char theta[4];
+        theta[0] = fgetc(stdin); theta[1] = fgetc(stdin); theta[2] = fgetc(stdin); theta[3] = fgetc(stdin);
         
         float x_f = *(float *)x;
         float y_f = *(float *)y;

@@ -84,8 +84,8 @@ float TankClient::readDistanceSensor(int ln, int id) {
         fputc((char)(id), stdout);
         fflush(stdout);
         
-        char buff[5];
-        fgets(buff, 5, stdin);
+        char buff[4];
+        buff[0] = fgetc(stdin); buff[1] = fgetc(stdin); buff[2] = fgetc(stdin); buff[3] = fgetc(stdin);
         return *(float *)buff;
     }
     

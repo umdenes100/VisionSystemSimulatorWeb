@@ -209,7 +209,7 @@ int main(int argc, char *argv[]) {
     char *program_id = get_id(child_json);
 
     // now that we have the JSON we need to perform initialization
-    if(initialize(program_id), get_code(child_json)) != 0) {
+    if(initialize(program_id, get_code(child_json)) != 0) {
         // initialize error:
         error("Unable to compile provided code.", 2);
     }

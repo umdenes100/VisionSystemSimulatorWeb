@@ -18,5 +18,6 @@ struct file_names {
 };
 
 int initialize(char *program_name, char *code);
+int cleanup(char *program_name);
 
 #endif

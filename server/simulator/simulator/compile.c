@@ -317,3 +317,23 @@ int initialize(char *program_name, char *code) {
 
     return 0;
 }
+
+int cleanup(char *program_name) {
+    char dest[17 + strlen(program_name) + 1];
+
+    int i;
+    for(i = 0; i < 17; i++) {
+        dest[i] = "../environments/"[i];
+    }
+
+    strcat(dest, program_name);
+
+    char command[17 + strlen(program_name) + strlen("rm -rf") + strlen("2>&1") + 3];
+    sprintf(command, "%s %s %s", "rm -rf", dest, "2>&1");
+
+    FILE* p = popen(command, "r");
+    if(!p || pclose(p)) {
+        error("Unable to cleanup.", 2);
+        return -1;
+    }
+}

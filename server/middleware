@@ -106,9 +106,9 @@ def preprocess(code):
 							# we have reached the end of what we need to tack on
 							tack_on = tack_on[1:len(tack_on) - 1].strip()
 							if tack_on == '':
-								tack_on = '(__LINE__ - 2)'
+								tack_on = '(__LINE__ - 3)'
 							else:
-								tack_on = '(__LINE__ - 2, ' + tack_on + ')'
+								tack_on = '(__LINE__ - 3, ' + tack_on + ')'
 
 							curr_code += rep + tack_on
 							done = True

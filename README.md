@@ -1,6 +1,57 @@
 # VisionSystemSimulatorWeb
 
-## Docker
+## For Students
+
+The simulator is a tool designed to give you a head start on programming and to help you learn how to program. To start off, we will look at the layout of the simulator. After that we will go into depth about the Enes100 and Tank simulator libraries and some small notes regarding coding in the simulator.
+
+### Layout
+
+The simulator is divided into two modes: development and simulation. In the development half of the simulator you will see the code editor, a few action buttons, an arena preview, and an OSV editor. The code editor comes with a 'Terminal' which allows you to see the status of your simulations and also prints the error message if your code fails to compile. The action buttons allow you to (1) see the documentation (this page) (2) randomize the arena, which will be visible on the preview, (3) perform a simulation, and (4) add in or remove obstacles from the arena. In the arena preview you will see the OSV location, the obstacle locations, the destination location, and the size of the OSV. The size of the OSV can be edited in the OSV editor, along with the distance sensors, which will be covered in greater detail later.
+
+The Simulation section has only 3 elements, the code highlighting, the output console, and the visual simulation. The code highlighter will take the 5 most recent ENES100 or TANK function calls and highlight them. This should allow you to debug issues quickly and painlessly. The output console simply prints out all Enes100.print and Enes100.println calls. Finnally, the actual simulation will show a video simulation of your code.
+
+### Libraries
+
+The simulator uses a variant of the Enes100 and Tank libraries provided for the course. The libraries are largely the same save a few exceptions which we will mention later. Note that because of technical limitations, some functions available in ardunio such as `digitalRead()` and `Serial.print()` are unavailable in the simulator and will prevent compilation. Below are the functions provided in the libraries.
+
+#### Enes100
+
+```Enes100::begin(char *, int, int, int, int)```
+This function initializes the Enes100 object and is required in order to utilize any other Enes100 related functions in the code. It also sets the Enes100.destination.x, y, and theta variables which are used to locate the destination in the arena.
+
+```Enes100::updateLocation()```
+This function updates the Enes100.location.x, y, and theta variables in the object to the latest location of the OSV in the simulation.
+
+```Enes100::print(arg)```
+This function will print whatever is passed in. The argument can either be an int, float, double, or char *.
+
+```Enes100::println(arg)```
+This function will print whatever is passed in followed by a new line character.
+
+```delay(int msec)```
+This function is not a member of the Enes100 class, but can be called by simply typing `delay(arg)` where arg is the number of milliseconds you would like to stop code execution.
+
+#### Tank
+
+```Tank::begin()```
+This function initalizes the tank object and is required in order to utilize any other Tank related function in the code.
+
+```Tank::setLeftMotorPWM(int pwm)```
+This function sets the PWM of the left motors in the OSV. This value can be anywhere from -255 to 255, with -255 being full speed backwards and 255 being full speed forwards.
+
+```Tank::setRightMotorPWM(int pwm)```
+This function sets the PWM of the right motors in the OSV. This value can be anywhere from -255 to 255, with -255 being full speed backwards and 255 being full speed forwards.
+
+```Tank::turnOffMotors()```
+This function simply stops the OSV where it is
+
+```Tank::readDistanceSensor(int sensorId)```
+This function is used to get distance data of the obstacles in the field. The distance is returned in meters, and is calculated by drawing a straight line from the distance sensor to the first object it hits. The distance reported will max out at 1m, and if the sensor is not enabled, it will return -1. To enable a sensor, go to the OSV editor, and select the sensors you wish to add by clicking on them when they darken on the drawing. The sensorId corresponds to the sensors location on the OSV, and is labeled below:
+
+![alt text](img.png "Distance Sensors")
+
+
+## For Staff: Docker
 
 Given that we have developers using every operating system under the sun, we have to have some way of standardizing things without making life hell for everybody. Enter Docker.
 

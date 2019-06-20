@@ -82,7 +82,7 @@ struct match_list get_function_declarations(char *file_name, int *status_code) {
                 // we need to add this to help with the regex (c has a weird regex matching rule)
                 n_characters++;
                 first_level_code = (char*)realloc(first_level_code, (n_characters + 1) * sizeof(char));
-                first_level_code[n_characters - 1] = '#';
+                first_level_code[n_characters - 1] = '`';
                 first_level_code[n_characters] = '\0';
             }
         }
@@ -94,7 +94,7 @@ struct match_list get_function_declarations(char *file_name, int *status_code) {
 
     // [0-9A-Za-z_\\[\\]\\*]+[[:space:]]+[0-9A-Za-z_\\[\\]\\*]+[[:space:]]*\\(.*\\)
     // a regex can be used to search for functions.
-    char *function_pattern = "[0-9A-Za-z_\\[\\*]+]?[[:space:]]+[0-9A-Za-z_]+[[:space:]]*\\([^#]*\\)";
+    char *function_pattern = "[0-9A-Za-z_\\[\\*]+]?[[:space:]]+[0-9A-Za-z_]+[[:space:]]*\\([^`]*\\)";
     int r_return;
 
     regex_t regex;

@@ -46,11 +46,10 @@ This function sets the PWM of the right motors in the OSV. This value can be any
 This function simply stops the OSV where it is
 
 ```Tank::readDistanceSensor(int sensorId)```
-This function is used to get distance data of the obstacles in the field. The distance is returned in meters, and is calculated by drawing a straight line from the distance sensor to the first object it hits. The distance reported will max out at 1m, and if the sensor is not enabled, it will return -1. To enable a sensor, go to the OSV editor, and select the sensors you wish to add by clicking on them when they darken on the drawing. The sensorId corresponds to the sensors location on the OSV, and is labeled below:
+This function is used to get distance data of the obstacles in the field. The distance is returned in meters, and is calculated by drawing a straight line from the distance sensor to the first object it hits. The distance reported will max out at 1m, and if the sensor is not enabled, it will return -1. To enable a sensor, go to the OSV editor, and select the sensors you wish to add by clicking on them when they darken on the drawing. The sensorId value corresponding to each sensor placement on the OSV is labeled below:
 
-https://github.com/umdenes100/VisionSystemSimulatorWeb/blob/master/img.png
 
-![alt text](img.png "Distance Sensors")
+![Possible Distance Sensor Placements on Simulation](img.png "Distance Sensors")
 
 
 ## For Staff: Docker

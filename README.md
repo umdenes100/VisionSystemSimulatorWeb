@@ -1,6 +1,6 @@
 # VisionSystemSimulatorWeb
 
-[![Simulator Image Capture](https://github.com/umdenes100/VisionSystemSimulatorWeb/blob/master/images/enes100_simulator_web_capture_8_28_19.JPG "The Vision System Simulator")](http://enes100.umd.edu/simulatorweb)
+[![Simulator Image Capture](https://github.com/umdenes100/VisionSystemSimulatorWeb/blob/master/images/enes100_simulator_web_capture_8_28_19.JPG "The Vision System Simulator (Click me)")](http://enes100.umd.edu/simulatorweb)
 
 ## For Students
 

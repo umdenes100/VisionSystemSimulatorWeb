@@ -96,7 +96,7 @@ float TankClient::readDistanceSensor(int ln, int id) {
         buff[3] = fgetc(stdin);
 
         return *(float *)buff;
-    } else {  // This object was never initialized.
+    } else {  // The current object was never initialized.
         return -1.0;
     }
 }

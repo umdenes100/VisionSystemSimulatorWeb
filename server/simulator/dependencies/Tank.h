@@ -1,5 +1,5 @@
-#ifndef TANK_H
-#define TANK_H
+#ifndef Tank_H_
+#define Tank_H_
 
 #include "TankClient.h"
 

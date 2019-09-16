@@ -2,6 +2,12 @@
 #define Enes100_h
 
 #include "VisionSystemClient.hpp"
+#include "ArduinoHelpers.hpp"
+
+#define INPUT             0
+#define OUTPUT            0
+#define LOW               0
+#define HIGH              0
 
 #define BLACK_BOX         0
 #define DATA              1
@@ -22,5 +28,6 @@
 #define ALUMINUM          1
 
 VisionSystemClient Enes100;
+SerialClient Serial;
 
 #endif /* Enes100_h */

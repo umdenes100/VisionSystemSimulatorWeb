@@ -21,4 +21,4 @@ private:
   bool init = false;
 };
 
-#endif  // TANKCLIENT_H
+#endif  /* TANKCLIENT_H */

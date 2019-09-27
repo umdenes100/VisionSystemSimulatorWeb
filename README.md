@@ -1,6 +1,6 @@
 # VisionSystemSimulatorWeb
 
-[![Simulator Image Capture](images/enes100_simulator_web_capture_8_28_19.JPG "The Vision System Simulator (Click me)")](http://enes100.umd.edu/simulatorweb)
+[![Simulator Image Capture](https://github.com/umdenes100/VisionSystemSimulatorWeb/blob/Fix-images/images/enes100_simulator_web_capture_8_28_19.JPG "The Vision System Simulator (Click me)")](http://enes100.umd.edu/simulatorweb)
 
 ## For Students
 
@@ -50,7 +50,7 @@ This function simply stops the OSV where it is
 ```Tank::readDistanceSensor(int sensorId)```
 This function is used to get distance data of the obstacles in the field. The distance is returned in meters, and is calculated by drawing a straight line from the distance sensor to the first object it hits. The distance reported will max out at 1m, and if the sensor is not enabled, it will return -1. To enable a sensor, go to the OSV editor, and select the sensors you wish to add by clicking on them when they darken on the drawing. The sensorId value corresponding to each sensor placement on the OSV is labeled below:
 
-<img src="images/simulator_distance_sensor_placements.png" alt="Possible Distance Sensor Placements on Simulation" title="Possible Distance Sensor Placements on Simulation" width="500">
+<img src="https://github.com/umdenes100/VisionSystemSimulatorWeb/blob/Fix-images/images/simulator_distance_sensor_placements.png" alt="Possible Distance Sensor Placements on Simulation" title="Possible Distance Sensor Placements on Simulation" width="500">
 
 
 ## For Staff: Docker

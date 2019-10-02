@@ -116,12 +116,12 @@ chmod +rwx run_tests.sh
 
 ## Restarting VisionSystemSim
 
-To restart the vision system sim, ssh into the ubuntu host using the following command. Ensure that the SimulatorWeb.pem file is inside the directory when you ssh. You need to ask an LTF in order to get access to the SimulatorWeb.pem file.
+To restart the vision system sim, Open up the terminal and type in the following command. This command will take you to the host server. Ensure that the SimulatorWeb.pem file is inside the directory when you ssh. You need to ask an LTF in order to get access to the SimulatorWeb.pem file.
 
 ```
 ssh -i SimulatorWeb.pem ubuntu@18.191.246.34
 ```
-Then run the following commands once you have successfully ssh'd into the ubuntu host.
+Then run the following commands once you have successfully ssh'd into the ubuntu host. These commands delete old versions of the simulator and create a new version. Lastly, these commands will log you out of the ubuntu host and take you back to your local host.
 ```
 tmux kill-session -t sim
 tmux new -s sim

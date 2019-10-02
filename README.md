@@ -121,6 +121,8 @@ To restart the vision system sim, ssh into the ubuntu host using the following c
 ```
 ssh -i SimulatorWeb.pem ubuntu@18.191.246.34
 ```
+Then run the following commands once you have succesfully ssh'd into the ubuntu host.
+```
 tmux kill-session -t sim
 tmux new -s sim
 cd VisionSystemSimulatorWeb

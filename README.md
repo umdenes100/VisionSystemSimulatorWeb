@@ -107,8 +107,23 @@ We've got support for extensive and flexible testing. To create and modify tests
 
 To run all the tests - 
 
+
+
 ```bash
 chmod +rwx run_tests.sh
 ./run_tests
 ```
 
+## Restarting VisionSystemSim
+
+To restart the vision system sim run the following commands
+
+```ssh sim
+tmux kill-session -t sim
+tmux new -s sim
+cd VisionSystemSimulatorWeb
+sudo docker-compose up —build &>/dev/null & 
+disown
+tmux detach
+logout
+```

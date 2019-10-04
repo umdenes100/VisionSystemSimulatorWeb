@@ -127,7 +127,7 @@ ssh -i SimulatorWeb.pem ubuntu@18.191.246.34
 tmux kill-session -t sim
 tmux new -s sim
 cd VisionSystemSimulatorWeb
-sudo docker-compose up —build &>/dev/null & 
+sudo docker-compose up --build &>/dev/null & 
 disown
 tmux detach
 logout

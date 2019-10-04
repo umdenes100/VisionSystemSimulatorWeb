@@ -115,14 +115,15 @@ chmod +rwx run_tests.sh
 ```
 
 ## Restarting VisionSystemSim
+If the simulator is taking more than a few seconds to simulate, it may need to be restarted.
 
-To restart the vision system sim, Open up the terminal and type in the following command. This command will take you to the host server. Ensure that the SimulatorWeb.pem file is inside the directory when you ssh. You need to ask an LTF in order to get access to the SimulatorWeb.pem file.
+Steps to restart:
+1. Obtain SimulatorWeb.pem from an LTF.
+2. Open a terminal and cd to the directory that contains SimulatorWeb.pem.
+3. Type the following commands:
 
 ```
 ssh -i SimulatorWeb.pem ubuntu@18.191.246.34
-```
-Then run the following commands once you have successfully ssh'd into the ubuntu host. These commands delete old versions of the simulator and create a new version. Lastly, these commands will log you out of the ubuntu host and take you back to your local host.
-```
 tmux kill-session -t sim
 tmux new -s sim
 cd VisionSystemSimulatorWeb
@@ -131,3 +132,4 @@ disown
 tmux detach
 logout
 ```
+What you are doing here is sshing into the system where the simulator backend is hosted, killing the current simulator backend, creating a new tab for the new simulator backend, starting up the new process, disowning it to let it keep running after you exit, and exiting.

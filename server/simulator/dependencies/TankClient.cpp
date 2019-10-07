@@ -35,7 +35,7 @@ void TankClient::setLeftMotorPWM(int ln, short pwm) {
     }
 };
 
-void TankClient::setRightMotorPWM(int pwm) {
+void TankClient::setRightMotorPWM(int ln, short pwm) {
     // Do what we want.
     if (pwm > 255) {
         pwm = 255;
@@ -59,7 +59,7 @@ void TankClient::setRightMotorPWM(int pwm) {
 
 };
 
-void TankClient::turnOffMotors(){
+void TankClient::turnOffMotors(int ln){
     // Do what we want.
     if (this->init) {
         fputc('\x05', stdout);

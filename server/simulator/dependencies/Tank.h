@@ -5,4 +5,4 @@
 
 TankClient Tank;
 
-#endif
+#endif /* TANK_H */

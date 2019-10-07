@@ -22,23 +22,23 @@ void Coordinate::init(double x, double y, double theta) {
 }
 
 bool VisionSystemClient::ping() {
-    // do nothing
+    // Do nothing.
 }
 
 bool VisionSystemClient::mission(int ln, int message) {
-    // do nothing
+    // Do nothing.
 }
 
 bool VisionSystemClient::mission(int ln, double message) {
-    // do nothing
+    // Do nothing.
 }
 
 bool VisionSystemClient::mission(int ln, Coordinate &message) {
-    // do nothing
+    // Do nothing.
 }
 
 bool VisionSystemClient::begin(int ln, const char *teamName, int teamType, int markerId, int rxPin, int txPin) {
-    // do what we want
+    // Do what we want.
     this->init = true;
     fputc('\x00', stdout);
     fputc((char)(ln), stdout);
@@ -53,7 +53,7 @@ bool VisionSystemClient::begin(int ln, const char *teamName, int teamType, int m
     y[0] = fgetc(stdin); y[1] = fgetc(stdin); y[2] = fgetc(stdin); y[3] = fgetc(stdin);
     char theta[4];
     theta[0] = fgetc(stdin); theta[1] = fgetc(stdin); theta[2] = fgetc(stdin); theta[3] = fgetc(stdin);
-    
+
     float x_f = *(float *)x;
     float y_f = *(float *)y;
     float theta_f = *(float *)theta;
@@ -63,8 +63,8 @@ bool VisionSystemClient::begin(int ln, const char *teamName, int teamType, int m
 }
 
 bool VisionSystemClient::updateLocation(int ln) {
-    // do what we want
-    if(this->init == true) {
+    // Do what we want.
+    if (this->init) {
         fputc('\x01', stdout);
         fputc((char)(ln), stdout);
         fputc((char)(ln >> 8), stdout);
@@ -78,7 +78,7 @@ bool VisionSystemClient::updateLocation(int ln) {
         y[0] = fgetc(stdin); y[1] = fgetc(stdin); y[2] = fgetc(stdin); y[3] = fgetc(stdin);
         char theta[4];
         theta[0] = fgetc(stdin); theta[1] = fgetc(stdin); theta[2] = fgetc(stdin); theta[3] = fgetc(stdin);
-        
+
         float x_f = *(float *)x;
         float y_f = *(float *)y;
         float theta_f = *(float *)theta;
@@ -91,10 +91,10 @@ bool VisionSystemClient::updateLocation(int ln) {
 }
 
 void VisionSystemClient::print(int ln, const char *message) {
-    // do what we want
-    if(this->init) {
+    // Do what we want.
+    if (this->init) {
         int s_len = strlen(message);
-        if(s_len <= 255) {
+        if (s_len <= 255) {
             fputc('\x02', stdout);
             fputc((char)(ln), stdout);
             fputc((char)(ln >> 8), stdout);
@@ -104,15 +104,15 @@ void VisionSystemClient::print(int ln, const char *message) {
             fputs(message, stdout);
             fputc('\x0', stdout);
             fflush(stdout);
-            
-            while(fgetc(stdin) != '\x08');
+
+            while (fgetc(stdin) != '\x08');
         }
     }
 }
 
 void VisionSystemClient::print(int ln, int message) {
-    // do what we want
-    if(this->init) {
+    // Do what we want.
+    if (this->init) {
         char str[256];
         sprintf(str, "%d", message);
         fputc('\x02', stdout);
@@ -124,14 +124,14 @@ void VisionSystemClient::print(int ln, int message) {
         fputs(str, stdout);
         fputc('\x0', stdout);
         fflush(stdout);
-        
-        while(fgetc(stdin) != '\x08');
+
+        while (fgetc(stdin) != '\x08');
     }
 }
 
 void VisionSystemClient::print(int ln, double message) {
-    // do what we want
-    if(this->init) {
+    // Do what we want.
+    if (this->init) {
         char str[256];
         sprintf(str, "%f", message);
         fputc('\x02', stdout);
@@ -143,16 +143,16 @@ void VisionSystemClient::print(int ln, double message) {
         fputs(str, stdout);
         fputc('\x0', stdout);
         fflush(stdout);
-        
-        while(fgetc(stdin) != '\x08');
+
+        while (fgetc(stdin) != '\x08');
     }
 }
 
 void VisionSystemClient::println(int ln, const char *message) {
-    // do what we want
-    if(this->init) {
+    // Do what we want.
+    if (this->init) {
         int s_len = strlen(message);
-        if(s_len <= 254) {
+        if (s_len <= 254) {
             char str[256];
             sprintf(str, "%s\n", message);
             fputc('\x02', stdout);
@@ -164,15 +164,15 @@ void VisionSystemClient::println(int ln, const char *message) {
             fputs(str, stdout);
             fputc('\x0', stdout);
             fflush(stdout);
-            
-            while(fgetc(stdin) != '\x08');
+
+            while (fgetc(stdin) != '\x08');
         }
     }
 }
 
 void VisionSystemClient::println(int ln, int message) {
-    // do what we want
-    if(this->init) {
+    // Do what we want.
+    if (this->init) {
         char str[256];
         sprintf(str, "%d\n", message);
         fputc('\x02', stdout);
@@ -184,14 +184,14 @@ void VisionSystemClient::println(int ln, int message) {
         fputs(str, stdout);
         fputc('\x0', stdout);
         fflush(stdout);
-        
-        while(fgetc(stdin) != '\x08');
+
+        while (fgetc(stdin) != '\x08');
     }
 }
 
 void VisionSystemClient::println(int ln, double message) {
-    // do what we want
-    if(this->init) {
+    // Do what we want.
+    if (this->init) {
         char str[256];
         sprintf(str, "%f\n", message);
         fputc('\x02', stdout);
@@ -203,13 +203,13 @@ void VisionSystemClient::println(int ln, double message) {
         fputs(str, stdout);
         fputc('\x0', stdout);
         fflush(stdout);
-        
-        while(fgetc(stdin) != '\x08');
+
+        while (fgetc(stdin) != '\x08');
     }
 }
 
 void delay(int ln, int msec) {
-    // do what we want
+    // Do what we want.
     fputc('\x07', stdout);
     fputc((char)(ln), stdout);
     fputc((char)(ln >> 8), stdout);
@@ -220,6 +220,6 @@ void delay(int ln, int msec) {
     fputc((char)(msec >> 16), stdout);
     fputc((char)(msec >> 24), stdout);
     fflush(stdout);
-    
-    while(fgetc(stdin) != '\x08');
+
+    while (fgetc(stdin) != '\x08');
 }

@@ -3,7 +3,7 @@ FROM ubuntu:latest
 ENV PYTHONUNBUFFERED 1
 
 RUN echo "Installing dependencies..." && \
-    apt -y --no-install-recommends update && \ 
+    apt -y --no-install-recommends update && \
     # apt -y --no-install-recommends upgrade && \
     apt remove --purge python && apt autoremove && \
     apt install -y --no-install-recommends \
@@ -22,13 +22,13 @@ RUN echo "Installing dependencies..." && \
     sudo
 
 RUN echo "Installing cJSON..." && \
-	git clone https://github.com/DaveGamble/cJSON.git && \
-	cd cJSON && \
-	mkdir build && \
-	cd build && \
-	cmake .. -DENABLE_CJSON_UTILS=On -DENABLE_CJSON_TEST=Off -DCMAKE_INSTALL_PREFIX=/usr && \
-	make && \
-	make install
+    git clone https://github.com/DaveGamble/cJSON.git && \
+    cd cJSON && \
+    mkdir build && \
+    cd build && \
+    cmake .. -DENABLE_CJSON_UTILS=On -DENABLE_CJSON_TEST=Off -DCMAKE_INSTALL_PREFIX=/usr && \
+    make && \
+    make install
 
 RUN python3.7 -m pip install setuptools
 RUN python3.7 -m pip install websockets aiohttp

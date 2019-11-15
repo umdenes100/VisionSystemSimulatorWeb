@@ -84,6 +84,9 @@ async def process_command(command, working_directory, data=None):
     return stdout.decode(), True
 
 
+routes = web.RouteTableDef()
+
+
 def preprocess(code):
     # first we need to address the fact that print is subset of println
     println_reg = f"Enes100\s*\.\s*println\s*"
@@ -127,22 +130,28 @@ def preprocess(code):
     return code
 
 
-async def middleware(request):
+async def handle_get_request(request):
     if "json" in request.url.query:
         request = json.loads(request.url.query["json"])
     else:
         request = dict(request.rel_url.query)
 
-    request["id"] = uuid.uuid4().hex
-    print(f"Request: {json.dumps(request, indent=2)}")
-    command, working_directory = REQUEST_TYPES[request["type"]]
+    try:
+        request["id"] = uuid.uuid4().hex
+        print(f"Request: {json.dumps(request, indent=2)}")
+        print(f"Request type is: {REQUEST_TYPES}")
+        command, working_directory = REQUEST_TYPES[request["type"]]
 
-    if request["type"] == "simulation":
-        request["code"] = preprocess(request["code"])
+        if request["type"] == "simulation":
+            request["code"] = preprocess(request["code"])
 
-    result, success = await process_command(command, working_directory, request)
-    if request["type"] == "simulation" and success:
-        result = result[:-2] + result[-1:]  # Removing trailing comma.
+        result, success = await process_command(
+            command, working_directory, request
+        )
+        if request["type"] == "simulation" and success:
+            result = result[:-2] + result[-1:]  # Removing trailing comma.
+    except KeyError as e:
+        print(e)
 
     try:
         result_json = json.loads(result)
@@ -158,6 +167,25 @@ async def middleware(request):
     )
 
 
+@routes.post("/simulator/simulate")
+async def simulate(request):
+    print("handling simulate request")
+
+
+@routes.post("/simulator/randomize")
+async def randomize_obstacle_placement_and_osv_orientation(request):
+    print("handling randomize request")
+    result, success = await process_command(
+        command="./randomize",
+        working_directory=os.path.join(BASE_DIR, "randomization"),
+        data=None,
+    )
+    print(f"Result is {result}")
+    return web.json_response(
+        result, headers={"Access-Control-Allow-Origin": "*"}
+    )
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -167,5 +195,5 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     app = web.Application()
-    app.add_routes([web.get("/", middleware)])
+    app.add_routes(routes)
     web.run_app(app, host=args.host, port=args.port)

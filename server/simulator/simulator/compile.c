@@ -332,6 +332,7 @@ int cleanup(char *program_name) {
     sprintf(command, "%s %s %s", "rm -rf", dest, "2>&1");
 
     FILE* p = popen(command, "r");
+    
     if(!p || pclose(p)) {
         error("Unable to cleanup.", 2);
         return -1;

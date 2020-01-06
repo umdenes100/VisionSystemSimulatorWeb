@@ -24,6 +24,7 @@ public:
   bool updateLocation(int ln);
   bool mission(int ln, int message);
   bool mission(int ln, double message);
+  bool mission(int ln, const char *message);
   bool mission(int ln, Coordinate &message);
   void print(int ln, const char *message);
   void print(int ln, int message);

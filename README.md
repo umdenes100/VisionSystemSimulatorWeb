@@ -52,6 +52,14 @@ This function is used to get distance data of the obstacles in the field. The di
 
 [<img src="https://raw.githubusercontent.com/umdenes100/VisionSystemSimulatorWeb/master/images/simulator_distance_sensor_placements.png" alt="Possible Distance Sensor Placements on Simulation" title="Possible Distance Sensor Placements on Simulation" width="500">](http://github.com/umdenes100/VisionSystemSimulatorWeb/blob/master/images/simulator_distance_sensor_placements.png)
 
+#### Other libraries
+
+You can import other standard Arduino libraries by including them at the top.
+
+For example, to include the Arduino library `math.h`, you would write: `#include <math.h>` at the top of your code, which would allow you to use commands like `atan()`.
+
+Note that the angle brackets`<>` indicate you are including a system library, and quotes `""` indicate you are including a local library.
+
 ## For Staff: Docker
 
 Given that we have developers using every operating system under the sun, we have to have some way of standardizing things without making life hell for everybody. Enter Docker.

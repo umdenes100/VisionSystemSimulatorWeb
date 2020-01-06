@@ -183,7 +183,7 @@ float read_distance_sensor(struct arena arena, short index) {
         t2.x = arena.obstacles[i].location.x + arena.obstacles[i].width;
         t2.y = arena.obstacles[i].location.y;
         top.p1 = t1; top.p2 = t2;
-        
+
         struct line obstacle_sides[4] = {right, bottom, left, top};
 
         for(j = 0; j < 4; j++) {
@@ -231,7 +231,7 @@ int check_for_collisions(struct arena *arena) {
     struct line front_osv;
     front_osv.p1 = a;
     front_osv.p2 = b;
-    
+
     struct line left_osv;
     left_osv.p1 = a;
     left_osv.p2 = c;
@@ -279,7 +279,7 @@ int check_for_collisions(struct arena *arena) {
         t2.x = arena->obstacles[i].location.x + arena->obstacles[i].width;
         t2.y = arena->obstacles[i].location.y;
         top.p1 = t1; top.p2 = t2;
-        
+
         struct line obstacle_sides[4] = {right, bottom, left, top};
 
         for(j = 0; j < 4; j++) {
@@ -301,7 +301,7 @@ int check_for_collisions(struct arena *arena) {
     r2.x = 4.0;
     r2.y = 2.0;
     right.p1 = r1; right.p2 = r2;
-    
+
     struct line bottom;
     struct coordinate b1, b2;
     b1.x = 0.0;
@@ -366,7 +366,7 @@ void update_osv(struct arena *arena, int frame_no) {
         arena->osv.location.y = prev_location.y;
         arena->osv.location.theta = prev_location.theta;
     }
-    
+
     cJSON *root = cJSON_CreateObject();
     cJSON *osv = cJSON_CreateObject();
     cJSON_AddNumberToObject(root, "frame_no", frame_no);
@@ -388,7 +388,7 @@ void print_command(char *command, char *data, int ln) {
     }
 
     cJSON_AddNumberToObject(root, "line_number", ln);
-    
+
     printf("%s,", cJSON_Print(root));
     cJSON_Delete(root);
 }
@@ -530,7 +530,7 @@ struct node * process_command(struct node *in, struct process p, struct arena *a
         curr = next;
     }
 
-    return NULL;    
+    return NULL;
 }
 
 struct node * frame(struct node *in, struct process p, struct arena *arena, int *frame_no) {

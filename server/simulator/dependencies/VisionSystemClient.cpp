@@ -33,6 +33,10 @@ bool VisionSystemClient::mission(int ln, double message) {
     // Do nothing.
 }
 
+bool VisionSystemClient::mission(int ln, const char *message) {
+    // Do nothinng.
+}
+
 bool VisionSystemClient::mission(int ln, Coordinate &message) {
     // Do nothing.
 }

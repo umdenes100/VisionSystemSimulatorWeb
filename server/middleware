@@ -13,6 +13,11 @@ import os
 Executable = namedtuple('Executable', ['command', 'working_directory'])
 
 BASE_DIR = os.path.dirname(os.path.realpath(__file__))
+HEADERS={
+		"Access-Control-Allow-Origin": "*",
+		"Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+		"Access-Control-Allow-Headers" : "*"
+}
 
 REQUEST_TYPES = {
 	'randomization': Executable(
@@ -117,35 +122,36 @@ def preprocess(code):
 	return code
 
 async def middleware(request):
-	if 'json' in request.url.query:
-		request = json.loads(request.url.query['json'])
-	else:
-		request = dict(request.rel_url.query)
-
-	request['id'] = uuid.uuid4().hex
-	print(f'Request: {json.dumps(request, indent=2)}')
-	command, working_directory = REQUEST_TYPES[request['type']]
-
-	if request['type'] == 'simulation':
+	if request.method == "OPTIONS":  # Preflight request. Send back the right headers.
+		return web.json_response({}, headers=HEADERS)
+	if request.method == "POST":  # Simulation request.
+		body = await request.text()
+		request = json.loads(body)
+		request['id'] = uuid.uuid4().hex
+		command = './simulate'
+		working_directory = os.path.join(BASE_DIR, 'simulator', 'simulator')
 		request['code'] = preprocess(request['code'])
-
-	result, success = await process_command(command, working_directory, request)
-	if request['type'] == 'simulation' and success:
-		result = result[:-2] + result[-1:]  # Removing trailing comma.
-
-	try:
-		result_json = json.loads(result)
-	except json.decoder.JSONDecodeError:
-		print(f'Invalid JSON: Received result {result}')
-		print('ERROR.')
-		return
-
-	# print(f'Output: {json.dumps(result_json, indent=2)}')
-	# print()
-	return web.json_response(result_json, headers={
-		'Access-Control-Allow-Origin': '*'
-	})
-
+		result, success = await process_command(command, working_directory, request)
+		if success:
+			result = result[:-2] + result[-1:]  # Removing trailing comma.
+		try:
+			result_json = json.loads(result)
+		except:
+			error_message = f'Invalid JSON: Received result {result}'
+			return web.json_response({'error': error_message}, headers=HEADERS)
+		return web.json_response(result_json, headers=HEADERS)
+	if request.method == "GET":  # Randomization request.
+		request = dict(request.rel_url.query)
+		request['id'] = uuid.uuid4().hex
+		command = './randomize'
+		working_directory = os.path.join(BASE_DIR, 'randomization')
+		result, success = await process_command(command, working_directory, request)
+		try:
+			result_json = json.loads(result)
+		except:
+			error_message = f'Invalid JSON: Received result {result}'
+			return web.json_response({'error': error_message}, headers=HEADERS)
+		return web.json_response(result_json, headers=HEADERS)
 
 if __name__ == '__main__':
 	parser = argparse.ArgumentParser()
@@ -154,5 +160,5 @@ if __name__ == '__main__':
 	args = parser.parse_args()
 
 	app = web.Application()
-	app.add_routes([web.get('/', middleware)])
+	app.add_routes([web.get('/', middleware), web.post('/', middleware), web.options('/', middleware)])  # Calls the middleware function above.
 	web.run_app(app, host=args.host, port=args.port)

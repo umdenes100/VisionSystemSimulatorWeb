@@ -16,7 +16,7 @@ BASE_DIR = os.path.dirname(os.path.realpath(__file__))
 HEADERS={
 		"Access-Control-Allow-Origin": "*",
 		"Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-		"Access-Control-Allow-Headers" : "*"
+		"Access-Control-Allow-Headers" : "Accept, Content-Type, Origin, Referer, User-Agent"
 }
 
 REQUEST_TYPES = {

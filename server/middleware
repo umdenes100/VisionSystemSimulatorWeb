@@ -16,7 +16,7 @@ BASE_DIR = os.path.dirname(os.path.realpath(__file__))
 HEADERS={
 		"Access-Control-Allow-Origin": "*",
 		"Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-		"Access-Control-Allow-Headers" : "*"
+		"Access-Control-Allow-Headers" : "Accept, Content-Type, Origin, Referer, User-Agent"
 }
 
 REQUEST_TYPES = {
@@ -123,8 +123,10 @@ def preprocess(code):
 
 async def middleware(request):
 	if request.method == "OPTIONS":  # Preflight request. Send back the right headers.
+		print("Request method is options")
 		return web.json_response({}, headers=HEADERS)
 	if request.method == "POST":  # Simulation request.
+		print("Request method is post")
 		body = await request.text()
 		request = json.loads(body)
 		request['id'] = uuid.uuid4().hex
@@ -141,6 +143,7 @@ async def middleware(request):
 			return web.json_response({'error': error_message}, headers=HEADERS)
 		return web.json_response(result_json, headers=HEADERS)
 	if request.method == "GET":  # Randomization request.
+		print("Request method is get")
 		request = dict(request.rel_url.query)
 		request['id'] = uuid.uuid4().hex
 		command = './randomize'

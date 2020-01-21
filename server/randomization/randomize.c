@@ -63,13 +63,13 @@ void randomize(void) {
     int i, randomization = rand() % 6;
     float baseY, xMin, xMax, yMin, yMax, destX, destY;
 
-    static const int presets[6][3] = {
-        {0, 1, 2},
-        {2, 1, 0},
-        {0, 2, 1},
-        {2, 0, 1},
-        {1, 0, 2},
-        {1, 2, 0}
+    static const int presets[6][2] = {
+        {0, 1},
+        {0, 2},
+        {1, 0},
+        {1, 2},
+        {2, 0},
+        {2, 1}
     };
 
 
@@ -79,14 +79,14 @@ void randomize(void) {
     cJSON_AddItemToObject(root, "osv", osv = cJSON_CreateObject());
     cJSON_AddNumberToObject(osv, "x", 0.35);
     cJSON_AddNumberToObject(osv, "y", 0.4 + (rand() % 5)*0.3);
-    cJSON_AddNumberToObject(osv, "theta", (rand() % 4) * PI/2 - PI);
+    cJSON_AddNumberToObject(osv, "theta", (rand() % 2) * PI - PI/2);
 
     //generate obstacles
     obstacles = cJSON_CreateArray();
-    for(int i = 0; i < 3; i++) {
+    for(int i = 0; i < 2; i++) {
         baseY = presets[randomization][i] * 0.65 + OBSTACLE_HEIGHT + 0.1;
         point = cJSON_CreateObject();
-        cJSON_AddNumberToObject(point, "x", i * 0.55 + 1.5);
+        cJSON_AddNumberToObject(point, "x", i * 0.55 + 2.05);
         cJSON_AddNumberToObject(point, "y", baseY);
         cJSON_AddNumberToObject(point, "width", 0.2);
         cJSON_AddNumberToObject(point, "height", 0.5);

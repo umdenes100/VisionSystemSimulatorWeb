@@ -79,7 +79,7 @@ void randomize(void) {
     cJSON_AddItemToObject(root, "osv", osv = cJSON_CreateObject());
     cJSON_AddNumberToObject(osv, "x", 0.35);
     cJSON_AddNumberToObject(osv, "y", 0.4 + (rand() % 5)*0.3);
-    cJSON_AddNumberToObject(osv, "theta", (rand() % 4) * PI/2 - PI);
+    cJSON_AddNumberToObject(osv, "theta", (rand() % 2) * PI - PI/2);
 
     //generate obstacles
     obstacles = cJSON_CreateArray();

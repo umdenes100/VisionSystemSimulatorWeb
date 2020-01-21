@@ -15,10 +15,6 @@
 #define FIRE              3
 #define WATER             4
 
-#define RED               0
-#define GREEN             1
-#define BLUE              2
-
 #define FRESH_UNPOLLUTED  0
 #define FRESH_POLLUTED    1
 #define SALT_UNPOLLUTED   2

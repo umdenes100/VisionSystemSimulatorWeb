@@ -1,16 +1,23 @@
 # VisionSystemSimulatorWeb
 
-[![Simulator Image Capture](https://raw.githubusercontent.com/umdenes100/VisionSystemSimulatorWeb/master/images/SimulatorImage.jpg "The Vision System Simulator (Click me)")](http://enes100.umd.edu/simulatorweb)
-
-## For Students
-
 The simulator is a tool designed to give you a head start on programming and to help you learn how to program. To start off, we will look at the layout of the simulator. After that we will go into depth about the Enes100 and Tank simulator libraries and some small notes regarding coding in the simulator.
 
-### Layout
+## Layout
 
-The simulator is divided into two modes: development and simulation. In the development half of the simulator you will see the code editor, a few action buttons/checkboxes, an arena preview, and an OSV editor. The code editor comes with a 'Terminal' which allows you to see the status of your simulations and also prints the error message if your code fails to compile. The action buttons allow you to (1) see the documentation (this page) (2) randomize the arena, which will be visible on the preview, (3) perform a simulation, (4) save and download a copy of your current code, (5) access example code, and (6) alert the teaching fellows of any issues with the simulator (hopefully this is unnessesary). Additionally there are two checkboxes that allow you to (1) put the screen in dark mode or (2) add or remove obstacles from the arena. In the arena preview you will see the OSV location, the obstacle locations, the destination location, and the size of the OSV. The size of the OSV can be edited in the OSV editor. There are also 9 distance sensors that can be used to help detect obstacles.
+The simulator is divided into two modes: development and simulation. In the development half of the simulator you will see the code editor, a few action buttons/checkboxes, an arena preview, and an OSV editor. The Simulation section has only 3 elements, the code highlighting, the output console, and the visual simulation. 
 
-The Simulation section has only 3 elements, the code highlighting, the output console, and the visual simulation. The code highlighter will take the 5 most recent ENES100 or TANK function calls and highlight them. This should allow you to debug issues quickly and painlessly. The output console simply prints out all Enes100.print and Enes100.println calls. Finnally, the actual simulation will show a video simulation of your code.
+### Development
+
+The code editor comes with a 'Terminal' which allows you to see the status of your simulations and also prints the error message if your code fails to compile. The action buttons allow you to (1) see the documentation (this page) (2) randomize the arena, which will be visible on the preview, (3) perform a simulation, (4) save and download a copy of your current code, (5) access example code, and (6) alert the teaching fellows of any issues with the simulator (hopefully this is unnessesary). Additionally there are two checkboxes that allow you to (1) put the screen in dark mode or (2) add or remove obstacles from the arena. In the arena preview you will see the OSV location, the obstacle locations, the destination location, and the size of the OSV. The size of the OSV can be edited in the OSV editor. There are also 9 distance sensors that can be used to help detect obstacles.
+
+[![Simulator Image Capture](https://raw.githubusercontent.com/umdenes100/VisionSystemSimulatorWeb/master/images/DevelopmentSection.jpg "The Vision System Simulator (Click me)")](http://enes100.umd.edu/simulatorweb)
+
+### Simulation
+
+The code highlighter will take the 5 most recent ENES100 or TANK function calls and highlight them. This should allow you to debug issues quickly and painlessly. The output console simply prints out all Enes100.print and Enes100.println calls. Finnally, the actual simulation will show a video simulation of your code.
+
+[![Simulator Image Capture](https://raw.githubusercontent.com/umdenes100/VisionSystemSimulatorWeb/master/images/SimulationSection.jpg "The Vision System Simulator (Click me)")](http://enes100.umd.edu/simulatorweb)
+
 
 ### Libraries
 
@@ -59,85 +66,3 @@ You can import other standard Arduino libraries by including them at the top.
 For example, to include the Arduino library `math.h`, you would write: `#include <math.h>` at the top of your code, which would allow you to use commands like `atan()`.
 
 Note that the angle brackets`<>` indicate you are including a system library, and quotes `""` indicate you are including a local library.
-
-## For Staff: Docker
-
-Given that we have developers using every operating system under the sun, we have to have some way of standardizing things without making life hell for everybody. Enter Docker.
-
-### Setup
-
-The first thing we're going to do is make life hell for Windows users. There are multiple Docker solutions on Windows (Docker Toolbox for Windows, Docker for Windows) but only one that will not make you want to burn your computer and become a hermit.
-
-You'll want Docker for Windows. Unfortunately, this uses a hypervisor known as HyperV. It isn't compatible with Windows 10 Home. Fortunately, the university gives away 
-Windows 10 Education, which will do just fine. (This will break VirtualBox. Talk to Karam about how to fix it.)
-
-Once that's installed, install Docker for Windows. Macintosh users, install Docker for Mac.
-
-### Background
-
-Docker utilizes a technology known as containerization. Little isolated environments that share a kernel but nothing else. We have two containers in this application - client and server. Each container is set up using a Dockerfile, which is a glorified bash script.
-
-You can build these containers into static images for convenience, and even extend other people's static containers for your own use. For example, the client container extends an NGINX image and the server container extends an Ubuntu image.
-
-These containers are orchestrated using docker-compose. In our configuration file (docker-compose.yml), you can see a few features of the orchestration, notably the names of the containers, the ports within the containers that are mapped to ports on your machine, and the directories that have been mounted. Mounting directories sets up your container so that certain directories on the container are tied to local directories on your machine and will reflect changes. For example, the client directory is mounted to NGINX's serving directory, which means that if you change a client file, a browser refresh will show you the changes you made.
-
-### Use
-
-Docker and docker-compose are well documented and so I won't talk about too many commands, but here are some key useful ones to know.
-
-`docker-compose up`
-
-Creates all your containers.
-
-`docker-compose up -d`
-
-Creates all your containers and then detaches so that you can continue to use your terminal.
-
-`docker-compose up --force-recreate --build`
-
-Recreates the container and rebuilds with any changes you might have made. Useful for when you modify the server. Docker caches steps so although it takes a while the first time you run it, subsequent runs will be quicker.
-
-`docker-compose exec <container-name> bash`
-
-Opens up the container and allows you to explore it in its current state. Useful for trying stuff out and debugging. e.g. `docker-compose exec server bash`
-
-`docker-compose stop`
-
-Stops all containers.
-
-`docker-compose kill`
-
-Stops all containers, violently.
-
-## Testing
-
-We've got support for extensive and flexible testing. To create and modify tests - simply fill out and add to the tests in the tests directory. To create a new tests file, just prepend the name with `test_` to ensure that it will run.
-
-To run all the tests - 
-
-
-
-```bash
-chmod +rwx run_tests.sh
-./run_tests
-```
-
-## Restarting VisionSystemSim
-If the simulator is taking more than a few seconds to simulate, it may need to be restarted.
-
-Steps to restart:
-1. Obtain SimulatorWeb.pem from an LTF.
-2. Open a terminal and cd to the directory that contains SimulatorWeb.pem.
-3. Type the following commands:
-
-```
-ssh -i SimulatorWeb.pem ubuntu@18.191.246.34
-tmux kill-session -t sim
-tmux new -s sim
-cd VisionSystemSimulatorWeb
-sudo docker-compose up --build &>/dev/null & 
-disown
-tmux detach
-logout
-```
-What you are doing here is sshing into the system where the simulator backend is hosted, killing the current simulator backend, creating a new tab for the new simulator backend, starting up the new process, disowning it to let it keep running after you exit, and exiting.

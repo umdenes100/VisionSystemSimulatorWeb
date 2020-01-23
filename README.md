@@ -10,7 +10,7 @@ The simulator is divided into two modes: development and simulation. In the deve
 
 The code editor comes with a 'Terminal' which allows you to see the status of your simulations and also prints the error message if your code fails to compile. The action buttons allow you to (1) see the documentation (this page) (2) randomize the arena, which will be visible on the preview, (3) perform a simulation, (4) save and download a copy of your current code, (5) access example code, and (6) alert the teaching fellows of any issues with the simulator (hopefully this is unnessesary). Additionally there are two checkboxes that allow you to (1) put the screen in dark mode or (2) add or remove obstacles from the arena. In the arena preview you will see the OSV location, the obstacle locations, the destination location, and the size of the OSV. The size of the OSV can be edited in the OSV editor. There are also 9 distance sensors that can be used to help detect obstacles.
 
-[![Simulator Image Capture](https://raw.githubusercontent.com/umdenes100/VisionSystemSimulatorWeb/master/images/SimulatorImage.jpg "The Vision System Simulator (Click me)")](http://enes100.umd.edu/simulatorweb)
+[![Simulator Image Capture](https://raw.githubusercontent.com/umdenes100/VisionSystemSimulatorWeb/master/images/DevelopmentSection.jpg "The Vision System Simulator (Click me)")](http://enes100.umd.edu/simulatorweb)
 
 ### Simulation
 

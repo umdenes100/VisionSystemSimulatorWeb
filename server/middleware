@@ -118,7 +118,7 @@ def preprocess(code):
 							curr_code += rep + tack_on
 							done = True
 		code = curr_code
-
+	print(code)
 	return code
 
 async def middleware(request):

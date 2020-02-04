@@ -78,7 +78,7 @@ void randomize(void) {
     cJSON_AddItemToObject(root, "type", cJSON_CreateString("randomization"));
     cJSON_AddItemToObject(root, "osv", osv = cJSON_CreateObject());
     cJSON_AddNumberToObject(osv, "x", 0.35);
-    cJSON_AddNumberToObject(osv, "y", 0.4 + (rand() % 5)*0.3);
+    cJSON_AddNumberToObject(osv, "y", 0.4 + (rand() % 4)*0.4);
     cJSON_AddNumberToObject(osv, "theta", (rand() % 2) * PI - PI/2);
 
     //generate obstacles
@@ -86,7 +86,7 @@ void randomize(void) {
     for(int i = 0; i < 2; i++) {
         baseY = presets[randomization][i] * 0.65 + OBSTACLE_HEIGHT + 0.1;
         point = cJSON_CreateObject();
-        cJSON_AddNumberToObject(point, "x", i * 0.55 + 2.05);
+        cJSON_AddNumberToObject(point, "x", i * 0.7 + 1.8);
         cJSON_AddNumberToObject(point, "y", baseY);
         cJSON_AddNumberToObject(point, "width", 0.2);
         cJSON_AddNumberToObject(point, "height", 0.5);

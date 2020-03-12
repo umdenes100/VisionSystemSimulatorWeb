@@ -210,7 +210,7 @@ int create_hdr_file(struct match_list functions, char *file) {
         return -1;
     }
 
-    fputs("#ifndef PROTOTYPES_H\n#define PROTOTYPES_H\n\n", fp);
+    fputs("#include \"VisionSystemClient.hpp\"\n\n#ifndef PROTOTYPES_H\n#define PROTOTYPES_H\n\n", fp);
     
     int i;
     for(i = 0; i < functions.n_matches; i++) {

@@ -60,12 +60,8 @@ void randomize(void) {
     cJSON *point = NULL;
     cJSON *obstacles = NULL;
     cJSON *dest = NULL;
-    int i, randomization = rand() % 6;
+    int i, randomization = rand() % 4;
     float baseY, xMin, xMax, yMin, yMax, destX, destY;
-
-
-
-
 
     int flipFlop = rand() % 2;
     int randColor = rand() % 2;

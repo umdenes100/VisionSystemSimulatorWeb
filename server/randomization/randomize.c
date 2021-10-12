@@ -62,11 +62,7 @@ void randomize(void) {
     cJSON *dest = NULL;
     int i, randomization = rand() % 4;
     float baseY, xMin, xMax, yMin, yMax, destX, destY;
-
     int flipFlop = rand() % 2;
-    int randColor = rand() % 2;
-    //mStartingLocation.x = 0.55;
-    //mStartingLocation.y = 0.55 + (flipFlop) * 0.9;  
 
     //generate starting location
     root = cJSON_CreateObject();
@@ -78,7 +74,7 @@ void randomize(void) {
 
     //generate destination
     dest = cJSON_CreateObject();
-    cJSON_AddNumberToObject(dest, "x", 0.55);
+    destX = 0.55;
 
     static int presets[4][3] = {
         {0, 2},
@@ -88,7 +84,7 @@ void randomize(void) {
     };
 
     if(flipFlop) {
-	cJSON_AddNumberToObject(dest, "y", 0.55);
+	destY = 0.55;
         cJSON_AddNumberToObject(osv, "theta", (rand() % 180) * 2 * PI / 360);
 	presets[0][0] = 0;
         presets[0][1] = 2;
@@ -102,7 +98,7 @@ void randomize(void) {
         presets[3][0] = 2;
         presets[3][1] = 1;
     } else {
-	cJSON_AddNumberToObject(dest, "y", 1.45);
+	destY = 1.45;
 	cJSON_AddNumberToObject(osv, "theta", ((rand() % 180)+180) * 2 * PI / 360);
         presets[0][0] = 0;
         presets[0][1] = 1;
@@ -118,6 +114,8 @@ void randomize(void) {
 
     }
 
+    cJSON_AddNumberToObject(dest, "x", destX);
+    cJSON_AddNumberToObject(dest, "y", destY);
     cJSON_AddItemToObject(root, "destination", dest);
 
 /*

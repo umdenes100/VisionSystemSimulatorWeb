@@ -79,7 +79,6 @@ void randomize(void) {
     //generate destination
     dest = cJSON_CreateObject();
     cJSON_AddNumberToObject(dest, "x", 0.55);
-    cJSON_AddItemToObject(root, "destination", dest);
 
     static int presets[4][3] = {
         {0, 2},

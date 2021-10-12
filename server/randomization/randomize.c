@@ -116,7 +116,6 @@ void randomize(void) {
 
     cJSON_AddNumberToObject(dest, "x", destX);
     cJSON_AddNumberToObject(dest, "y", destY);
-    cJSON_AddItemToObject(root, "destination", dest);
 
 /*
     static const int presets[6][2] = {
@@ -150,7 +149,7 @@ void randomize(void) {
         cJSON_AddItemToArray(obstacles, point);
     }
     cJSON_AddItemToObject(root, "obstacles", obstacles);
-
+    cJSON_AddItemToObject(root, "destination", dest);
 
 /*
     //generate destination

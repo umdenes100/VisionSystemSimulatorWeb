@@ -1,20 +1,20 @@
 # VisionSystemSimulatorWeb
 
-The simulator is a tool designed to give you a head start on programming and to help you learn how to program. To start off, we will look at the layout of the simulator. After that we will go into depth about the Enes100 and Tank simulator libraries and some small notes regarding coding in the simulator.
+The simulator is a tool designed to give you a head start on programming and to help you learn how to program using the Vision System. To start off, we will look at the layout of the simulator. After that we will go into depth about the Enes100 and Tank simulator libraries and some small notes regarding coding in the simulator.
 
 ## Layout
 
-The simulator is divided into two modes: development and simulation. In the development half of the simulator you will see the code editor, a few action buttons/checkboxes, an arena preview, and an OSV editor. The Simulation section has only 3 elements, the code highlighting, the output console, and the visual simulation. 
+The simulator is divided into two modes: development and simulation. In the development half of the simulator you will see the code editor, a few action buttons/checkboxes, an arena preview, and an OSV editor. The Simulation section has three elements: the code highlighting, the output console, and the visual simulation. 
 
 ### Development
 
-The code editor comes with a 'Terminal' which allows you to see the status of your simulations and also prints the error message if your code fails to compile. The action buttons allow you to (1) see the documentation (this page) (2) randomize the arena, which will be visible on the preview, (3) perform a simulation, (4) save and download a copy of your current code, (5) access example code, and (6) alert the teaching fellows of any issues with the simulator (hopefully this is unnessesary). Additionally there are two checkboxes that allow you to (1) put the screen in dark mode or (2) add or remove obstacles from the arena. In the arena preview you will see the OSV location, the obstacle locations, the destination location, and the size of the OSV. The size of the OSV can be edited in the OSV editor. There are also 9 distance sensors that can be used to help detect obstacles.
+The code editor comes with a 'Terminal' which allows you to see the status of your simulations and also prints the error message if your code fails to compile. The action buttons allow you to (1) see the documentation (this page) (2) randomize the arena, which will be visible on the preview, (3) perform a simulation, (4) save and download a copy of your current code, (5) access example code, and (6) alert the teaching fellows of any issues with the simulator (hopefully this is unnessesary). Additionally there are two checkboxes that allow you to (1) put the screen in dark mode or (2) add or remove obstacles from the arena. In the arena preview you will see the OSV location, the obstacle locations, the destination location, and the size of the OSV. The size of the OSV can be edited in the OSV editor. There are also 9 ultrasonic distance sensors that can be used to help detect obstacles.
 
 [![Simulator Image Capture](https://raw.githubusercontent.com/umdenes100/VisionSystemSimulatorWeb/master/images/DevelopmentSection.jpg "The Vision System Simulator (Click me)")](http://enes100.umd.edu/simulatorweb)
 
 ### Simulation
 
-The code highlighter will take the 5 most recent ENES100 or TANK function calls and highlight them. This should allow you to debug issues quickly and painlessly. The output console simply prints out all Enes100.print and Enes100.println calls. Finnally, the actual simulation will show a video simulation of your code.
+The code highlighter will take the five most-recent ENES100 or TANK function calls and highlight them. This should allow you to debug issues quickly and painlessly. The output console simply prints out all Enes100.print and Enes100.println calls. Finnally, the actual simulation will show a video simulation of your code.
 
 [![Simulator Image Capture](https://raw.githubusercontent.com/umdenes100/VisionSystemSimulatorWeb/master/images/SimulationSection.jpg "The Vision System Simulator (Click me)")](http://enes100.umd.edu/simulatorweb)
 
@@ -26,7 +26,7 @@ The simulator uses a variant of the Enes100 and Tank libraries provided for the 
 #### Enes100
 
 ```Enes100::begin(char *, int, int, int, int)```
-This function initializes the Enes100 object and is required in order to utilize any other Enes100 related functions in the code. It also sets the Enes100.destination.x, y, and theta variables which are used to locate the destination in the arena.
+This function initializes the Enes100 object and is required in order to utilize any other Enes100 related functions in the code. It also sets the Enes100.destination.x, y, and theta variables which are used to locate the destination zone in the arena.
 
 ```Enes100::updateLocation()```
 This function updates the Enes100.location.x, y, and theta variables in the object to the latest location of the OSV in the simulation.

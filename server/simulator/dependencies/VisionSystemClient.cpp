@@ -1,229 +1,124 @@
 #include "VisionSystemClient.hpp"
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
 Coordinate::Coordinate() {
-    init(0, 0, 0);
+  init(0, 0, 0);
 }
 
 Coordinate::Coordinate(double x, double y) {
-    init(x, y, 0);
+  init(x, y, 0);
 }
 
 Coordinate::Coordinate(double x, double y, double theta) {
-    init(x, y, theta);
+  init(x, y, theta);
 }
 
 void Coordinate::init(double x, double y, double theta) {
-    this->x = x;
-    this->y = y;
-    this->theta = theta;
+  this->x = x;
+  this->y = y;
+  this->theta = theta;
 }
 
 bool VisionSystemClient::ping() {
-    // Do nothing.
+  mSerial->write((byte) OP_PING);
+  mSerial->write(FLUSH_SEQUENCE, 4);
+  mSerial->flush();
+  
+  return receive(NULL);
 }
 
-bool VisionSystemClient::mission(int ln, int message) {
-    // Do nothing.
+bool VisionSystemClient::begin(const char* teamName, int teamType, int markerId, int rxPin, int txPin) {
+  delay(3000);
+  mMarkerId = markerId;
+  mSerial = new SoftwareSerial(rxPin, txPin);
+  mSerial->begin(9600);
+  
+  while (mSerial->available()) {
+    mSerial->read();
+  }
+  
+  mSerial->write(OP_BEGIN);
+  mSerial->write(teamType);
+  mSerial->write(teamName);
+  mSerial->write(FLUSH_SEQUENCE, 4);
+  mSerial->flush();
+  
+  return receive(&missionSite);
 }
 
-bool VisionSystemClient::mission(int ln, double message) {
-    // Do nothing.
+bool VisionSystemClient::updateLocation() {
+  mSerial->write(OP_LOCATION);
+  mSerial->write((byte*) &mMarkerId, 2);
+  mSerial->write(FLUSH_SEQUENCE, 4);
+  mSerial->flush();
+  
+  return receive(&location);
 }
 
-bool VisionSystemClient::mission(int ln, const char *message) {
-    // Do nothinng.
+bool VisionSystemClient::mission(int type, int message) {
+  mSerial->write(OP_MISSION);
+  mSerial->write(type);
+  mSerial->print(message);
+  mSerial->write(FLUSH_SEQUENCE, 4);
+  mSerial->flush();
+  
+  return receive(NULL);
 }
 
-bool VisionSystemClient::mission(int ln, Coordinate &message) {
-    // Do nothing.
+bool VisionSystemClient::mission(int type, double message) {
+  mSerial->write(OP_MISSION);
+  mSerial->write(type);
+  mSerial->print(message);
+  mSerial->write(FLUSH_SEQUENCE, 4);
+  mSerial->flush();
+  
+  return receive(NULL);
+}
+bool VisionSystemClient::mission(int type, char message) {
+  mSerial->write(OP_MISSION);
+  mSerial->write(type);
+  mSerial->print(message);
+  mSerial->write(FLUSH_SEQUENCE, 4);
+  mSerial->flush();
+
+  return receive(NULL);
 }
 
-bool VisionSystemClient::begin(int ln, const char *teamName, int teamType, int markerId, int rxPin, int txPin) {
-    // Do what we want.
-    this->init = true;
-    fputc('\x00', stdout);
-    fputc((char)(ln), stdout);
-    fputc((char)(ln >> 8), stdout);
-    fputc((char)(ln >> 16), stdout);
-    fputc((char)(ln >> 24), stdout);
-    fflush(stdout);
-
-    char x[4];
-    x[0] = fgetc(stdin); x[1] = fgetc(stdin); x[2] = fgetc(stdin); x[3] = fgetc(stdin);
-    char y[4];
-    y[0] = fgetc(stdin); y[1] = fgetc(stdin); y[2] = fgetc(stdin); y[3] = fgetc(stdin);
-    char theta[4];
-    theta[0] = fgetc(stdin); theta[1] = fgetc(stdin); theta[2] = fgetc(stdin); theta[3] = fgetc(stdin);
-
-    float x_f = *(float *)x;
-    float y_f = *(float *)y;
-    float theta_f = *(float *)theta;
-
-    this->destination = Coordinate(x_f, y_f, theta_f);
-    return true;
+bool VisionSystemClient::mission(int type, Coordinate& message) {
+  mSerial->write(OP_MISSION);
+  mSerial->write(type);
+  mSerial->print(message.x);
+  mSerial->print(',');
+  mSerial->print(message.y);
+  mSerial->print(',');
+  mSerial->print(message.theta);
+  mSerial->write(FLUSH_SEQUENCE, 4);
+  mSerial->flush();
+  
+  return receive(NULL);
 }
 
-bool VisionSystemClient::updateLocation(int ln) {
-    // Do what we want.
-    if (this->init) {
-        fputc('\x01', stdout);
-        fputc((char)(ln), stdout);
-        fputc((char)(ln >> 8), stdout);
-        fputc((char)(ln >> 16), stdout);
-        fputc((char)(ln >> 24), stdout);
-        fflush(stdout);
-
-        char x[4];
-        x[0] = fgetc(stdin); x[1] = fgetc(stdin); x[2] = fgetc(stdin); x[3] = fgetc(stdin);
-        char y[4];
-        y[0] = fgetc(stdin); y[1] = fgetc(stdin); y[2] = fgetc(stdin); y[3] = fgetc(stdin);
-        char theta[4];
-        theta[0] = fgetc(stdin); theta[1] = fgetc(stdin); theta[2] = fgetc(stdin); theta[3] = fgetc(stdin);
-
-        float x_f = *(float *)x;
-        float y_f = *(float *)y;
-        float theta_f = *(float *)theta;
-
-        this->location = Coordinate(x_f, y_f, theta_f);
-        return true;
-    } else {
-        return false;
-    }
-}
-
-void VisionSystemClient::print(int ln, const char *message) {
-    // Do what we want.
-    if (this->init) {
-        int s_len = strlen(message);
-        if (s_len <= 255) {
-            fputc('\x02', stdout);
-            fputc((char)(ln), stdout);
-            fputc((char)(ln >> 8), stdout);
-            fputc((char)(ln >> 16), stdout);
-            fputc((char)(ln >> 24), stdout);
-            fputc((char)(s_len + 1), stdout);
-            fputs(message, stdout);
-            fputc('\x0', stdout);
-            fflush(stdout);
-
-            while (fgetc(stdin) != '\x08');
+bool VisionSystemClient::receive(Coordinate* coordinate) {
+  unsigned long start = millis();
+  int pos = 0;
+  byte buffer[13];
+  
+  while (millis() - start < 120 && pos < 13) {
+    if (mSerial->available()) {
+      buffer[pos++] = mSerial->read();
+      if (buffer[0] == 1 || buffer[0] == 7 || buffer[0] == 9) {
+        return coordinate == NULL;
+      } else if (pos == 13) {
+        if (coordinate != NULL) {
+          coordinate->x = *(float *) (buffer + 1);
+          coordinate->y = *(float *) (buffer + 5);
+          coordinate->theta = *(float *) (buffer + 9);
+          return true;
+        } else {
+          return false;
         }
+      }
     }
-}
-
-void VisionSystemClient::print(int ln, int message) {
-    // Do what we want.
-    if (this->init) {
-        char str[256];
-        sprintf(str, "%d", message);
-        fputc('\x02', stdout);
-        fputc((char)(ln), stdout);
-        fputc((char)(ln >> 8), stdout);
-        fputc((char)(ln >> 16), stdout);
-        fputc((char)(ln >> 24), stdout);
-        fputc((char)(strlen(str) + 1), stdout);
-        fputs(str, stdout);
-        fputc('\x0', stdout);
-        fflush(stdout);
-
-        while (fgetc(stdin) != '\x08');
-    }
-}
-
-void VisionSystemClient::print(int ln, double message) {
-    // Do what we want.
-    if (this->init) {
-        char str[256];
-        sprintf(str, "%f", message);
-        fputc('\x02', stdout);
-        fputc((char)(ln), stdout);
-        fputc((char)(ln >> 8), stdout);
-        fputc((char)(ln >> 16), stdout);
-        fputc((char)(ln >> 24), stdout);
-        fputc((char)(strlen(str) + 1), stdout);
-        fputs(str, stdout);
-        fputc('\x0', stdout);
-        fflush(stdout);
-
-        while (fgetc(stdin) != '\x08');
-    }
-}
-
-void VisionSystemClient::println(int ln, const char *message) {
-    // Do what we want.
-    if (this->init) {
-        int s_len = strlen(message);
-        if (s_len <= 254) {
-            char str[256];
-            sprintf(str, "%s\n", message);
-            fputc('\x02', stdout);
-            fputc((char)(ln), stdout);
-            fputc((char)(ln >> 8), stdout);
-            fputc((char)(ln >> 16), stdout);
-            fputc((char)(ln >> 24), stdout);
-            fputc((char)(s_len + 2), stdout);
-            fputs(str, stdout);
-            fputc('\x0', stdout);
-            fflush(stdout);
-
-            while (fgetc(stdin) != '\x08');
-        }
-    }
-}
-
-void VisionSystemClient::println(int ln, int message) {
-    // Do what we want.
-    if (this->init) {
-        char str[256];
-        sprintf(str, "%d\n", message);
-        fputc('\x02', stdout);
-        fputc((char)(ln), stdout);
-        fputc((char)(ln >> 8), stdout);
-        fputc((char)(ln >> 16), stdout);
-        fputc((char)(ln >> 24), stdout);
-        fputc((char)(strlen(str) + 2), stdout);
-        fputs(str, stdout);
-        fputc('\x0', stdout);
-        fflush(stdout);
-
-        while (fgetc(stdin) != '\x08');
-    }
-}
-
-void VisionSystemClient::println(int ln, double message) {
-    // Do what we want.
-    if (this->init) {
-        char str[256];
-        sprintf(str, "%f\n", message);
-        fputc('\x02', stdout);
-        fputc((char)(ln), stdout);
-        fputc((char)(ln >> 8), stdout);
-        fputc((char)(ln >> 16), stdout);
-        fputc((char)(ln >> 24), stdout);
-        fputc((char)(strlen(str) + 2), stdout);
-        fputs(str, stdout);
-        fputc('\x0', stdout);
-        fflush(stdout);
-
-        while (fgetc(stdin) != '\x08');
-    }
-}
-
-void delay(int ln, int msec) {
-    // Do what we want.
-    fputc('\x07', stdout);
-    fputc((char)(ln), stdout);
-    fputc((char)(ln >> 8), stdout);
-    fputc((char)(ln >> 16), stdout);
-    fputc((char)(ln >> 24), stdout);
-    fputc((char)(msec), stdout);
-    fputc((char)(msec >> 8), stdout);
-    fputc((char)(msec >> 16), stdout);
-    fputc((char)(msec >> 24), stdout);
-    fflush(stdout);
-
-    while (fgetc(stdin) != '\x08');
+  }
+  
+  return false;
 }

@@ -97,6 +97,7 @@ def preprocess(code):
 				tack_on = ''
 				stack = 0
 				done = False
+				parens = False
 				for i in range(len(sector)):
 					if done:
 						curr_code += sector[i]
@@ -104,10 +105,11 @@ def preprocess(code):
 						tack_on += sector[i]
 						if sector[i] == '(':
 							stack += 1
+							parens = True
 						elif sector[i] == ')':
 							stack -= 1
 
-						if stack == 0:
+						if stack == 0 and parens:
 							# we have reached the end of what we need to tack on
 							tack_on = tack_on[1:len(tack_on) - 1].strip()
 							if tack_on == '':
@@ -115,6 +117,10 @@ def preprocess(code):
 							else:
 								tack_on = '(__LINE__ - 2, ' + tack_on + ')'
 
+							curr_code += rep + tack_on
+							done = True
+						elif stack == 0 and not parens:
+							tack_on = 'S' # mission() messes up missionSite
 							curr_code += rep + tack_on
 							done = True
 		code = curr_code

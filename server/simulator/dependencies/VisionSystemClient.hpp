@@ -1,24 +1,13 @@
 #ifndef VisionSystemClient_hpp
 #define VisionSystemClient_hpp
 
-#include "Arduino.h"
-#include "SoftwareSerial.h"
-
-// Transmission opcodes
-#define OP_PING     0
-#define OP_BEGIN    2
-#define OP_LOCATION 4
-#define OP_MISSION  6
-#define OP_PRINT    8
-
-const byte FLUSH_SEQUENCE[] = {0xFF, 0xFE, 0xFD, 0xFC};
-
-class Coordinate {
+class Coordinate
+{
 public:
   Coordinate();
   Coordinate(double x, double y);
   Coordinate(double x, double y, double theta);
-  
+
   double x;
   double y;
   double theta;
@@ -27,48 +16,30 @@ private:
   void init(double x, double y, double theta);
 };
 
-class VisionSystemClient {
+class VisionSystemClient
+{
 public:
   bool ping();
-  bool begin(const char* teamName, int teamType, int markerId, int rxPin, int txPin);
-  bool updateLocation();
-  bool mission(int type, int message);
-  bool mission(int type, double message);
-  bool mission(int type, char message);
-  bool mission(int type, Coordinate& message);
-  template <typename T>
-  void print(T message);
-  template <typename T>
-  void println(T message);
-  
+  bool begin(int ln, const char *teamName, int teamType, int markerId, int rxPin, int txPin);
+  bool updateLocation(int ln);
+  bool mission(int ln, int message);
+  bool mission(int ln, double message);
+  bool mission(int ln, const char *message);
+  bool mission(int ln, Coordinate &message);
+  void print(int ln, const char *message);
+  void print(int ln, int message);
+  void print(int ln, double message);
+  void println(int ln, const char *message);
+  void println(int ln, int message);
+  void println(int ln, double message);
+
   Coordinate location;
-  Coordinate missionSite;
-  
+  Coordinate destination;
+
 private:
-  bool receive(Coordinate* coordinate = NULL);
-  
-  int mMarkerId;
-  SoftwareSerial* mSerial;
+  bool init = false;
 };
 
-/**
- * Templated functions have to be in the header file
- **/
-template <typename T>
-void VisionSystemClient::print(T message) {
-  mSerial->write(OP_PRINT);
-  mSerial->print(message);
-  mSerial->write(FLUSH_SEQUENCE, 4);
-  mSerial->flush();
-}
-
-template <typename T>
-void VisionSystemClient::println(T message) {
-  mSerial->write(OP_PRINT);
-  mSerial->print(message);
-  mSerial->write('\n');
-  mSerial->write(FLUSH_SEQUENCE, 4);
-  mSerial->flush();
-}
+void delay(int ln, int msec);
 
 #endif /* VisionSystemClient_hpp */

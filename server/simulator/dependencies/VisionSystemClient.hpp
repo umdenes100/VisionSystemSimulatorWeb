@@ -34,7 +34,7 @@ public:
   void println(int ln, double message);
 
   Coordinate location;
-  Coordinate destination;
+  Coordinate missionSite;
 
 private:
   bool init = false;

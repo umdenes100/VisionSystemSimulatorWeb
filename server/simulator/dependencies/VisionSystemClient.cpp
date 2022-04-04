@@ -62,7 +62,7 @@ bool VisionSystemClient::begin(int ln, const char *teamName, int teamType, int m
     float y_f = *(float *)y;
     float theta_f = *(float *)theta;
 
-    this->destination = Coordinate(x_f, y_f, theta_f);
+    this->missionSite = Coordinate(x_f, y_f, theta_f);
     return true;
 }
 

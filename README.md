@@ -15,6 +15,7 @@ The code editor comes with a 'Terminal' which allows you to see the status of yo
 4. Save and download a copy of your current code.
 5. Access example code.
 6. Alert the teaching fellows of any issues with the simulator (hopefully this is unnessesary). 
+
 Additionally there are two checkboxes that allow you to 
 1. Put the screen in dark mode.
 2. Add or remove obstacles from the arena. 

@@ -9,23 +9,24 @@
 
 // this function will retrieve all matches to the regex in the string
 struct match_list get_all_matches(regex_t r, char *to_match) {
-    char **matches = (char**)malloc(1 * sizeof(char*));
+    char **matches = (char**)malloc(1 * sizeof(char*));  //why multiply by 1? also need to figure out this pointer math
     int n_matches = 0;
 
     while(1) {
-        regmatch_t details;
+        regmatch_t details; //records the matches of the regex, the first element records the part of the string that matches the entire element
 
         if(!regexec(&r, to_match, (size_t) 1, &details, 0)) {
             // we have a match, now we need to extract the match
             n_matches++;
-            matches = (char**)realloc(matches, n_matches * sizeof(char*));
-            matches[n_matches - 1] = (char*)malloc((details.rm_eo - details.rm_so + 1) * sizeof(char));
+            matches = (char**)realloc(matches, n_matches * sizeof(char*)); //reallocating memory
+            //subtract the offset of the beginning and end of the match and then we get the number of characters
+            matches[n_matches - 1] = (char*)malloc((details.rm_eo - details.rm_so + 1) * sizeof(char)); 
             int i;
             for(i = details.rm_so; i < details.rm_eo; i++) {
-                matches[n_matches - 1][i - details.rm_so] = to_match[i];
+                matches[n_matches - 1][i - details.rm_so] = to_match[i]; //seems like we are adding the match to array
             }
 
-            matches[n_matches - 1][i - details.rm_so] = '\0';
+            matches[n_matches - 1][i - details.rm_so] = '\0'; //null termination
             
             // now we want to move on to next possible match
             to_match += details.rm_eo;
@@ -56,8 +57,8 @@ struct match_list get_function_declarations(char *file_name, int *status_code) {
 
     int n_characters = 0;
     int braces_stack = 0;
-    char *first_level_code = (char*)malloc(1 * sizeof(char));
-    first_level_code[0] = '\0';
+    char *first_level_code = (char*)malloc(1 * sizeof(char)); //initial pointer
+    first_level_code[0] = '\0'; //null
 
 
     // first we want to extract all of the code not in functions.
@@ -69,14 +70,16 @@ struct match_list get_function_declarations(char *file_name, int *status_code) {
             braces_stack--;
         } else if(braces_stack == 0) {
             n_characters++;
-            first_level_code = (char*)realloc(first_level_code, (n_characters + 1) * sizeof(char));
+            //reallocate first_level_code with the number of characters
+            first_level_code = (char*)realloc(first_level_code, (n_characters + 1) * sizeof(char)); 
 
+            //guessign this is to prevent shananigens involved once we put 'c' into array
             if(c == '\n' || c == '\r') {
                 c = ' ';
             }
 
             first_level_code[n_characters - 1] = c;
-            first_level_code[n_characters] = '\0';
+            first_level_code[n_characters] = '\0'; // end is null terminated
 
             if(c == ')') {
                 // we need to add this to help with the regex (c has a weird regex matching rule)
@@ -107,7 +110,7 @@ struct match_list get_function_declarations(char *file_name, int *status_code) {
     struct match_list matches = get_all_matches(regex, first_level_code);
     // printf("%d\n", matches.n_matches);
 
-    free(first_level_code);
+    free(first_level_code); 
     fclose(fp);
 
     return matches;
@@ -115,6 +118,7 @@ struct match_list get_function_declarations(char *file_name, int *status_code) {
 
 // this function creates a directory for the program using the program name
 int create_dir(char *name) {
+    //is 17 connected to the "../environments/" ?
     char dest[17 + strlen(name) + 1];
 
     int i;
@@ -136,10 +140,10 @@ int create_dir(char *name) {
 struct file_names get_file_names(char *file_name) {
     int s_len = strlen("../environments/");
     int f_len = strlen(file_name);
-    int src_len = s_len + 2 * f_len + 1 + strlen(".cpp");
+    int src_len = s_len + 2 * f_len + 1 + strlen(".cpp"); //what's the point of 2*f_len?
     int hdr_len = s_len + 2 * f_len + 1 + strlen(".h");
 
-    char *src = (char*)malloc((src_len + 1) * sizeof(char));
+    char *src = (char*)malloc((src_len + 1) * sizeof(char)); 
     char *hdr = (char*)malloc((hdr_len + 1) * sizeof(char));
 
     int i;
@@ -186,7 +190,7 @@ int create_src_file(char *code, struct file_names files) {
         error("Unable to create src file.", 2);
         return -1;
     }
-
+    //we are writing the contents below into the src file
     char n_line[strlen("#include ''") + strlen(files.hdr) + 2];
     n_line[0] = '\0';
     strcat(n_line, "#include \"");

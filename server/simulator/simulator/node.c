@@ -3,7 +3,7 @@
 #include "node.h"
 
 struct node * new_node(char *curr_buff, int curr_size) {
-    struct node *n = (struct node *)malloc(1 * sizeof(struct node));
+    struct node *n = (struct node *)malloc(1 * sizeof(struct node));    //looks like a linked list
     n->next = NULL;
     n->data = curr_buff;
     n->size = curr_size;

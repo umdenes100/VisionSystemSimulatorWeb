@@ -34,7 +34,7 @@ REQUEST_TYPES = {
 	),
 }
 
-
+# all the functions that are supported by us
 functions = {
 	'Enes100': ['begin', 'updateLocation', 'mission', 'print', 'println'],
 	'Tank': ['readDistanceSensor', 'turnOffMotors', 'setRightMotorPWM', 'setLeftMotorPWM'],

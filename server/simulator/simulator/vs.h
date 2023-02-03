@@ -4,7 +4,7 @@
 #include "simulator.h"
 #include "node.h"
 
-#define PI 3.1415926535f
+#define PI 3.1415926535f  //pi defined twice
 #define FE_FPS 60
 #define SEC_TO_CROSS 12.0f
 #define METERS_PER_FRAME (1/(FE_FPS * SEC_TO_CROSS / 4.0f))

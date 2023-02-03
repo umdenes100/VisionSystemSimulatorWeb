@@ -24,7 +24,7 @@ char* get_input() {
 
     while((c = getchar()) != EOF) {
         n_characters++;
-        string = (char*)realloc(string, (n_characters + 1) * sizeof(char));
+        string = (char*)realloc(string, (n_characters + 1) * sizeof(char)); //the +1 is to account for the null termination
         string[n_characters] = '\0';
         string[n_characters - 1] = c;
     }
@@ -129,7 +129,7 @@ int ngets(char *new_buffer, int fd) {
 
 struct process copen(char *command) {
     char *argv[] = { NULL };
-    int in_pipe[2];
+    int in_pipe[2];  //pipe bullshit
     int out_pipe[2];
 
     if(pipe(in_pipe) < 0) {
@@ -141,8 +141,9 @@ struct process copen(char *command) {
     }
 
     int pid = fork();
+    //both processes are going to run the code below
     switch(pid) {
-        case -1:
+        case -1: 
         // this error
         error("Unable to fork.", 4);
         case 0:
@@ -165,7 +166,7 @@ struct process copen(char *command) {
         exit(0);
         break;
         default:
-        // this is parent with child pid
+        // this is parent with child pid, this runs concurrently with the child process
         close(out_pipe[0]);
         close(in_pipe[1]);
         break;
@@ -197,12 +198,12 @@ unsigned long time_nsec() {
 
 int main(int argc, char *argv[]) {
     char *input = get_input();
-    cJSON *json = cJSON_Parse(input);
+    cJSON *json = cJSON_Parse(input); //parsing the input into a json file?
 
     if(json == NULL) {
-        error("Unable to parse JSON.", 1);
+        error("Unable to parse JSON.", 1); 
     }
-
+    //*json is a tree
     cJSON *parent_json = json;
     cJSON *child_json = json->child;
 

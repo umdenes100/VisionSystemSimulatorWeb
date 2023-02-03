@@ -10,10 +10,10 @@
 #include "node.h"
 #include "vs.h"
 
-#define SENSOR_RANGE 1.0f
+#define SENSOR_RANGE 1.0f 
 #define PI 3.1415926535f
 #define BUFF_SIZE 262
-#define EPSILON 0.000001f
+#define EPSILON 0.000001f //represents zero, old guys must have come across something that cuased them to use this.
 #define ROTATIONS_PER_SECOND 0.25f
 #define max(x1,x2) ((x1) > (x2) ? (x1) : (x2))
 #define min(x1,x2) ((x1) < (x2) ? (x1) : (x2))
@@ -23,7 +23,7 @@ char buffer [BUFF_SIZE];
 unsigned short buffer_pos = 0;
 
 float cross_product(struct coordinate a, struct coordinate b) {
-    return a.x * b.y - b.x * a.y;
+    return a.x * b.y - b.x * a.y;                               
 }
 
 float dot_product(struct coordinate a, struct coordinate b) {
@@ -33,11 +33,11 @@ float dot_product(struct coordinate a, struct coordinate b) {
 struct coordinate * line_segment_intersect(struct coordinate p, struct coordinate p2, struct coordinate q, struct coordinate q2) {
     struct coordinate r = {p2.x - p.x, p2.y - p.y, 0.0};
     struct coordinate s = {q2.x - q.x, q2.y - q.y, 0.0};
-    struct coordinate qminp = {q.x - p.x, q.y - p.y, 0.0};
-    float rxs = cross_product(r, s);
-    float qpxr = cross_product(qminp, r);
-    float qminp_dot_r = dot_product(qminp, r);
-    float qminp_dot_s = dot_product(qminp, s);
+    struct coordinate qminp = {q.x - p.x, q.y - p.y, 0.0};  //q - p
+    float rxs = cross_product(r, s);  // r (cross prod) s
+    float qpxr = cross_product(qminp, r); // (q-p) (cross prod) r
+    float qminp_dot_r = dot_product(qminp, r); // (q-p) (dot prod) r
+    float qminp_dot_s = dot_product(qminp, s); // (q-p) (dot prod) r
 
     // If r x s = 0 and (q - p) x r = 0, then the two lines are collinear.
     if(abs(rxs) < EPSILON && abs(qpxr) < EPSILON) {
@@ -101,10 +101,10 @@ float read_distance_sensor(struct arena arena, short index) {
     float cos_theta = cos(arena.osv.location.theta);
     float sin_theta = sin(arena.osv.location.theta);
 
-    struct coordinate midPointFront;
+    struct coordinate midPointFront; //the way that the arrow is pointing
     midPointFront.x = arena.osv.location.x + arena.osv.height / 2 * cos_theta;
     midPointFront.y = arena.osv.location.y + arena.osv.height / 2 * sin_theta;
-
+    //the letters are the corners of the aruco marker
     struct coordinate a;
     a.x = midPointFront.x - arena.osv.width / 2 * sin_theta;
     a.y = midPointFront.y + arena.osv.width / 2 * cos_theta;
@@ -207,7 +207,7 @@ int check_for_collisions(struct arena *arena) {
     struct coordinate coordinate_front;
     coordinate_front.x = arena->osv.location.x + arena->osv.width / 2 * cos_theta;
     coordinate_front.y = arena->osv.location.y + arena->osv.width / 2 * sin_theta;
-
+    //idk if we should put this in a seperate function, probably not
     struct coordinate a;
     a.x = coordinate_front.x - arena->osv.height / 2 * sin_theta;
     a.y = coordinate_front.y + arena->osv.height / 2 * cos_theta;

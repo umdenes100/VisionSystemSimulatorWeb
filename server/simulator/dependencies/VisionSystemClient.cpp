@@ -41,31 +41,36 @@ bool VisionSystemClient::mission(int ln, Coordinate &message) {
     // Do nothing.
 }
 
+//ln seems to contain the coordinate set for the mission set
 bool VisionSystemClient::begin(int ln, const char *teamName, int teamType, int markerId, int rxPin, int txPin) {
     // Do what we want.
-    this->init = true;
-    fputc('\x00', stdout);
+    this->init = true; //set vision system client private var init to be true.
+    fputc('\x00', stdout); //seems to be an opcode
     fputc((char)(ln), stdout);
-    fputc((char)(ln >> 8), stdout);
+    fputc((char)(ln >> 8), stdout); //each char is 8 bits, so we will meed to shift ln by 8 bits to properly read the next char.
     fputc((char)(ln >> 16), stdout);
     fputc((char)(ln >> 24), stdout);
-    fflush(stdout);
+    fflush(stdout); //flush the stdout to standard output
 
-    char x[4];
-    x[0] = fgetc(stdin); x[1] = fgetc(stdin); x[2] = fgetc(stdin); x[3] = fgetc(stdin);
+
+    //somehow get 12 chars in this.
+    char x[4]; //why is char array length 4?
+    x[0] = fgetc(stdin); x[1] = fgetc(stdin); x[2] = fgetc(stdin); x[3] = fgetc(stdin); //fgetc will get next character from stdandard input
     char y[4];
     y[0] = fgetc(stdin); y[1] = fgetc(stdin); y[2] = fgetc(stdin); y[3] = fgetc(stdin);
     char theta[4];
     theta[0] = fgetc(stdin); theta[1] = fgetc(stdin); theta[2] = fgetc(stdin); theta[3] = fgetc(stdin);
 
-    float x_f = *(float *)x;
+    float x_f = *(float *)x; //pointer shenanigens
     float y_f = *(float *)y;
     float theta_f = *(float *)theta;
 
+    //we extract the coordinates and put them into the missionSite "object"
     this->missionSite = Coordinate(x_f, y_f, theta_f);
     return true;
 }
 
+//same logic as the begin statement
 bool VisionSystemClient::updateLocation(int ln) {
     // Do what we want.
     if (this->init) {
@@ -106,7 +111,7 @@ void VisionSystemClient::print(int ln, const char *message) {
             fputc((char)(ln >> 24), stdout);
             fputc((char)(s_len + 1), stdout);
             fputs(message, stdout);
-            fputc('\x0', stdout);
+            fputc('\x0', stdout); //null termination?
             fflush(stdout);
 
             while (fgetc(stdin) != '\x08');

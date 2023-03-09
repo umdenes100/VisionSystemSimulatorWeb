@@ -22,10 +22,10 @@ public:
   bool ping();
   bool begin(int ln, const char *teamName, int teamType, int markerId, int rxPin, int txPin);
   bool updateLocation(int ln);
-  bool mission(int ln, int message);
-  bool mission(int ln, double message);
-  bool mission(int ln, const char *message);
-  bool mission(int ln, Coordinate &message);
+  bool mission(int ln, int type, int message);
+  bool mission(int ln, int type, double message);
+  bool mission(int ln, int type, const char *message);
+  bool mission(int ln, int type, Coordinate &message);
   void print(int ln, const char *message);
   void print(int ln, int message);
   void print(int ln, double message);

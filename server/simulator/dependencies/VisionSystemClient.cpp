@@ -25,19 +25,20 @@ bool VisionSystemClient::ping() {
     // Do nothing.
 }
 
-bool VisionSystemClient::mission(int ln, int message) {
+//need to add an extra parameter here!!!
+bool VisionSystemClient::mission(int ln, int type, int message) {
     // Do nothing.
 }
 
-bool VisionSystemClient::mission(int ln, double message) {
+bool VisionSystemClient::mission(int ln, int type, double message) {
     // Do nothing.
 }
 
-bool VisionSystemClient::mission(int ln, const char *message) {
+bool VisionSystemClient::mission(int ln, int type, const char *message) {
     // Do nothinng.
 }
 
-bool VisionSystemClient::mission(int ln, Coordinate &message) {
+bool VisionSystemClient::mission(int ln, int type, Coordinate &message) {
     // Do nothing.
 }
 

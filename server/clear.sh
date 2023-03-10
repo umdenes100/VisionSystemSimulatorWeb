@@ -1,4 +1,5 @@
 #!/bin/sh
-
+sudo docker-compose stop
 cd simulator/environments
-ls
+sudo rm -rf *
+sudo docker-compose up --build &>/dev/null & 

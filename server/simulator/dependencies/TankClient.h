@@ -14,6 +14,7 @@ public:
   void begin();
 
   float readDistanceSensor(int ln, int id);
+  float readBumper(int ln, int id);
   void turnOffMotors(int ln);
   void setRightMotorPWM(int ln, short pwm);
   void setLeftMotorPWM(int ln, short pwm);

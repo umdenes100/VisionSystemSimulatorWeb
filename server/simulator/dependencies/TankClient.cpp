@@ -101,3 +101,32 @@ float TankClient::readDistanceSensor(int ln, int id) {
         return -1.0;
     }
 }
+
+
+float TankClient::readBumper(int ln, int id) {
+    // Do what we want.
+    if (id > 11) {  // There are only 12 possible distance sensor placements
+                    // on the simulator.
+        return -1.0;  // Return an error value.
+    }
+
+    if (this->init) {
+        fputc('\x09', stdout); //opcode
+        fputc((char)(ln), stdout);                       //outputting something
+        fputc((char)(ln >> 8), stdout);
+        fputc((char)(ln >> 16), stdout);
+        fputc((char)(ln >> 24), stdout);
+        fputc((char)(id), stdout);
+        fflush(stdout);
+
+        char buff[4];
+        buff[0] = fgetc(stdin);       //looks like a way to get the distance
+        buff[1] = fgetc(stdin);
+        buff[2] = fgetc(stdin);
+        buff[3] = fgetc(stdin);
+
+        return *(float *)buff;
+    } else {  // The current object was never initialized.
+        return -1.0;
+    }
+}

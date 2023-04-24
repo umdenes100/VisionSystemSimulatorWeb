@@ -518,6 +518,10 @@ struct node * process_command(struct node *in, struct process p, struct arena *a
 
             write(p.output_fd, &ack_code, sizeof(unsigned char));
         }
+    } else if(opcode == 0x09){
+        print_command("readDistanceSensor", NULL, *(int *)(buffer + 1));
+        int collision = check_for_collisions(arena)
+        write(p.output_fd, &collision, sizeof(int));
     } else {
         // error("Invalid opcode\n");
     }

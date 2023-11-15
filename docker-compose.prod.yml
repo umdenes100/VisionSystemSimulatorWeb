@@ -13,7 +13,7 @@ services:
       - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
       #- "--certificatesresolvers.myresolver.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
       # Change this email address to a group email address 
-      - "--certificatesresolvers.myresolver.acme.email=hammondt@umd.edu"
+      - "--certificatesresolvers.myresolver.acme.email=briandk@umd.edu"
       - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
     ports:
       - "443:443"
